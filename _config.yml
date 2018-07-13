@@ -4,8 +4,8 @@
 
 url: http://hexiaoqiao.github.io
 title: Hexiaoqiao
-subtitle: Focus on BigData,Distributed System,JStorm,Hadoop 2.*
-author: void
+subtitle: Focus on BigData,Distributed System,Hadoop 2.*
+author: Hexiaoqiao
 simple_search: https://www.google.com/search
 description:
 
@@ -51,7 +51,7 @@ titlecase: true       # Converts page and post titles to titlecase
 
 # list each of the sidebar modules you want to include, in the order you want them to appear.
 # To add custom asides, create files in /source/_includes/custom/asides/ and add them to the list like 'custom/asides/custom_aside_name.html'
-default_asides: [asides/recent_posts.html, asides/github.html, asides/delicious.html, asides/pinboard.html, asides/googleplus.html]
+default_asides: [asides/recent_posts.html, asides/weibo.html, asides/qrcode.html, asides/github.html, asides/delicious.html, asides/pinboard.html, asides/googleplus.html]
 
 # Each layout uses the default asides, but they can have their own asides instead. Simply uncomment the lines below
 # and add an array with the asides you want to use.
@@ -62,6 +62,14 @@ default_asides: [asides/recent_posts.html, asides/github.html, asides/delicious.
 # ----------------------- #
 #   3rd Party Settings    #
 # ----------------------- #
+# Weibo
+weibo_uid: 1283533382
+weibo_verifier: 9bc28858
+weibo_fansline: 0
+weibo_show: true
+weibo_pic: true
+weibo_skin: 1
+
 
 # Github repositories
 github_user:
@@ -91,11 +99,11 @@ delicious_user:
 delicious_count: 3
 
 # Disqus Comments
-disqus_short_name:
-disqus_show_comment_count: false
+disqus_short_name: Hexiaoqiao
+disqus_show_comment_count: ture
 
 # Google Analytics
-google_analytics_tracking_id:
+google_analytics_tracking_id: UA-72478952-2
 
 # Facebook Like
 facebook_like: false
