@@ -173,7 +173,7 @@ public LocatedBlock addBlock(String src, String clientName, ExtendedBlock previo
 （1）NameNode重启完成后DataNode没有成功更新SecretKey造成客户端读写失败；  
 （2）NameNode滚动SecretKey后DataNode没有及时同步造成后续读写失败；  
 {% codeblock datanode.log lang:xml %}
-2017-05-17 23:41:58,952 ERROR org.apache.hadoop.hdfs.server.datanode.DataNode: rz-data-hdp-dn2925.rz.sankuai.com:50010:DataXceiver error processing WRITE_BLOCK operation  src: /ip:port
+2017-05-17 23:41:58,952 ERROR org.apache.hadoop.hdfs.server.datanode.DataNode: hostname:50010:DataXceiver error processing WRITE_BLOCK operation  src: /ip:port
 dst: /ip:port
 org.apache.hadoop.security.token.SecretManager$InvalidToken: Can't re-compute password for block_token_identifier (expiryDate=*, keyId=*, userId=*, blockPoolId=*, blockId=*, access modes=[WRITE]), since the required block key (keyID=*) doesn't exist.
        at org.apache.hadoop.hdfs.security.token.block.BlockTokenSecretManager.retrievePassword(BlockTokenSecretManager.java:384)
