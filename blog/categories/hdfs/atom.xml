@@ -1,198 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
 
-<!DOCTYPE html>
-<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
-<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
-<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <title>Hexiaoqiao</title>
-  <meta name="author" content="Hexiaoqiao">
-
-  
-  <meta name="description" content="数据平台 - Hadoop实习工程师 职位描述 1、搭建维护Hadoop、HBase、Spark等集群并进行必要的troubleshooting，保障系统正常运行；
-2、提高集群的使用效率及稳定性，并对整个系统做合理分离，满足各种应用场景的使用；
-3、构建集群监控体系、可视化体系、调度系统， &hellip;">
-  
-
-  <!-- http://t.co/dKP3o1e -->
-  <meta name="HandheldFriendly" content="True">
-  <meta name="MobileOptimized" content="320">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  
-  <link rel="canonical" href="http://hexiaoqiao.github.io/">
-  <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/atom.xml" rel="alternate" title="Hexiaoqiao" type="application/atom+xml">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-
-  
-  <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-72478952-2']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-  </script>
-
-
-</head>
-
-<body   >
-  <header role="banner"><hgroup>
-  <h1><a href="/">Hexiaoqiao</a></h1>
-  
-    <h2>Focus on BigData,Distributed System,Hadoop 2.*</h2>
-  
-</hgroup>
-
-</header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
-  
-</ul>
-  
-<form action="https://www.google.com/search" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="sitesearch" value="hexiaoqiao.github.io">
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
-  
-<ul class="main-navigation">
-  <li><a href="/">Blog</a></li>
-  <li><a href="/blog/archives">Archives</a></li>
-  <li><a href="/about">About</a></li>
-</ul>
-
-</nav>
-  <div id="main">
-    <div id="content">
-      <div class="blog-index">
-  
-  
-  
-    <article>
-      
-  <header>
+  <title><![CDATA[Category: Hdfs | Hexiaoqiao]]></title>
+  <link href="http://hexiaoqiao.github.io/blog/categories/hdfs/atom.xml" rel="self"/>
+  <link href="http://hexiaoqiao.github.io/"/>
+  <updated>2018-10-09T11:58:28+08:00</updated>
+  <id>http://hexiaoqiao.github.io/</id>
+  <author>
+    <name><![CDATA[Hexiaoqiao]]></name>
     
-      <h1 class="entry-title"><a href="/blog/2018/10/05/recruit/">大数据职位招聘</a></h1>
-    
-    
-      <p class="meta">
-        
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
 
-
-
-
-<time class='entry-date' datetime='2018-10-05T10:45:00+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>10:45 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>数据平台 - Hadoop实习工程师</h2>
-
-<h3>职位描述</h3>
-
-<p>1、搭建维护Hadoop、HBase、Spark等集群并进行必要的troubleshooting，保障系统正常运行；<br/>
-2、提高集群的使用效率及稳定性，并对整个系统做合理分离，满足各种应用场景的使用；<br/>
-3、构建集群监控体系、可视化体系、调度系统，保障集群安全和数据安全；<br/>
-4、负责搭建BI系统，数据仓库模型的ETL实施；<br/>
-5、数据使用开发平台;<br/>
-6、各个业务线的数据接入及数据一致性建设；<br/>
-7、不断解决规模增长带来的技术和业务问题，确保数据平台稳定性可靠性和线性扩展能力，驱动业务发展。</p>
-
-<h3>职位要求</h3>
-
-<p>1、对技术有着永无止境的追求，自认为是技术Geek，具备很强的问题解决能力；<br/>
-2、熟悉Hadoop生态系统开源项目，至少精读过其中某一个的源码，对大规模数据处理具有独到的理解，有Patch源代码经验者优先；<br/>
-3、有Hadoop经验优先。</p>
-
-<h2>金融安全部 - 数据PM岗</h2>
-
-<h3>职位描述</h3>
-
-<p>1、负责数据治理体系的规划，设计，和实现落地；<br/>
-2、负责数据合法合规、数据安全、内外部业务方面的需求管理和分析，识别需求本质，采用产品化思维解决问题；<br/>
-3、沟通和协调各部门资源，组织跨团队协作并推进产品实施，驱动项目进度，按期保质完成项目各阶段目标；<br/>
-4、其他数据相关工作等。</p>
-
-<h3>职位要求</h3>
-
-<p>1、有数据分析、产品经理或金融行业工作经验；<br/>
-2、数学、统计、金融、计算机或信息技术等相关专业本科及以上学历；<br/>
-3、具有一定的产品文档能力，能够产出标准的产品需求文档，熟练掌握Axure等原型设计工具；<br/>
-4、具备优秀的沟通、协调能力，和团队合作精神；思路清晰，善于提炼、分析并解决问题；<br/>
-5、具备极强的责任心、抗压能力、沟通理解能力及协同推动能力。</p>
-
-<h3>加分项</h3>
-
-<p>1、对数据驱动业务有一定理解，对数据与安全业务有一定敏感性，有较强的逻辑分析能力、独立思考能力和创新能力；<br/>
-2、具有互联网行业的数据产品经验者，或安全业务数据分析经验，或金融行业从业经验者优先；<br/>
-3、熟悉Oracle、Mysql等数据库，精通SQL；<br/>
-4、熟悉数据挖掘基本原理，数据挖掘方法论和基本算法；精通至少一种数据分析/挖掘工具，如SAS等。</p>
-
-<h2>金融安全部 - 数据流通岗</h2>
-
-<h3>职位描述</h3>
-
-<p>1、负责内外部数据项目管理工作，组织推进各部门各角色快速高效完成数据类项目；<br/>
-2、负责数据管理制度的拟定、发布及推动落地；<br/>
-3、其他数据相关工作等。</p>
-
-<h3>职位要求</h3>
-
-<p>1、至少1年以上项目管理或数据安全管理工作经验；<br/>
-2、处理过跨部门、多角色合作的复杂事务，思路清晰，善于提炼、分析并解决问题；<br/>
-3、具备极强的责任心、抗压能力、沟通理解能力及协同推动能力。</p>
-
-<h3>加分项</h3>
-
-<p>1、具备传统金融或互联网金融企业从业背景者优先；<br/>
-2、有安全技术背景或数据安全管理经验者优先。</p>
-
-<p>联系方式：xq.he2009#gmail.com(#替换@)</p>
-</div>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2018/07/13/a-brief-introduction-of-hdfs-blocktoken-mechanism/">HDFS BlockToken机制解析</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2018-07-13T10:45:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>10:45 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>一、背景</h2>
+  <entry>
+    <title type="html"><![CDATA[HDFS BlockToken机制解析]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2018/07/13/a-brief-introduction-of-hdfs-blocktoken-mechanism/"/>
+    <updated>2018-07-13T10:45:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2018/07/13/a-brief-introduction-of-hdfs-blocktoken-mechanism</id>
+    <content type="html"><![CDATA[<h2>一、背景</h2>
 
 <p>敏感信息和隐私数据的安全保障是互联网公司非常关心的问题，尤其进入大数据时代，稍有不慎就会出现重大安全事故，所以数据安全问题就变得越来越重要。</p>
 
@@ -208,7 +34,7 @@
 其中认证问题通过Kerberos能够很好地解决，并通过<a href="https://issues.apache.org/jira/browse/HADOOP-4487">HADOOP-4487</a>在Hadoop内部设计了一套Token机制完美实现了安全认证问题，同时在性能上得到保证，图1为Hadoop安全认证体系概要图示。关于Hadoop Security特性的细节参考<a href="https://issues.apache.org/jira/browse/HADOOP-4487">HADOOP-4487</a>，这里不再展开。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/blocktoken/security.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/blocktoken/security.png" align="center"><br />
 <label class=“pic_title” align="center">图1 Hadoop安全认证体系</label>
 </div>
 
@@ -246,8 +72,8 @@
 <p>开始详细梳理BlockToken原理之前，首先简单梳理下如图2所示的HDFS读写流程：</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/blocktoken/read.png" align="center">
-<img src="/images/blocktoken/write.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/blocktoken/read.png" align="center">
+<img src="http://hexiaoqiao.github.io/images/blocktoken/write.png" align="center"><br />
 <label class=“pic_title” align="center">图2 HDFS读写流程示意图</label>
 </div>
 
@@ -261,7 +87,7 @@
 
 <p>LocatedBlock是衔接整个读写流程的关键数据结构：</p>
 
-<figure class='code'><figcaption><span>LocatedBlock.java </span></figcaption>
+<p><figure class='code'><figcaption><span>LocatedBlock.java </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -281,24 +107,22 @@
 </span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">ExtendedBlock</span> <span class="n">b</span><span class="o">;</span>
 </span><span class='line'>  <span class="kd">private</span> <span class="kt">long</span> <span class="n">offset</span><span class="o">;</span>  <span class="c1">// offset of the first byte of the block in the file</span>
 </span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">DatanodeInfoWithStorage</span><span class="o">[]</span> <span class="n">locs</span><span class="o">;</span>
-</span><span class='line'>  <span class="cm">/** Cached storage ID for each replica */</span>
+</span><span class='line'>  <span class="o">/&lt;</span><span class="n">strong</span><span class="o">&gt;</span> <span class="n">Cached</span> <span class="n">storage</span> <span class="n">ID</span> <span class="k">for</span> <span class="n">each</span> <span class="n">replica</span> <span class="o">*/</span>
 </span><span class='line'>  <span class="kd">private</span> <span class="n">String</span><span class="o">[]</span> <span class="n">storageIDs</span><span class="o">;</span>
-</span><span class='line'>  <span class="cm">/** Cached storage type for each replica, if reported. */</span>
+</span><span class='line'>  <span class="o">/&lt;/</span><span class="n">strong</span><span class="o">&gt;</span> <span class="n">Cached</span> <span class="n">storage</span> <span class="n">type</span> <span class="k">for</span> <span class="n">each</span> <span class="n">replica</span><span class="o">,</span> <span class="k">if</span> <span class="n">reported</span><span class="o">.</span> <span class="o">*/</span>
 </span><span class='line'>  <span class="kd">private</span> <span class="n">StorageType</span><span class="o">[]</span> <span class="n">storageTypes</span><span class="o">;</span>
 </span><span class='line'>  <span class="c1">// corrupt flag is true if all of the replicas of a block are corrupt.</span>
-</span><span class='line'>  <span class="c1">// else false. If block has few corrupt replicas, they are filtered and </span>
+</span><span class='line'>  <span class="c1">// else false. If block has few corrupt replicas, they are filtered and</span>
 </span><span class='line'>  <span class="c1">// their locations are not part of this object</span>
 </span><span class='line'>  <span class="kd">private</span> <span class="kt">boolean</span> <span class="n">corrupt</span><span class="o">;</span>
 </span><span class='line'>  <span class="kd">private</span> <span class="n">Token</span><span class="o">&lt;</span><span class="n">BlockTokenIdentifier</span><span class="o">&gt;</span> <span class="n">blockToken</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Token</span><span class="o">&lt;</span><span class="n">BlockTokenIdentifier</span><span class="o">&gt;();</span>
-</span><span class='line'>  <span class="o">......</span>
+</span><span class='line'>  <span class="o">&amp;</span><span class="n">hellip</span><span class="o">;&amp;</span><span class="n">hellip</span><span class="o">;</span>
 </span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
+</span></code></pre></td></tr></table></div></figure></p>
 
 <h3>4.2 BlockToken数据结构</h3>
 
-<p>前一节提到的LocatedBlock除了标识数据块Block信息外，还包含了认证流程中的核心数据结构blockToken：</p>
-
+<p>前一节提到的LocatedBlock除了标识数据块Block信息外，还包含了认证流程中的核心数据结构blockToken：  <br/>
 <figure class='code'><figcaption><span>Token.java </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -314,15 +138,13 @@
 </span><span class='line'>  <span class="kd">private</span> <span class="n">Text</span> <span class="n">service</span><span class="o">;</span>
 </span><span class='line'>  <span class="kd">private</span> <span class="n">TokenRenewer</span> <span class="n">renewer</span><span class="o">;</span>
 </span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>blockToken的主要属性如下：<br/>
 （1）kind标识的是Token的类型，这里为常量“HDFS_BLOCK_TOKEN”；<br/>
 （2）service用来描述请求的服务，一般由服务端的”host:port”组成，对blockToken一般置空；<br/>
 （3）TokenRenewer在客户端生命周期内周期Renew，避免因为Token过期造成请求失败，对BlockToken未见Renew的显性实现，所以BlockToken只在有效期内生效；<br/>
-（4）identifier是BlockTokenIdentifier的序列化结果：</p>
-
+（4）identifier是BlockTokenIdentifier的序列化结果：<br/>
 <figure class='code'><figcaption><span>BlockTokenIdentifier.java </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -340,8 +162,7 @@
 </span><span class='line'>  <span class="kd">private</span> <span class="kt">long</span> <span class="n">blockId</span><span class="o">;</span>
 </span><span class='line'>  <span class="kd">private</span> <span class="kd">final</span> <span class="n">EnumSet</span><span class="o">&lt;</span><span class="n">AccessMode</span><span class="o">&gt;</span> <span class="n">modes</span><span class="o">;</span>
 </span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>包含了当前请求来源userId，数据块标识blockId，数据块所在的BlockPool（用于HDFS Federation架构），本次请求的权限标识modes（READ, WRITE, COPY, REPLACE），Token的过期时间及keyId；<br/>
 （5）password即是使用共享密钥SecretKey应用HMAC算法对identifier计算得到的密码。<br/>
@@ -353,13 +174,12 @@
 
 <p>1、客户端使用文件路径向NameNode发送读写请求，其中请求接口如下：</p>
 
-<figure class='code'><figcaption><span>interface </span></figcaption>
+<p><figure class='code'><figcaption><span>interface </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="n">LocatedBlocks</span> <span class="nf">getBlockLocations</span><span class="o">(</span><span class="n">String</span> <span class="n">clientName</span><span class="o">,</span> <span class="n">String</span> <span class="n">src</span><span class="o">,</span> <span class="kt">long</span> <span class="n">offset</span><span class="o">,</span> <span class="kt">long</span> <span class="n">length</span><span class="o">);</span>
 </span><span class='line'><span class="kd">public</span> <span class="n">LocatedBlock</span> <span class="nf">addBlock</span><span class="o">(</span><span class="n">String</span> <span class="n">src</span><span class="o">,</span> <span class="n">String</span> <span class="n">clientName</span><span class="o">,</span> <span class="n">ExtendedBlock</span> <span class="n">previous</span><span class="o">,</span> <span class="n">DatanodeInfo</span><span class="o">[]</span> <span class="n">excludedNodes</span><span class="o">,</span> <span class="kt">long</span> <span class="n">fileId</span><span class="o">,</span> <span class="n">String</span><span class="o">[]</span> <span class="n">favoredNodes</span><span class="o">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>2、NameNode经过权限检查后，搜索到文件对应的数据块信息，结合激活的keyId组织出完整的BlockTokenIdentifier，使用keyId对应密钥SecretKey加密BlockTokenIdentifier得到密码，BlockToken数据就绪，加上已经获取到的数据块信息即是LocatedBlock返回给客户端；</p>
 
@@ -380,7 +200,7 @@
 <p>事实上，HDFS更进一步同时维护三份共享密钥，NameNode一旦发现有SecretKey过期，马上生成新SecretKey补充进来并向前滚动当前激活SecretKey，DataNode心跳过来后及时下发更新后的SecretKey集合，如图3所示。维护三份密钥的代价是NameNode需要同时检查三份数据有效期，但是通常情况过期时间较大（默认是10h）且数据量极小，所以完全不会给NameNode或者DataNode带来负担。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/blocktoken/blocktoken.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/blocktoken/blocktoken.png" align="center"><br />
 <label class=“pic_title” align="center">图3 HDFS BlockToken流程图示</label>
 </div>
 
@@ -410,8 +230,7 @@
 
 <p>前面BlockToken流程分析可以看出，设计思路和实现方案都比较优雅，但是实践过程中还是可能会遇到一些问题：<br/>
 （1）NameNode重启完成后DataNode没有成功更新SecretKey造成客户端读写失败；<br/>
-（2）NameNode滚动SecretKey后DataNode没有及时同步造成后续读写失败；</p>
-
+（2）NameNode滚动SecretKey后DataNode没有及时同步造成后续读写失败；<br/>
 <figure class='code'><figcaption><span>datanode.log </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -427,7 +246,7 @@
 <span class='line-number'>12</span>
 </pre></td><td class='code'><pre><code class='xml'><span class='line'>2017-05-17 23:41:58,952 ERROR org.apache.hadoop.hdfs.server.datanode.DataNode: hostname:50010:DataXceiver error processing WRITE_BLOCK operation  src: /ip:port
 </span><span class='line'>dst: /ip:port
-</span><span class='line'>org.apache.hadoop.security.token.SecretManager$InvalidToken: Can&#39;t re-compute password for block_token_identifier (expiryDate=*, keyId=*, userId=*, blockPoolId=*, blockId=*, access modes=[WRITE]), since the required block key (keyID=*) doesn&#39;t exist.
+</span><span class='line'>org.apache.hadoop.security.token.SecretManager$InvalidToken: Can<span class="ni">&amp;rsquo;</span>t re-compute password for block_token_identifier (expiryDate=<span class="nt">&lt;em&gt;</span>, keyId=<span class="nt">&lt;/em&gt;</span>, userId=<span class="nt">&lt;em&gt;</span>, blockPoolId=<span class="nt">&lt;/em&gt;</span>, blockId=<span class="nt">&lt;em&gt;</span>, access modes=[WRITE]), since the required block key (keyID=<span class="nt">&lt;/em&gt;</span>) doesn<span class="ni">&amp;rsquo;</span>t exist.
 </span><span class='line'>       at org.apache.hadoop.hdfs.security.token.block.BlockTokenSecretManager.retrievePassword(BlockTokenSecretManager.java:384)
 </span><span class='line'>       at org.apache.hadoop.hdfs.security.token.block.BlockTokenSecretManager.checkAccess(BlockTokenSecretManager.java:302)
 </span><span class='line'>       at org.apache.hadoop.hdfs.security.token.block.BlockPoolTokenSecretManager.checkAccess(BlockPoolTokenSecretManager.java:97)
@@ -437,8 +256,7 @@
 </span><span class='line'>       at org.apache.hadoop.hdfs.protocol.datatransfer.Receiver.processOp(Receiver.java:74)
 </span><span class='line'>       at org.apache.hadoop.hdfs.server.datanode.DataXceiver.run(DataXceiver.java:251)
 </span><span class='line'>       at java.lang.Thread.run(Thread.java:745)
-</span></code></pre></td></tr></table></div></figure>
-
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>这两个问题的主要原因是社区实现中DataNode同步SecretKey采用的是从NameNode Push的方案，但是对是否Push成功没有感知，比如：</p>
 
@@ -466,35 +284,15 @@
 [5] <a href="https://issues.apache.org/jira/browse/HADOOP-4359">https://issues.apache.org/jira/browse/HADOOP-4359</a><br/>
 [6] <a href="https://issues.apache.org/jira/browse/HDFS-13473">https://issues.apache.org/jira/browse/HDFS-13473</a><br/>
 [7] <a href="http://hadoop.apache.org/releases.html">http://hadoop.apache.org/releases.html</a></p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2018/03/30/the-analysis-of-basic-principle-of-hdfs-ha-using-qjm/">HDFS HA Using QJM原理解析</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2018-03-30T10:45:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>30</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>10:45 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>一、前言</h2>
+  <entry>
+    <title type="html"><![CDATA[HDFS HA Using QJM原理解析]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2018/03/30/the-analysis-of-basic-principle-of-hdfs-ha-using-qjm/"/>
+    <updated>2018-03-30T10:45:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2018/03/30/the-analysis-of-basic-principle-of-hdfs-ha-using-qjm</id>
+    <content type="html"><![CDATA[<h2>一、前言</h2>
 
 <p>Hadoop 1.0时代，Hadoop核心组件HDFS NameNode和MapReduce JobTracker都存在单点问题（SPOF），其中以NameNode SPOF尤为严重。HDFS作为整个Hadoop生态的基础组件，一旦NameNode发生故障，包括HDFS在内及其上层依赖组件（YARN/MapReduce/Spark/Hive/Pig/HBase等）都将无法正常工作，另外NameNode恢复过程非常耗时，尤其对大型集群，NameNode重启时间非常可观，给HDFS的可用性带来了极大的挑战，同时在使用场景上也带来明显的限制。</p>
 
@@ -507,7 +305,7 @@
 <p>在Hadoop 1.0时代，HDFS的架构相对简单，组件单一，主要包含NameNode，Seconday NameNode，DataNode和DFSClient四个核心组件（见图1 Hadoop 1.0中HDFS架构），其中NameNode提供元数据管理服务，Secondary NameNode以冷备的状态为NameNode分担Checkpoint工作（定期合并FsImage和Editlog），为避免出现歧义后来也称Secondary NameNode为Checkpoint Node。在这种架构下NameNode是整个系统的单点，一旦出现故障对可用性是致命的。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/ha/hadoop1.0.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/ha/hadoop1.0.png" align="center"><br />
 <label class=“pic_title” align="center">图1 Hadoop 1.0中HDFS架构图</label>
 </div>
 
@@ -523,7 +321,7 @@
 <p>虽然存在问题，但是AvatarNode架构相比Hadoop 1.0已经有了本质的区别，也正是因为其在HA特性上的优秀表现，AvatarNode方案被国内外很多团队采纳和使用。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/ha/facebookavatar.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/ha/facebookavatar.png" align="center"><br />
 <label class=“pic_title” align="center">图2 Facebook提出的HDFS AvatarNode架构图</label>
 </div>
 
@@ -539,7 +337,7 @@
 <p>对比AvatarNode，HA using QJM方案不再存在SPOF问题，High Availability特性明显提升，同时具备了自动Failover能力。正是其良好的设计和容错能力，HDFS HA using QJM方案在2012年随Hadoop 2.0正式发布，此后一直是Hadoop社区默认HDFS HA方案。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/ha/hausingqjm.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/ha/hausingqjm.png" align="center"><br />
 <label class=“pic_title” align="center">图3 HDFS HA using QJM架构图</label>
 </div>
 
@@ -577,7 +375,7 @@
 <p>在JournalNode Cluster中所有JN之间完全对等，不存在Primary/Secondary区别。功能上看也极其简单，Hadoop-2.7.1分支中总共2478行代码实现了完整的JournalNode功能，详细模块见图4JournalNode功能模块。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/ha/journalnode.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/ha/journalnode.png" align="center"><br />
 <label class=“pic_title” align="center">图4 JournalNode功能模块</label>
 </div>
 
@@ -613,7 +411,7 @@
 <p>在ANN进程的整个生命周期里，按照不同阶段，与JournalNode交互的逻辑可以简单划分成三个部分，如图5所示Active NameNode与JournalNode之间交互的状态转换图。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/ha/changestate.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/ha/changestate.png" align="center"><br />
 <label class=“pic_title” align="center">图5 Active NameNode与JournalNode之间交互的状态转换图</label>
 </div>
 
@@ -655,7 +453,7 @@
 <p>所有的准备工作完成，NameNode正式进入Active状态，开启HDFS读写服务。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/ha/recovery.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/ha/recovery.png" align="center"><br />
 <label class=“pic_title” align="center">图6 QJournal Recovery过程图示</label>
 </div>
 
@@ -675,7 +473,7 @@
 <p>3、ANN处理客户端写请求的锁外，NameNode请求执行一次对FSEditLogOp的Sync操作，也就是说NameNode端写缓存是单线程操作，但是Sync可能是批量操作，但是从客户端角度来看写请求都会保证数据安全落到JouranlNode后才会返回，所以整体上看NameNode具备强一致性保证，当然整个文件系统强一致保证由多个部分共同支撑，这里不再展开。ANN端的Sync首先从DoubleBuffer里读出所有准备就绪的数据，通过RPC请求送达JournalNode，这类请求到达JournalNode端会第一时间持久化，保证数据可靠；</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/ha/write.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/ha/write.png" align="center"><br />
 <label class=“pic_title” align="center">图7 Active NameNode写数据到JournalNode示意图</label>
 </div>
 
@@ -707,7 +505,7 @@
 <p>当前实现中，SBN仅回放Finalized状态的Segment。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/ha/read.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/ha/read.png" align="center"><br />
 <label class=“pic_title” align="center">图8 Standby NameNode从JournalNode读数据示意图</label>
 </div>
 
@@ -771,42 +569,22 @@
 [10] <a href="https://issues.apache.org/jira/browse/HDFS-1623">https://issues.apache.org/jira/browse/HDFS-1623</a><br/>
 [11] <a href="https://issues.apache.org/jira/browse/HADOOP-4539">https://issues.apache.org/jira/browse/HADOOP-4539</a><br/>
 [12] <a href="https://issues.apache.org/jira/browse/HDFS-976">https://issues.apache.org/jira/browse/HDFS-976</a></p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2017/02/12/namenode-restart-optimization/">HDFS NameNode重启优化</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2017-02-12T10:45:00+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>10:45 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>一、背景</h2>
+  <entry>
+    <title type="html"><![CDATA[HDFS NameNode重启优化]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2017/02/12/namenode-restart-optimization/"/>
+    <updated>2017-02-12T10:45:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2017/02/12/namenode-restart-optimization</id>
+    <content type="html"><![CDATA[<h2>一、背景</h2>
 
 <p>在Hadoop集群整个生命周期里，由于调整参数、Patch、升级等多种场景需要频繁操作NameNode重启，不论采用何种架构，重启期间集群整体存在可用性和可靠性的风险，所以优化NameNode重启非常关键。</p>
 
 <p>本文基于<a href="https://github.com/apache/hadoop/tree/branch-2">Hadoop-2.x</a>和<a href="http://hadoop.apache.org/docs/r2.7.1/hadoop-project-dist/hadoop-hdfs/HDFSHighAvailabilityWithQJM.html">HA with QJM</a>社区架构和系统设计（如图1所示），通过梳理NameNode重启流程，并在此基础上，阐述对NameNode重启优化实践。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/restartnn/qjm.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/restartnn/qjm.png" align="center"><br />
 <label class=“pic_title” align="center">图1 HDFS HA with QJM架构图示</label>
 </div>
 
@@ -832,7 +610,7 @@
 <p>从线上NameNode历次重启时间数据看，各阶段耗时占比基本接近如图2所示。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/restartnn/namenodetime.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/restartnn/namenodetime.png" align="center"><br />
 <label class=“pic_title” align="center">图2 NameNode重启各阶段耗时占比</label>
 </div>
 
@@ -846,7 +624,7 @@
 <p>如前述，FSImage文件记录了HDFS整个目录树Namespace相关的元数据。从<a href="https://github.com/apache/hadoop/tree/branch-2.4.0">Hadoop-2.4.0</a>起，FSImage开始采用<a href="https://developers.google.com/protocol-buffers/">Google Protobuf</a>编码格式描述（<a href="https://issues.apache.org/jira/browse/HDFS-5698">HDFS-5698</a>），详细描述文件见<a href="https://github.com/apache/hadoop/blob/branch-2.4.0/hadoop-hdfs-project/hadoop-hdfs/src/main/proto/fsimage.proto">fsimage.proto</a>。根据描述文件和实现逻辑，FSImage文件格式如图3所示。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/restartnn/fsimage.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/restartnn/fsimage.png" align="center"><br />
 <label class=“pic_title” align="center">图3 FSImage文件格式</label>
 </div>
 
@@ -875,7 +653,7 @@
 <p>记录在EditLog之中的每个操作又称为一个事务，对应一个整数形式的事务编号。在当前实现中多个事务组成一个Segment，生成独立的EditLog文件，其中文件名称标记了起止的事务编号，正在写入的EditLog文件仅标记起始事务编号。EditLog文件的格式非常简单，没再通过Google Protobuf描述，文件格式如图4所示。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/restartnn/editlog.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/restartnn/editlog.png" align="center"><br />
 <label class=“pic_title” align="center">图4 EditLog文件格式</label>
 </div>
 
@@ -906,7 +684,7 @@
 （2）NameNode重启时所有DataNode集中在同一时间段进行BlockReport请求；</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/restartnn/rpcprocesstime.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/restartnn/rpcprocesstime.png" align="center"><br />
 <label class=“pic_title” align="center">图5 BlockReport和AddBlock两个RPC处理时间对比</label></div>
 
 
@@ -953,7 +731,7 @@ NameNode加载完元数据后，所有DataNode尝试开始进行数据块汇报�
 <p>不论选择HA热备方案SBN（StandbyNameNode）还是冷备方案SNN（SecondaryNameNode）架构，执行Checkpoint的逻辑几乎一致，如图6所示。如果SBN/SNN服务长时间未正常运行，Checkpoint不能按照预期执行，这样会积压大量EditLog。积压的EditLog文件越多，重启NameNode需要加载EditLog时间越长。所以尽可能避免出现SNN/SBN长时间未正常服务的状态。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/restartnn/checkpoint.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/restartnn/checkpoint.png" align="center"><br />
 <label class=“pic_title” align="center">图6 Checkpoint流程</label>
 </div>
 
@@ -982,7 +760,7 @@ NameNode加载完元数据后，所有DataNode尝试开始进行数据块汇报�
 <p>经过多次优化调整，从线上NameNode历次的重启时间监控指标上看，收益非常明显，图7截取了其中几次NameNode重启时元数据量及重启时间开销对比，图中直观显示在500M元数据量级下，重启时间从~4000s优化到~2000s。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/restartnn/time.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/restartnn/time.png" align="center"><br />
 <label class=“pic_title” align="center">图7 NameNode重启时间对比</label>
 </div>
 
@@ -1003,1129 +781,15 @@ NameNode加载完元数据后，所有DataNode尝试开始进行数据块汇报�
 [4] Hadoop Source. <a href="https://github.com/apache/hadoop">https://github.com/apache/hadoop</a><br/>
 [5] HDFS Issues. <a href="https://issues.apache.org/jira/browse/HDFS">https://issues.apache.org/jira/browse/HDFS</a><br/>
 [6] Cloudera Blog. <a href="http://blog.cloudera.com/">http://blog.cloudera.com/</a></p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2017/01/18/exact-count-optimization-of-apache-kylin/">Apache Kylin精确去重指标优化</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2017-01-18T10:45:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>10:45 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>前篇《<a href="http://hexiaoqiao.github.io/blog/2016/11/27/exact-count-and-global-dictionary-of-apache-kylin/">Apache Kylin精确计数与全局字典揭秘</a>》从精确计数使用场景到当前方案存在的问题及Apache Kylin在解决精确计数问题的思路进行了详细介绍。在此基础上，来自团队同学也是Apache Kylin社区Committer的<a href="https://github.com/kangkaisen">@Kangkaisen</a>更进一步，将Apache Kylin超高基数的精确去重指标查询提速数十倍。</p>
-
-<h2>一、问题背景</h2>
-
-<p>某业务方的Cube有12个维度，35个指标，其中13个是精确去重指标，并且有一半以上的精确去重指标单天基数在千万级别，Cube单天数据量1.5亿行左右。</p>
-
-<p>但是一个结果仅有21行的精确去重查询竟然需要12秒多：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>SELECT A, B, count(distinct uuid), 
-</span><span class='line'>FROM table
-</span><span class='line'>WHERE dt = 17150
-</span><span class='line'>GROUP BY A, B</span></code></pre></td></tr></table></div></figure>
-
-
-<p>
-跟踪整个查询执行过程发现，HBase端耗时~6s，Kylin的Query Server端耗时~5s。</p>
-
-<p>精确去重指标已经在美团点评生产环境大规模使用，精确去重的查询的确比普通Sum指标慢，但是差异并不明显。但是这个查询的性能表现已超出预期，决定分析一下，到底慢在哪。</p>
-
-<h2>二、优化过程</h2>
-
-<h3>2.1 将精确去重指标拆分HBase列族</h3>
-
-<p>首先确认了这个Cube的维度设计是合理的，这个查询也精准匹配了cuboid，并且在HBase端也只扫描了21行数据。</p>
-
-<p>那么问题是，为什么在HBase端只扫描21行数据需要~6s？一个显而易见的原因是Kylin的精确去重指标是用bitmap存储的明细数据，而这个Cube有13个精确去重指标，并且基数都很大。</p>
-
-<p>从两方面验证了这个猜想：<br/>
-（1）同样SQL的查询Sum指标只需要120毫秒，并且HBase端Scan仅需2毫秒；<br/>
-（2）用HBase HFile命令行工具查看并计算出HFile单个KeyValue的大小，发现普通的指标列族的每个KeyValue大小是29B，精确去重指标列族的每个KeyValue大小是37M；</p>
-
-<p>所以第一个优化就是将精确去重指标拆分到多个HBase列族，优化后效果十分明显。查询时间从12s减少到5.7s，HBase端耗时从6s减少到1.3s，不过Query Server耗时依旧有~4.5s。</p>
-
-<h3>2.2 移除不必要的toString避免bitmap deserialize</h3>
-
-<p>Kylin的Query Server耗时依旧有4.5s，猜测还是和bitmap比较大有关，但是为什么bitmap大会导致如此耗时呢？</p>
-
-<p>为了分析Query Server端查询处理的时间到底花在了哪，利用[Java Mission Control][1]进行了性能分析。</p>
-
-<p>JMC分析很简单，在Kylin的启动进程中增加以下参数：</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>-XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -XX:StartFlightRecording=delay=20s,duration=300s,name=kylin,filename=myrecording.jfr,settings=profile</span></code></pre></td></tr></table></div></figure>
-
-
-<p>获得myrecording.jfr文件后，在本机执行jmc，然后打开myrecording.jfr文件就可以进行性能分析。</p>
-
-<p>热点代码的分析如图：</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/kylin/expensiveOftoString.png" alt="" align="center"><br />
-<label class=“pic_title” align="center">图1 JMC分析结果图示</label>
-</div>
-
-
-<p></p>
-
-<p>从图中我们可以发现，耗时最多的代码是一个毫无意义的toString。</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Preconditions.checkState(comparator.compare(last, fetched) &lt;= 0, "Not sorted! last: " + last + " fetched: " + fetched);</span></code></pre></td></tr></table></div></figure>
-
-
-<p>其中last和fetched就是一个bitamp。
-去掉这个toString之后，Query Server的耗时减少超过1s。</p>
-
-<h3>2.3 获取bitmap的字节长度时避免deserialize</h3>
-
-<p>在去掉无意义的toString之后，热点代码已经变成了对bitmap的deserialize。</p>
-
-<p>不过bitmap的deserialize共有两处，一处是bitmap本身的deserialize，一处是在获取bitmap的字节长度。</p>
-
-<p>于是很自然的想法就是在获取bitmap的字节长度时避免deserialize bitmap，当时有两种思路：
-（1）在serialize bitmap时就写入bitmap的字节长度；<br/>
-（2）在MutableRoaringBitmap序列化的头信息中获取bitmap的字节长度。(Kylin的精确去重使用的bitmap是[RoaringBitmap][2])；</p>
-
-<p>思路1中一个显然问题是如何保证向前兼容，这里向前兼容的方法就是根据MutableRoaringBitmap deserialize时的cookie头信息来确认版本，并在新的serialize方式中写入了版本号，便于之后序列化方式的更新和向前兼容。</p>
-
-<p>经过这个优化后，Kylin Query Server端耗时再次减少超过1s。</p>
-
-<h3>2.4 无需上卷聚合的精确去重查询优化</h3>
-
-<p>从精确去重指标在美团点评大规模使用以来，我们发现部分用户的应用场景并没有跨Segment上卷聚合的需求，即只需要查询单天的去重值，或是每次全量构建的Cube，也无需跨Segment上卷聚合。</p>
-
-<p>所以我们希望对无需上卷聚合的精确去重查询进行优化，当时考虑了两种可行方案：</p>
-
-<p><strong>方案1：精确去重指标新增一种返回类型</strong></p>
-
-<p>一个极端的做法是对无需跨segment上卷聚合的精确去重查询，我们只存储最终的去重值。</p>
-
-<p>优点：<br/>
-（1）存储成本会极大降低；<br/>
-（2）查询速度会明显提高；</p>
-
-<p>缺点：<br/>
-（1）无法支持上卷聚合，与Kylin指标的设计原则不符合；<br/>
-（2）无法支持segment的merge，因为要进行merge必须要存储明细的bitmap；<br/>
-（3）新增一种返回类型，对不清楚的用户可能会有误导；<br/>
-（4）查询需要上卷聚合时直接报错，用户体验不好，尽管使用这种返回类型的前提是无需上聚合卷；</p>
-
-<p>实现难点：
-如果能够接受以上缺点，实现成本并不高，目前没有想到明显的难点。</p>
-
-<p><strong>方案2：serialize bitmap的同时写入distinct count值</strong></p>
-
-<p>优点：<br/>
-（1）对用户无影响；<br/>
-（2）符合现在Kylin指标和查询的设计；</p>
-
-<p>缺点：<br/>
-（1）存储依然需要存储明细的bitmap；<br/>
-（2）查询速度提升有限，因为即使不进行任何bitmap serialize，bitmap本身太大也会导致HBase scan，网络传输等过程变慢；</p>
-
-<p>实现难点：
-如何根据是否需要上卷聚合来确定是否需要serialize bitmap？开始的思路是从查询过程入手，确认在整个查询过程中，哪些地方需要进行上卷聚合。</p>
-
-<p>为此，仔细阅读了Kylin Query Server端的查询代码，HBase Coprocessor端的查询代码，看了Calcite的example例子。发现在HBase端和Kylin Query Server端，Cube build时都有可能需要指标的聚合。</p>
-
-<p>此时又意识到另外一个问题：即使清晰的知道了何时需要聚合，我又该如何把是否聚合的标记传递到精确去重的反序列方法中呢？</p>
-
-<p>现在精确去重的deserialize方法参数只有一个ByteBuffer，如果加参数，就要改变整个kylin指标deserialize的接口，这将会影响所有指标类型，并会造成大范围的改动。所以把这个思路放弃了。</p>
-
-<p>后来想到既然目标是优化无需上卷的精确去重指标，那为什么还要费劲去deserialize出整个bitmap呢，只要个distinct count值就可以。</p>
-
-<p>所以目标就集中在BitmapCounter本身的deserialize上，并联想到早前在Kylin前端加载速度提升十倍的核心思想：延迟加载，就改变了BitmapCounter的deserialize方法，默认只读出distinct count值，不进行bitmap的deserialize，并将那个buffer保留，等到的确需要上卷聚合的时候再根据buffer deserialize 出bitmap。</p>
-
-<p>当然，这个思路可行有一个前提，就是buffer内存拷贝的开销是远小于bitmap deserialize的开销，庆幸的是事实的确如此。</p>
-
-<p>最终经过这个优化，对于无需上卷聚合的精确去重查询，查询速度也有了较大提升。</p>
-
-<p>显然，这个优化加速查询的同时加大了需要上卷聚合的精确去重查询的内存开销。解决的办法：<br/>
-（1）对于超大数据集并且需要上卷的精确去重查询，用户在分析查询时返回的结果行数应该不会太多；<br/>
-（2）我们需要做好Query Server端的内存控制；</p>
-
-<h2>三、总结</h2>
-
-<p>通过总共4个优化，在向前兼容的前提下，后端仅通过100多行的代码改动，对Kylin超高基数的精确去重指标查询有了明显提升，测试中最明显的查询超过50倍的性能提升。</p>
-
-<h2>四、反思</h2>
-
-<p>（1）善于利用各类命令和工具，快速分析和定位问题；<br/>
-（2）重写toString，hashCode，equals等基础方法一定要轻量化，避免复杂操作；<br/>
-（3）设计序列化，通信协议，存储格式时，一定要有版本信息，便于之后的更新和兼容；</p>
-
-<h2>五、参考</h2>
-
-<p>[1] <a href="http://blog.takipi.com/oracle-java-mission-control-the-ultimate-guide/">http://blog.takipi.com/oracle-java-mission-control-the-ultimate-guide/</a> <br/>
-[2] <a href="https://github.com/RoaringBitmap/RoaringBitmap">https://github.com/RoaringBitmap/RoaringBitmap</a><br/>
-[3] <a href="https://issues.apache.org/jira/browse/KYLIN-2308">https://issues.apache.org/jira/browse/KYLIN-2308</a><br/>
-[4] <a href="https://issues.apache.org/jira/browse/KYLIN-2337">https://issues.apache.org/jira/browse/KYLIN-2337</a><br/>
-[5] <a href="https://issues.apache.org/jira/browse/KYLIN-2349">https://issues.apache.org/jira/browse/KYLIN-2349</a><br/>
-[6] <a href="https://issues.apache.org/jira/browse/KYLIN-2353">https://issues.apache.org/jira/browse/KYLIN-2353</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/11/27/exact-count-and-global-dictionary-of-apache-kylin/">Apache Kylin精确计数与全局字典揭秘</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-11-27T10:45:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:45 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Apache Kylin是基于Hadoop之上的SQL多维分析引擎，具有支持海量数据、秒级响应、高并发等特点。Kylin中使用的精确去重计数和全局字典技术在相关领域里非常具有借鉴意义。本文作者来自<a href="http://kylin.apache.org/">Apache Kylin</a>社区PMC成员<a href="https://github.com/sunyerui">@Sunyerui</a>，谢绝转载。</p>
-
-<h2>一、问题背景</h2>
-
-<p>在OLAP数据分析中，去重计数（count distinct）是非常常见的需求，且通常希望统计的结果是精确值，也就是说需要精确去重计数。</p>
-
-<p>但在超大的数据集规模上，实现精确去重计数是一件非常困难的事，一句话总结：超大规模数据集下精确去重与快速响应之间的矛盾：</p>
-
-<p>（1）超大规模数据集：意味着需要处理的数据量很多；<br/>
-（2）精确去重：意味着要保留所有数据细节，这样才能使结果可上卷；<br/>
-（3）快速响应：需要通过预计算或者内存计算等手段，加快速度；</p>
-
-<p>上述条件相互约束，很难处理。因此目前主流OLAP系统都是采用近似去重计数的方式。</p>
-
-<h2>二、现状分析</h2>
-
-<p>在Apache Kylin中，目前提供的也是近似去重计数，是基于HLL（<a href="https://en.wikipedia.org/wiki/HyperLogLog">HyperLogLog</a>）实现的。</p>
-
-<p>简单来说，每个需要被计数的值都会经过特定Hash函数的计算，将得到的哈希值放入到byte数组中，最后根据特定算法对byte数据的内容进行统计，就可以得到近似的去重结果。</p>
-
-<p>这种方式的好处是，不论数据有多少，byte数组的大小是有理论上限的，通常不会超过128KB，存储压力非常小。也就是说能够满足超大数据集和快速响应的要求。</p>
-
-<p>但最大的问题就是结果是非精确的，这是因为保存的都是经过hash计算的值，而一旦使用hash就一定会有冲突，这就是导致结果不精确的直接原因。此外在实践中发现，hash函数的计算是计算密集型的任务，需要大量的CPU资源。</p>
-
-<p>目前Apache Kylin提供的近似去重计数最高精度误差为1.44%，这在很多场景下是不能满足需求的，这促使我们考虑是否能在现有框架下实现精确去重计数的功能。</p>
-
-<h2>三、具体实现</h2>
-
-<h3>3.1 Int型数据精确去重计数</h3>
-
-<p>回顾文初提到三个问题，为了保证去重结果是精确，统计的结果必须要保留细节，而信息保存的最小单位是bit，也就是说在最理想情况下，每个用于统计的值都在结果中用一个bit来保存。这样的分析使我们很容易想到bitmap这种数据结构，它可以以bit为单位保存信息，且可以根据数据分布进行有效压缩，节省最后的存储量。但bitmap通常只能实现对int类型（包括byte和short类型）的处理，所以我们可以先尝试只针对Int型数据实现精确去重计数。</p>
-
-<p>目前业界有很多成熟的bitmap库可用，比如RoaringBitmap，ConciseSet等，其中RoaringBitmap的读写速度最快，存储效率也很高，目前已经在Spark，Drill等开源项目中使用，因此我们也选择了RoaringBitmap。经过试验，证明了我们的想法是可行的，通过实现一种新的基于bitmap的去重计算指标，确实能够实现对Int型数据的精确去重计数。在百万量级的数据量下，存储的结果可以控制在几兆，同时查询能够在秒级内完成，且可以支持任意粒度的上卷聚合计算。</p>
-
-<h3>3.2 Trie树与AppendTrie树</h3>
-
-<p>上述的结果能够满足Int类型数据的需求，但更多的数据是其它类型的，比如String类型的uuid。那么是否能够采用类似方式支持其它类型的精确去重计数呢？答案是肯定的。只要能将所有数据都统一映射到int类型的数据，那么就可以同样采用bitmap的方式解决问题。这样的映射关系有很多种实现方式，比如基于格式的编码，hash编码等，其中空间和性能效率都比较高，且通用性更强的是基于Trie树的字典编码方式。目前Apache Kylin之前已经实现了TrieDictionary，用于维度值的编码。</p>
-
-<p>Trie树又名前缀树，是是一种有序树，一个节点的所有子孙都有相同的前缀，也就是这个节点对应的字符串，根节点对应空字符串，而每个字符串对应的编码值由对应节点在树中的位置来决定。图1是一棵典型的Trie树示意图，注意并不是每个节点都有对应的字符串值。</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/kylin/trie.png" alt="" align="center"><br />
-<label class=“pic_title” align="center">图1 Trie树结构图示</label>
-</div>
-
-
-<p></p>
-
-<p>在构造Trie树时，将每个值依次加入到树中，可以分为三种情况，如图2所示。</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/kylin/trieaddnode.png" alt="" align="center"><br />
-<label class=“pic_title” align="center">图2 构建Trie树过程</label>
-</div>
-
-
-<p></p>
-
-<p>上述的是Trie树在构建过程中的内存模型，当所有数据加入之后，需要将整棵Trie树的数据序列化并持久化。具体的格式如图3所示。</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/kylin/trieserialize.png" alt="" align="center"><br />
-<label class=“pic_title” align="center">图3 Trie树序列化图示</label>
-</div>
-
-
-<p></p>
-
-<p>从图3中可以按照，整棵树按照广度优先的顺序依次序列化，其中childOffset和nValuesBeneath的长度是可变的，这是为了根据整棵树的大小尽可能使用更短的数据，降低存储量。此外需要注意到，childOffset的最高两位是标志位，分别标识当前节点是否是最后一个child，以及当前节点是否对应了原始数据的一个值。</p>
-
-<p>当需要从字典中检索某个值的映射id时，直接从序列化后的数据读取即可，不需要反序列化整棵Trie树，这样能在保证检索速度的同时保持较低的内存用量。整个过程如图4所示。</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/kylin/triesearch.png" alt="" align="center"><br />
-<label class=“pic_title” align="center">图4 Trie树检索过程</label>
-</div>
-
-
-<p></p>
-
-<p>通过上述对Trie树的分析可以看到，Trie树的效率很高，但有一个问题，Trie树的内容是不可变的。也就是说，当一颗Trie树构建完成后，不能再追加新的数据进去，也不能删除现有数据，这是因为每个原始数据对应的映射id是由对应节点在树中的位置决定的，一旦树的结构发生变化，那么会导致部分原始数据的映射id发生变化，从而导致错误的结果。为此，我们需要对Trie树进行改造，使之能够持续追加数据，也就是AppendTrie树。</p>
-
-<p>图5是AppendTrie的序列化格式，可以看到和传统Trie树相比，主要区别在于不保留每个节点的子value数，转而将节点对应的映射id保存到序列化数据中，这样虽然增大了存储空间，但使得整棵树是可以追加的。</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/kylin/appendtrie.png" alt="" align="center"><br />
-<label class=“pic_title” align="center">图5 AppendTrie序列化图示</label>
-</div>
-
-
-<p></p>
-
-<p>经过改造，AppendTrie树已经满足了我们的需求，能够支持我们实现对所有数据的统一编码，进而支持精确去重计数。但从实际情况来看，当统计的数据量超过千万时，整颗树的内存占用和序列化数据都会变得很大，因此需要考虑分片，将整颗树拆成多颗子树，通过控制每颗子树的大小，来实现整棵树的容量扩展。为了实现这个目标，当一棵树的大小超过设定阈值后，需要通过分裂算法将一棵树分裂成两棵子树，图6展示了整个过程。</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/kylin/appendtriesplit.png" alt="" align="center"><br />
-<label class=“pic_title” align="center">图6 AppendTrie分裂过程图示</label>
-</div>
-
-
-<p></p>
-
-<p>在一棵AppendTrie树是由多棵子树构成的基础上，我们很容易想到通过LRU之类的算法来控制所有子树的加载和淘汰行为。为此我们基于guava的LoadingCache实现了特定的数据结构CachedTreeMap。这种map继承于TreeMap，同时value通过LoadingCache管理，可以根据策略加载或换出，从而在保证功能的前提下降低了整体的内存占用。</p>
-
-<p>此外，为了支持字典数据的读写并发，数据持久化采用mvcc的理念，每次构建持久化的结果作为一个版本，版本一旦生成就不可再更改，后续更新必须复制版本数据后进行，并持久化为更新的版本。每次读取时则选择当前最新的版本读取，这样就避免了读写冲突。同时设置了基于版本个数和存活时间的版本淘汰机制，保证不会占用过多存储。</p>
-
-<p>经过上述的改进和优化后，AppendTrie树完全达到了我们的要求，可以对所有类型的数据统一做映射编码，支持的数据量可以到几十亿甚至更多，且保持内存占用量的可控，这就是我们的可追加通用字典AppendTrieDictionary。</p>
-
-<h3>3.3 全局字典与全类型精确去重计数</h3>
-
-<p>基于AppendTrieDictionary，我们可以将任意类型的数据放到一个字典里进行统一映射。在Apache Kylin的现有实现中，Cube的每个Segment都会创建独立的字典，这种方式会导致相同数据在不同Segment字典中被映射成不同的值，这会导致最终的去重结果出错。为此，我们需要在所有Segment中使用同一个字典实例，也就是全局字典GlobaDictionary。</p>
-
-<p>具体来说，根据字典的资源路径（元数据名+库名+表名+列名）可以从元数据中获取同一个字典实例，后续的数据追加也是基于这个唯一的字典实例创建的builder进行的。</p>
-
-<p>另外，经常出现一个cube中需要对多列计算精确去重，这些列的数据基于同一数据源，且所有列是其中某列数据的子集，比如uuid类型的数据，此时可以针对包含全集数据的列建一份全局字典，其它列复用这一个字典即可。</p>
-
-<p>图7展示了整个字典构建到应用的全过程。</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/kylin/appendtriesplit.png" alt="" align="center"><br />
-<label class=“pic_title” align="center">图7 字典树构建及检索流程</label>
-</div>
-
-
-<p></p>
-
-<h2>四、结论与展望</h2>
-
-<p>通过对Bitmap和Trie树的合理运用和针对性优化，以及cache置换策略的应用，我们在Apache Kylin中成功实现了亿级规模的精确去重计数功能，支持任意粒度的上卷聚合，且保证内存可控。这里并没有全新的技术，只是对现有相关技术的组合运用，但解决了业界顶尖的技术难题。这也启发我们除了需要关注新技术，更应该多思考如何挖掘现有技术的潜力。</p>
-
-<p>当然，目前的全局字典还存在一些问题和可改进的点，也欢迎更多讨论和贡献，其中包括：<br/>
-（1）目前在内存有限，且字典较大时，容易出现字典分片被频繁换入换成的抖动，导致整体效率不高；<br/>
-（2）全局字典只支持进程内的并发构建，但还不支持跨机器的并发构建；<br/>
-（3）实际场景中，很多列的数据有高度相似性或属于同一来源，有可能共享同一个全局字典；</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/10/01/carbondata-column-based-storage-format/">Apache CarbonData初探</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-10-01T10:45:00+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2016</span></span> <span class='time'>10:45 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="https://github.com/apache/incubator-carbondata">CarbonData</a>是由华为开源并支持<a href="http://hadoop.apache.org/">Hadoop</a>的列式存储文件格式，支持索引、压缩以及解编码等。其目的是为了实现同一份数据达到多种需求，而且能够实现更快的交互查询，目前该项目正处于Apache孵化阶段。本文在简单介绍CarbonData基础上，利用SSB基准测试工具对CarbonData与其他多种列式文件存储格式进行简单测试。部分内容来自<a href="http://weibo.com/207774111">@大月</a>同学。</p>
-
-<h2>一、简介</h2>
-
-<h3>1.1 背景</h3>
-
-<p>针对数据的需求分析主要有以下5点要求： <br/>
-（1）支持海量数据扫描提取其中某些列；<br/>
-（2）支持根据主键进行查找的低于秒级响应；<br/>
-（3）支持海量数据进行交互式查询的秒级响应； <br/>
-（4）支持快速地抽取单独记录，并且从该记录中获取到所有列信息； <br/>
-（5）支持HDFS，可以与Hadoop集群进行很好的无缝兼容。<br/>
-现有的Hadoop生态系统中没有同时满足这五点要求文件格式。比如Parquet/ORC的文件能够满足第一和第五条要求，其他的要求无法满足，基于这些事实华为开发了CarbonData。</p>
-
-<h3>1.2 优势</h3>
-
-<p>CarbonData文件格式是基于列式存储的，并存储在HDFS之上；其包含了现有列式存储文件格式的许多优点，比如：可分割、可压缩、支持复杂数据类型等。</p>
-
-<p>CarbonData为了解决前面提到的几点要求，加入了许多独特的特性，主要概括为以下四点：<br/>
-（1）数据及索引：在有过滤的查询中，它可以显著地加速查询性能，减少I/O和CPU资源；CarbonData的索引由多级索引组成，计算引擎可以利用这些索引信息来减少调度和一些处理的开销；扫描数据的时候可以仅仅扫描更细粒度的单元（称为blocklet），而不再是扫描整个文件；<br/>
-（2）可操作的编码数据：通过支持高效的压缩和全局编码模式，它可以直接在压缩或者编码的数据上查询，仅仅在需要返回结果的时候才进行转换，更好的查询下推；<br/>
-（3）列组：支持列组，并且使用行格式进行存储，减少查询时行重建的开销；<br/>
-（4）多种使用场景：顺序存取、随机访问、类OLAP交互式查询等。</p>
-
-<h3>1.3 文件格式</h3>
-
-<p>一个CarbonData文件是由一系列被称为blocklet组成的，除了blocklet，还有许多其他的元信息，比如模式、偏移量以及索引信息等，这些元信息是存储在CarbonData文件中的footer里。<br/>
-当在内存中建立索引的时候都需要读取footer里面的信息，因为可以利用这些信息优化后续所有的查询。</p>
-
-<p>每个blocklet又是由许多Data Chunks组成。Data Chunks里面的数据可以按列或者行的形式存储；数据既可以是单独的一列也可以是多列。文件中所有blocklets都包含相同数量和类型的Data Chunks。CarbonData文件格式如图1所示。</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/carbondata/carbonformat.png" alt="CarbonData文件格式" align="center"><br />
-<label class=“pic_title” align="center">图1 CarbonData文件格式</label>
-</div>
-
-
-<p></p>
-
-<p>每个Data Chunk又是由许多被称为Pages的单元组成。总共有三种类型的pages：<br/>
-（1）Data Page：包含一列或者列组的编码数据；<br/>
-（2）Row ID Page：包含行id的映射，在Data Page以反向索引的形式存储时会被使用；<br/>
-（3）RLE Page：包含一些额外的元信息，只有在Data Page使用RLE编码的时候会被使用。</p>
-
-<h2>二、SSB介绍</h2>
-
-<p>SSB全称Star Schema Benchmark，顾名思义，是一套用于测试数据库产品在星型模式下性能表现的基准测试规范，目前在学术界和工业界都得到了广泛的使用。提到数据仓库系统（更广义地说，决策支持系统）的基准测试规范，最权威的莫过于TPC-H和TPC-DS这两套规范，他们都由非营利组织TPC（事务处理性能理事会）发布。SSB实际上就是基于TPC-H修改而来的，将TPC-H的雪花模式简化为了星型模式，将基准查询由TPC-H的复杂Ad-Hoc查询改为了结构更固定的OLAP查询。</p>
-
-<p>SSB的设定为零售业订单的产品、供应商分析场景，Schema包含一张事实表「订单lineorder」和四张维表：「消费者customer」, 「供应商supplier」, 「零件part」, 「日期date」，构成了一个典型的星型模式。图1中，表名下方的"SF * 30,000"代表各表的数据行数。例如，当SF=1时，事实表lineorder包含6,000,000行数据，维表customer包含30,000行数据，Date表的行数固定，不随SF变化。</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/carbondata/ssb.png" alt="SSB Schema" align="center"><br />
-<label class=“pic_title” align="center">图2 SSB Schema</label>
-</div>
-
-
-<p>SSB的基准查询专注于星型模式下的一类典型查询：读取事实表一次，连接各个维表，对某些维度属性做过滤，最后对某些维度属性分组聚集。在此基础上，SSB重点关注以下方面：<br/>
-（1）提升「功能覆盖率」：基准查询集合应当尽可能地覆盖对星型模式的各种查询类型。SSB的基准查询分为四组，分别测试带2、3、4个维度属性过滤的情况，基本覆盖了多数场景；<br/>
-（2）提升「选择度覆盖率」：某个查询最终需要读取的事实表行数（即事实表的选择度）由各个维度过滤条件的FF（过滤因子）决定。基准查询应当覆盖不同的选择度。SSB的基准查询的选择度大到1.9%，小到百万分之1，覆盖了很宽的范围；<br/>
-（3）减小缓存的影响：如果相邻的两个基准查询扫描的事实数据有很大的重合，后者很有可能直接从缓存中读取数据，这会影响最终的测试结果。因此应当尽量避免基准查询读取重合的事实数据。</p>
-
-<p>SSB的完整规范见<a href="http://www.cs.umb.edu/~poneil/StarSchemaB.PDF%E3%80%82">http://www.cs.umb.edu/~poneil/StarSchemaB.PDF%E3%80%82</a></p>
-
-<p>简单说明：<br/>
-SF（Scale Factor） ：生成测试数据集时传入的数据量规模因子，决定了各表最终生成的行数。<br/>
-FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选出的行数占过滤前行数的比例叫做FF。在过滤列彼此独立的条件下，表的FF为该表上各个过滤条件FF的乘积。</p>
-
-<h2>三、安装使用</h2>
-
-<p>SSB的安装是指测试数据集生成工具dbgen的安装，步骤如下：<br/>
-（1）下载代码。官方提供的代码不支持在Mac上编译，这里我们使用Presto开发人员修改过的版本；</p>
-
-<figure class='code'><figcaption><span>ssb-dbgen </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'>$ git clone https://github.com/electrum/ssb-dbgen
-</span><span class='line'>$ cd ssb-dbgen
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>（2）如果在Mac上编译，直接运行make即可。如果在Linux上编译，需要修改makefile，将“MACHINE =MAC”改为“MACHINE =LINUX”；<br/>
-（3）编译后的可执行程序为dbgen，它依赖一个数据分布文件dists.dss。dbgen默认将测试数据生成在当前目录，如果需要生成到其他目录，可以将dbgen和dists.dss拷贝到对应目录使用；<br/>
-（4）使用dbgen生成测试数据。</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/carbondata/ssbgen.png" align="center"><br />
-<label class=“pic_title” align="center">图3 dbgen生成测试数据</label>
-</div>
-
-
-<p></p>
-
-<h2>四、基准测试用例</h2>
-
-<p>SSB提供了一套标准对各个数据仓库/OLAP系统进行性能测试和比较，其最大的特点：使用星型模式、基准查询代表性强、可以生成任意量级的测试数据。SSB的基准查询集分为4组，共13个查询。每组的查询结构类似，但「选择度」不同。这里列出每个查询的SQL和FF以及需要的事实表行数。</p>
-
-<figure class='code'><figcaption><span>ssbquery-set </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-<span class='line-number'>84</span>
-<span class='line-number'>85</span>
-<span class='line-number'>86</span>
-<span class='line-number'>87</span>
-<span class='line-number'>88</span>
-<span class='line-number'>89</span>
-<span class='line-number'>90</span>
-<span class='line-number'>91</span>
-<span class='line-number'>92</span>
-<span class='line-number'>93</span>
-<span class='line-number'>94</span>
-<span class='line-number'>95</span>
-<span class='line-number'>96</span>
-<span class='line-number'>97</span>
-<span class='line-number'>98</span>
-<span class='line-number'>99</span>
-<span class='line-number'>100</span>
-<span class='line-number'>101</span>
-<span class='line-number'>102</span>
-<span class='line-number'>103</span>
-<span class='line-number'>104</span>
-<span class='line-number'>105</span>
-<span class='line-number'>106</span>
-<span class='line-number'>107</span>
-<span class='line-number'>108</span>
-<span class='line-number'>109</span>
-<span class='line-number'>110</span>
-<span class='line-number'>111</span>
-<span class='line-number'>112</span>
-<span class='line-number'>113</span>
-<span class='line-number'>114</span>
-<span class='line-number'>115</span>
-<span class='line-number'>116</span>
-<span class='line-number'>117</span>
-<span class='line-number'>118</span>
-<span class='line-number'>119</span>
-<span class='line-number'>120</span>
-<span class='line-number'>121</span>
-<span class='line-number'>122</span>
-<span class='line-number'>123</span>
-<span class='line-number'>124</span>
-<span class='line-number'>125</span>
-<span class='line-number'>126</span>
-<span class='line-number'>127</span>
-<span class='line-number'>128</span>
-<span class='line-number'>129</span>
-<span class='line-number'>130</span>
-<span class='line-number'>131</span>
-<span class='line-number'>132</span>
-<span class='line-number'>133</span>
-<span class='line-number'>134</span>
-<span class='line-number'>135</span>
-<span class='line-number'>136</span>
-<span class='line-number'>137</span>
-<span class='line-number'>138</span>
-<span class='line-number'>139</span>
-<span class='line-number'>140</span>
-<span class='line-number'>141</span>
-<span class='line-number'>142</span>
-<span class='line-number'>143</span>
-<span class='line-number'>144</span>
-<span class='line-number'>145</span>
-<span class='line-number'>146</span>
-<span class='line-number'>147</span>
-<span class='line-number'>148</span>
-<span class='line-number'>149</span>
-<span class='line-number'>150</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'>Q1.1
-</span><span class='line'>select sum(lo_extendedprice*lo_discount) as revenue
-</span><span class='line'>from lineorder, date
-</span><span class='line'>where lo_orderdate = d_datekey
-</span><span class='line'>and d_year = 1993
-</span><span class='line'>and lo_discount between 1 and 3
-</span><span class='line'>and lo_quantity <span class="nt">&lt; 25</span><span class="err">;</span>
-</span><span class='line'><span class="na">FF =</span> <span class="s">(1/7)*0.5*(3/11)</span> <span class="err">=</span> <span class="err">0.0194805</span>
-</span><span class='line'><span class="err">#</span> <span class="err">of</span> <span class="na">lineorder =</span> <span class="s">0.0194805*6,000,000</span> <span class="err">≈</span> <span class="err">116,883</span>
-</span><span class='line'>
-</span><span class='line'><span class="err">Q1.2</span>
-</span><span class='line'><span class="err">select</span> <span class="err">sum(lo_extendedprice*lo_discount)</span> <span class="err">as</span> <span class="err">revenue</span>
-</span><span class='line'><span class="err">from</span> <span class="err">lineorder,</span> <span class="err">date</span>
-</span><span class='line'><span class="err">where</span> <span class="na">lo_orderdate =</span> <span class="s">d_datekey</span>
-</span><span class='line'><span class="err">and</span> <span class="na">d_yearmonthnum =</span> <span class="s">199401</span>
-</span><span class='line'><span class="err">and</span> <span class="err">lo_discount</span> <span class="err">between</span> <span class="err">4</span> <span class="err">and</span> <span class="err">6</span>
-</span><span class='line'><span class="err">and</span> <span class="err">lo_quantity</span> <span class="err">between</span> <span class="err">26</span> <span class="err">and</span> <span class="err">35;</span>
-</span><span class='line'><span class="na">FF =</span> <span class="s">(1/84)*(3/11)*0.2</span> <span class="err">=</span> <span class="err">0.00064935</span>
-</span><span class='line'><span class="err">#</span> <span class="err">of</span> <span class="na">lineorder =</span> <span class="s">0.00064935*6,000,000</span> <span class="err">≈</span> <span class="err">3896</span>
-</span><span class='line'>
-</span><span class='line'><span class="err">Q1.3</span>
-</span><span class='line'><span class="err">select</span> <span class="err">sum(lo_extendedprice*lo_discount)</span> <span class="err">as</span> <span class="err">revenue</span>
-</span><span class='line'><span class="err">from</span> <span class="err">lineorder,</span> <span class="err">date</span>
-</span><span class='line'><span class="err">where</span> <span class="na">lo_orderdate =</span> <span class="s">d_datekey</span>
-</span><span class='line'><span class="err">and</span> <span class="na">d_weeknuminyear =</span> <span class="s">6</span>
-</span><span class='line'><span class="err">and</span> <span class="na">d_year =</span> <span class="s">1994</span>
-</span><span class='line'><span class="err">and</span> <span class="err">lo_discount</span> <span class="err">between</span> <span class="err">5</span> <span class="err">and</span> <span class="err">7</span>
-</span><span class='line'><span class="err">and</span> <span class="err">lo_quantity</span> <span class="err">between</span> <span class="err">26</span> <span class="err">and</span> <span class="err">35;</span>
-</span><span class='line'><span class="na">FF =</span> <span class="s">(1/364)*(3/11)*0.1</span> <span class="err">=</span> <span class="err">0.000075</span>
-</span><span class='line'><span class="err">#</span> <span class="err">of</span> <span class="na">lineorder =</span> <span class="s">0.000075*6,000,000</span> <span class="err">≈</span> <span class="err">450</span>
-</span><span class='line'>
-</span><span class='line'><span class="err">Q2.1</span>
-</span><span class='line'><span class="err">select</span> <span class="err">sum(lo_revenue),</span> <span class="err">d_year,</span> <span class="err">p_brand1</span>
-</span><span class='line'><span class="err">from</span> <span class="err">lineorder,</span> <span class="err">date,</span> <span class="err">part,</span> <span class="err">supplier</span>
-</span><span class='line'><span class="err">where</span> <span class="na">lo_orderdate =</span> <span class="s">d_datekey</span> <span class="err">and</span> <span class="na">lo_partkey =</span> <span class="s">p_partkey</span> <span class="err">and</span> <span class="na">lo_suppkey =</span> <span class="s">s_suppkey</span>
-</span><span class='line'><span class="err">and</span> <span class="na">p_category =</span> <span class="s">&#39;MFGR#12&#39;</span>
-</span><span class='line'><span class="err">and</span> <span class="na">s_region =</span> <span class="s">&#39;AMERICA&#39;</span>
-</span><span class='line'><span class="err">group</span> <span class="err">by</span> <span class="err">d_year,</span> <span class="err">p_brand1</span>
-</span><span class='line'><span class="err">order</span> <span class="err">by</span> <span class="err">d_year,</span> <span class="err">p_brand1;</span>
-</span><span class='line'><span class="na">pcategory =</span> <span class="s">&#39;MFGR#12&#39;</span><span class="err">,</span> <span class="na">FF =</span> <span class="s">1/25;</span> <span class="err">sregion,</span> <span class="na">FF=</span><span class="s">1/5.</span>
-</span><span class='line'><span class="na">FF =</span> <span class="s">(1/25)*(1/5)</span> <span class="err">=</span> <span class="err">1/125</span>
-</span><span class='line'><span class="err">#</span> <span class="err">of</span> <span class="na">lineorder =</span> <span class="s">(1/125)*6,000,000</span> <span class="err">≈</span> <span class="err">48,000</span>
-</span><span class='line'>
-</span><span class='line'><span class="err">Q2.2</span>
-</span><span class='line'><span class="err">select</span> <span class="err">sum(lo_revenue),</span> <span class="err">d_year,</span> <span class="err">p_brand1</span>
-</span><span class='line'><span class="err">from</span> <span class="err">lineorder,</span> <span class="err">date,</span> <span class="err">part,</span> <span class="err">supplier</span>
-</span><span class='line'><span class="err">where</span> <span class="na">lo_orderdate =</span> <span class="s">d_datekey</span> <span class="err">and</span> <span class="na">lo_partkey =</span> <span class="s">p_partkey</span> <span class="err">and</span> <span class="na">lo_suppkey =</span> <span class="s">s_suppkey</span>
-</span><span class='line'><span class="err">and</span> <span class="err">p_brand1</span> <span class="err">between</span> <span class="err">&#39;MFGR#2221&#39;</span> <span class="err">and</span> <span class="err">&#39;MFGR#2228&#39;</span>
-</span><span class='line'><span class="err">and</span> <span class="na">s_region =</span> <span class="s">&#39;ASIA&#39;</span>
-</span><span class='line'><span class="err">group</span> <span class="err">by</span> <span class="err">d_year,</span> <span class="err">p_brand1</span>
-</span><span class='line'><span class="err">order</span> <span class="err">by</span> <span class="err">d_year,</span> <span class="err">p_brand1;</span>
-</span><span class='line'><span class="na">FF =</span> <span class="s">(1/125)*(1/5)</span> <span class="err">=</span> <span class="err">1/625</span>
-</span><span class='line'><span class="err">#</span> <span class="err">of</span> <span class="na">lineorder =</span> <span class="s">(1/625)*6,000,000</span> <span class="err">≈</span> <span class="err">9600</span>
-</span><span class='line'>
-</span><span class='line'><span class="err">Q2.3</span>
-</span><span class='line'><span class="err">select</span> <span class="err">sum(lo_revenue),</span> <span class="err">d_year,</span> <span class="err">p_brand1</span>
-</span><span class='line'><span class="err">from</span> <span class="err">lineorder,</span> <span class="err">date,</span> <span class="err">part,</span> <span class="err">supplier</span>
-</span><span class='line'><span class="err">where</span> <span class="na">lo_orderdate =</span> <span class="s">d_datekey</span> <span class="err">and</span> <span class="na">lo_partkey =</span> <span class="s">p_partkey</span> <span class="err">and</span> <span class="na">lo_suppkey =</span> <span class="s">s_suppkey</span>
-</span><span class='line'><span class="err">and</span> <span class="na">p_brand1 =</span> <span class="s">&#39;MFGR#2221&#39;</span>
-</span><span class='line'><span class="err">and</span> <span class="na">s_region =</span> <span class="s">&#39;EUROPE&#39;</span>
-</span><span class='line'><span class="err">group</span> <span class="err">by</span> <span class="err">d_year,</span> <span class="err">p_brand1</span>
-</span><span class='line'><span class="err">order</span> <span class="err">by</span> <span class="err">d_year,</span> <span class="err">p_brand1;</span>
-</span><span class='line'><span class="na">FF =</span> <span class="s">(1/1000)*(1/5)</span> <span class="err">=</span> <span class="err">1/5000</span>
-</span><span class='line'><span class="err">#</span> <span class="err">of</span> <span class="na">lineorder =</span> <span class="s">(1/5000)*6,000,000</span> <span class="err">≈</span> <span class="err">1200</span>
-</span><span class='line'>
-</span><span class='line'><span class="err">Q3.1</span>
-</span><span class='line'><span class="err">select</span> <span class="err">c_nation,</span> <span class="err">s_nation,</span> <span class="err">d_year,</span> <span class="err">sum(lo_revenue)</span> <span class="err">as</span> <span class="err">revenue</span>
-</span><span class='line'><span class="err">from</span> <span class="err">lineorder,</span> <span class="err">customer,</span> <span class="err">supplier,</span> <span class="err">date</span>
-</span><span class='line'><span class="err">where</span> <span class="na">lo_custkey =</span> <span class="s">c_custkey</span> <span class="err">and</span> <span class="na">lo_suppkey =</span> <span class="s">s_suppkey</span> <span class="err">and</span> <span class="na">lo_orderdate =</span> <span class="s">d_datekey</span>
-</span><span class='line'><span class="err">and</span> <span class="na">c_region =</span> <span class="s">&#39;ASIA&#39;</span>
-</span><span class='line'><span class="err">and</span> <span class="na">s_region =</span> <span class="s">&#39;ASIA&#39;</span>
-</span><span class='line'><span class="err">and</span> <span class="err">d_year</span> <span class="nt">&gt;</span>= 1992 and d_year <span class="err">&lt;</span>= 1997
-</span><span class='line'>group by c_nation, s_nation, d_year
-</span><span class='line'>order by d_year asc, revenue desc;
-</span><span class='line'>FF = (1/5)*(1/5)*(6/7) = 6/175
-</span><span class='line'># of lineorder = (6/175)*6,000,000 ≈ 205,714
-</span><span class='line'>
-</span><span class='line'>Q3.2
-</span><span class='line'>select c_city, s_city, d_year, sum(lo_revenue) as revenue
-</span><span class='line'>from lineorder, customer, supplier, date
-</span><span class='line'>where lo_custkey = c_custkey and lo_suppkey = s_suppkey and lo_orderdate = d_datekey
-</span><span class='line'>and c_nation = &#39;UNITED STATES&#39;
-</span><span class='line'>and s_nation = &#39;UNITED STATES&#39;
-</span><span class='line'>and d_year &gt;= 1992 and d_year <span class="err">&lt;</span>= 1997
-</span><span class='line'>group by c_city, s_city, d_year
-</span><span class='line'>order by d_year asc, revenue desc;
-</span><span class='line'>FF = (1/25)*(1/25)*(6/7) = 6/4375
-</span><span class='line'># of lineorder = (6/4375)*6,000,000 ≈ 8,228
-</span><span class='line'>
-</span><span class='line'>Q3.3
-</span><span class='line'>select c_city, s_city, d_year, sum(lo_revenue) as revenue
-</span><span class='line'>from lineorder, customer, supplier, date
-</span><span class='line'>where lo_custkey = c_custkey and lo_suppkey = s_suppkey and lo_orderdate = d_datekey
-</span><span class='line'>and (c_city=&#39;UNITED KI1&#39; or c_city=&#39;UNITED KI5&#39;)
-</span><span class='line'>and (s_city=&#39;UNITED KI1&#39; or s_city=&#39;UNITED KI5&#39;)
-</span><span class='line'>and d_year &gt;= 1992 and d_year <span class="err">&lt;</span>= 1997
-</span><span class='line'>group by c_city, s_city, d_year
-</span><span class='line'>order by d_year asc, revenue desc;
-</span><span class='line'>FF = (1/125)*(1/125)*(6/7) = 6/109375
-</span><span class='line'># of lineorder = (6/109375)*6,000,000 ≈ 329
-</span><span class='line'>
-</span><span class='line'>Q3.4 &quot;needle-in-haystack&quot;
-</span><span class='line'>select c_city, s_city, d_year, sum(lo_revenue) as revenue
-</span><span class='line'>from lineorder, customer, supplier, date
-</span><span class='line'>where lo_custkey = c_custkey and lo_suppkey = s_suppkey and lo_orderdate = d_datekey
-</span><span class='line'>and (c_city=&#39;UNITED KI1&#39; or c_city=&#39;UNITED KI5&#39;)
-</span><span class='line'>and (s_city=&#39;UNITED KI1&#39; or s_city=&#39;UNITED KI5&#39;)
-</span><span class='line'>and d_yearmonth = &#39;Dec1997&#39;
-</span><span class='line'>group by c_city, s_city, d_year
-</span><span class='line'>order by d_year asc, revenue desc;
-</span><span class='line'>FF = (1/125)*(1/125)*(1/84) = 1/1,312,500
-</span><span class='line'># of lineorder = (1/1,312,500)*6,000,000 ≈ 5
-</span><span class='line'>
-</span><span class='line'>Q4.1
-</span><span class='line'>select d_year, c_nation, sum(lo_revenue - lo_supplycost) as profit
-</span><span class='line'>from lineorder, date, customer, supplier, part
-</span><span class='line'>where lo_custkey = c_custkey and lo_suppkey = s_suppkey and lo_partkey = p_partkey and lo_orderdate = d_datekey
-</span><span class='line'>and c_region = &#39;AMERICA&#39;
-</span><span class='line'>and s_region = &#39;AMERICA&#39;
-</span><span class='line'>and (p_mfgr = &#39;MFGR#1&#39; or p_mfgr = &#39;MFGR#2&#39;)
-</span><span class='line'>group by d_year, c_nation
-</span><span class='line'>order by d_year, c_nation;
-</span><span class='line'>FF = (1/5)(1/5)*(2/5) = 2/125
-</span><span class='line'># of lineorder = (2/125)*6,000,000 ≈ 96000
-</span><span class='line'>
-</span><span class='line'>Q4.2 &quot;Drill Down to Category in 2 Specific Years&quot;
-</span><span class='line'>select d_year, s_nation, p_category, sum(lo_revenue - lo_supplycost) as profit
-</span><span class='line'>from lineorder, date, customer, supplier, part
-</span><span class='line'>where lo_custkey = c_custkey and lo_suppkey = s_suppkey and lo_partkey = p_partkey and lo_orderdate = d_datekey
-</span><span class='line'>and c_region = &#39;AMERICA&#39;
-</span><span class='line'>and s_region = &#39;AMERICA&#39;
-</span><span class='line'>and (d_year = 1997 or d_year = 1998)
-</span><span class='line'>and (p_mfgr = &#39;MFGR#1&#39; or p_mfgr = &#39;MFGR#2&#39;)
-</span><span class='line'>group by d_year, s_nation, p_category
-</span><span class='line'>order by d_year, s_nation, p_category;
-</span><span class='line'>FF = (2/7)*(2/125) = 4/875
-</span><span class='line'># of lineorder = (4/875)*6,000,000 ≈ 27,428
-</span><span class='line'>
-</span><span class='line'>Q4.3 &quot;Further Drill Down to cities in US&quot;
-</span><span class='line'>select d_year, s_city, p_brand1, sum(lo_revenue - lo_supplycost) as profit
-</span><span class='line'>from lineorder, date, customer, supplier, part
-</span><span class='line'>where lo_custkey = c_custkey and lo_suppkey = s_suppkey and lo_partkey = p_partkey and lo_orderdate = d_datekey
-</span><span class='line'>and c_region = &#39;AMERICA&#39;
-</span><span class='line'>and s_nation = &#39;UNITED STATES&#39;
-</span><span class='line'>and (d_year = 1997 or d_year = 1998)
-</span><span class='line'>and p_category = &#39;MFGR#14&#39;
-</span><span class='line'>group by d_year, s_city, p_brand1
-</span><span class='line'>order by d_year, s_city, p_brand1;
-</span><span class='line'>FF = (1/5)*(1/25)*(2/7)*(1/25) = 2/21875
-</span><span class='line'># of lineorder = (2/21875)*6,000,000 ≈ 549
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>五、测试过程</h2>
-
-<h3>5.1 测试范围</h3>
-
-<p>为了尽可能覆盖多种列式存储系统的性能表现，本次测试选择了ORC，Parquet和CarbonData。</p>
-
-<h3>5.2 测试数据规模</h3>
-
-<p>我们希望测到千万级、亿级和十亿级事实表的规模，因此分别选择了2、20、200的SF（Scale Factor），对应的各表行数如下：</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/carbondata/datascale.png" align="center"><br />
-<label class=“pic_title” align="center">图4 测试数据规模</label>
-</div>
-
-
-<p></p>
-
-<h3>5.3 测试数据准备</h3>
-
-<p>由于CarbonData的数据导入必须依赖csv文件，但是dbgen生成的是"|&ldquo;分割的文本数据，所以利用dbgen生成数据后需要先对测试数据进行一次预处理，将其转换成各系统均可识别的格式。最后，为避免测试过程中，数据缓存对测试结果的影响，为不同的存储系统和SF建立不同的测试表{table}_{format}_{scale}，如lineorder_orc_2。<br/>
-综上考虑，以SF=2为例，数据准备分为三步：<br/>
-（1）使用dbgen生成文本的测试数据；<br/>
-（2）预处理生成的测试数据将其转换成csv格式；<br/>
-（3）将csv格式的测试数据按照{table}_{format}_{scale}导入不同存储格式的表中；
-最终在测试库下会生成包括文本存储格式数据在内共60张测试表{table}_{format}_{scale}；
-测试数据在HDFS上副本因子统一为3；</p>
-
-<h4>附：建表语句</h4>
-
-<figure class='code'><figcaption><span>create ssb tables </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-<span class='line-number'>81</span>
-<span class='line-number'>82</span>
-<span class='line-number'>83</span>
-<span class='line-number'>84</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'>USE ssb;
-</span><span class='line'>
-</span><span class='line'>DROP TABLE IF EXISTS `LINEORDER`;
-</span><span class='line'>CREATE TABLE `LINEORDER` (
-</span><span class='line'>  LO_ORDERKEY       bigint,
-</span><span class='line'>  LO_LINENUMBER     int,
-</span><span class='line'>  LO_CUSTKEY        bigint,
-</span><span class='line'>  LO_PARTKEY        bigint,
-</span><span class='line'>  LO_SUPPKEY        bigint,
-</span><span class='line'>  LO_ORDERDATE      int,
-</span><span class='line'>  LO_ORDERPRIOTITY  string,
-</span><span class='line'>  LO_SHIPPRIOTITY   int,
-</span><span class='line'>  LO_QUANTITY       int,
-</span><span class='line'>  LO_EXTENDEDPRICE  int,
-</span><span class='line'>  LO_ORDTOTALPRICE  int,
-</span><span class='line'>  LO_DISCOUNT       int,
-</span><span class='line'>  LO_REVENUE        int,
-</span><span class='line'>  LO_SUPPLYCOST     int,
-</span><span class='line'>  LO_TAX            int,
-</span><span class='line'>  LO_COMMITDATE     int,
-</span><span class='line'>  LO_SHIPMODE       string
-</span><span class='line'>)
-</span><span class='line'>STORED BY &#39;carbondata&#39;;
-</span><span class='line'>
-</span><span class='line'>DROP TABLE IF EXISTS `CUSTOMER`;
-</span><span class='line'>CREATE TABLE `CUSTOMER` (
-</span><span class='line'>  C_CUSTKEY     bigint,
-</span><span class='line'>  C_NAME        string,
-</span><span class='line'>  C_ADDRESS     string,
-</span><span class='line'>  C_CITY        string,
-</span><span class='line'>  C_NATION      string,
-</span><span class='line'>  C_REGION      string,
-</span><span class='line'>  C_PHONE       string,
-</span><span class='line'>  C_MKTSEGMENT  string
-</span><span class='line'>)
-</span><span class='line'>STORED BY &#39;carbondata&#39;;
-</span><span class='line'>
-</span><span class='line'>DROP TABLE IF EXISTS `DATE`;
-</span><span class='line'>CREATE TABLE `DATE` (
-</span><span class='line'>  D_DATEKEY          int,
-</span><span class='line'>  D_DATE             string,
-</span><span class='line'>  D_DAYOFWEEK        string,
-</span><span class='line'>  D_MONTH            string,
-</span><span class='line'>  D_YEAR             int,
-</span><span class='line'>  D_YEARMONTHNUM     int,
-</span><span class='line'>  D_YEARMONTH        string,
-</span><span class='line'>  D_DAYNUMINWEEK     int,
-</span><span class='line'>  D_DAYNUMINMONTH    int,
-</span><span class='line'>  D_DAYNUMINYEAR     int,
-</span><span class='line'>  D_MONTHNUMINYEAR   int,
-</span><span class='line'>  D_WEEKNUMINYEAR    int,
-</span><span class='line'>  D_SELLINGSEASON    string,
-</span><span class='line'>  D_LASTDAYINWEEKFL  int,
-</span><span class='line'>  D_LASTDAYINMONTHFL int,
-</span><span class='line'>  D_HOLIDAYFL        int,
-</span><span class='line'>  D_WEEKDAYFL        int
-</span><span class='line'>)
-</span><span class='line'>STORED BY &#39;carbondata&#39;;
-</span><span class='line'>
-</span><span class='line'>DROP TABLE IF EXISTS `PART`;
-</span><span class='line'>CREATE TABLE `PART`  (
-</span><span class='line'>  P_PARTKEY     bigint,
-</span><span class='line'>  P_NAME        string,
-</span><span class='line'>  P_MFGR        string,
-</span><span class='line'>  P_CATEGORY    string,
-</span><span class='line'>  P_BRAND1      string,
-</span><span class='line'>  P_COLOR       string,
-</span><span class='line'>  P_TYPE        string,
-</span><span class='line'>  P_SIZE        int,
-</span><span class='line'>  P_CONTAINER   string
-</span><span class='line'>)
-</span><span class='line'>STORED BY &#39;carbondata&#39;;
-</span><span class='line'>
-</span><span class='line'>DROP TABLE IF EXISTS `SUPPLIER`;
-</span><span class='line'>CREATE TABLE `SUPPLIER` (
-</span><span class='line'>  S_SUPPKEY     bigint,
-</span><span class='line'>  S_NAME        string,
-</span><span class='line'>  S_ADDRESS     string,
-</span><span class='line'>  S_CITY        string,
-</span><span class='line'>  S_NATION      string,
-</span><span class='line'>  S_REGION      string,
-</span><span class='line'>  S_PHONE       string
-</span><span class='line'>)
-</span><span class='line'>STORED BY &#39;carbondata&#39;;
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>5.4 测试方法</h3>
-
-<p>使用13个基准查询对各系统进行测试，测试期间尽量避免队列资源存在竞争情况。每个基准查询跑三遍，结果取均值。<br/>
-为减少不同计算引擎之间的差异，本次测试基于Spark 1.5.2进行，详细配置如下：</p>
-
-<figure class='code'><figcaption><span>spark-1.5.2 </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'>$SPARK_HOME/bin/spark-submit --master yarn-client --queue root.hadoop-hdp.test --executor-cores 4 --executor-memory 8G --num-executors 8 --name &quot;SSB Colume Test&quot;
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>对于CarbonData选择相同的资源选项。</p>
-
-<figure class='code'><figcaption><span>carbondata-0.1.0 </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'>$CARBON_HOME/bin/carbon-spark-sql --master yarn-client --queue root.hadoop-hdp.test --executor-cores 4 --executor-memory 8G --num-executors 8 --conf spark.carbon.storepath=hdfs:///user/hive/warehouse/ssb_compress.db --name &quot;SSB Column Test&quot;
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>附Hadoop集群环境：<br/>
-（1）JDK：1.7.0_76 HotSpot&trade; 64-Bit Server<br/>
-（2）Hadoop：2.7.1<br/>
-（3）Spark：1.5.2<br/>
-（4）HDFS Replica Ratio：3</p>
-
-<h3>5.5 测试结果</h3>
-
-<h4>1、数据导入时间对比</h4>
-
-<p>数据导入时间可参考：<a href="https://cwiki.apache.org/confluence/pages/viewpage.action?pageId=65869949">Apache CarbonData Performance Benchmark</a>，数据导入效率表现基本一致，orc与parquet无明显差别，这里不再详述。</p>
-
-<h4>2、存储资源占用对比</h4>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/carbondata/compressdata.png" align="center"><br />
-<label class=“pic_title” align="center">图5 数据存储空间占用对比结果</label>
-</div>
-
-
-
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/carbondata/compressratio.png" align="center"><br />
-<label class=“pic_title” align="center">图6 数据压缩率对比图示</label>
-</div>
-
-
-<p></p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/carbondata/compress.png" align="center"><br />
-<label class=“pic_title” align="center">图7 数据压缩率对比图示</label>
-</div>
-
-
-<p></p>
-
-<p>从数据压缩率的测试结果可以看出：<br/>
-（1）orc和parquet的数据压缩率与数据本身的关系并不大，基本可以控制在0.3以内，但是CarbonData对数据的压缩能力并不好，对于SSB的测试数据集，压缩率主要集中在0.4上下；<br/>
-（2）需要关注的的是CarbonData中部分数据甚至超过的原始文本数据大小；</p>
-
-<h4>3、查询效率对比</h4>
-
-<p><em>注：下面关于查询效率的测试数据中包含了作业提交时间、JVM启动时间等，数据本身存在少许误差。</em></p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/carbondata/ssb2.png" align="center"><br />
-<label class=“pic_title” align="center">图8 数据规模SF2下的查询结果对比</label>
-</div>
-
-
-<p></p>
-
-<p>从SF=2数据规模下查询效率对比数据来看：<br/>
-（1）多种存储系统的查询性能差别并不大；<br/>
-（2） 整体来看，CarbonData稍微优于其他存储系统；<br/>
-如果考虑到作业提交时间及JVM启动时间的误差，在SF2数据规模下的结果基本没有明显差异；</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/carbondata/ssb20.png" align="center"><br />
-<label class=“pic_title” align="center">图9 数据规模SF20下的查询结果对比</label>
-</div>
-
-
-<p></p>
-
-<p><em>注：在SF=20数据规模下的测试结果看，结论与SF=2保持一致；</em></p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/carbondata/ssb200.png" align="center"><br />
-<label class=“pic_title” align="center">图10 数据规模SF200下的查询结果对比</label>
-</div>
-
-
-<p></p>
-
-<p>在SF=200的数据规模查询效率对比数据来看：<br/>
-（1）所有查询模式中，carbon明显优于其他存储系统；<br/>
-（2）从整体上看，ORC/Parquet没有明显区别，基本可认为性能表现相似；<br/>
-如果考虑到作业提交时间及JVM启动时间的误差，作业执行时间的差异表现差异非常明显，CarbonData具有非常好的优势；</p>
-
-<h2>六、结论</h2>
-
-<p>1、从查询性能上看，CarbonData具备非常好的优势，主要原因：<br/>
-（1）MDK，Min-Max and Inverted Index等辅助信息可对结果数据进行更快速的查询，也能高效重建结果数据；<br/>
-（2）列组（Column group）技术消除了行数据重建时隐式Join操作；<br/>
-（3）使用全局字典编码加快计算速度，处理/查询引擎直接在编码数据上进行处理而不需要转换；<br/>
-（4）延迟解码使得聚合操作更快，只有需要返回结果给用户时才进行解码转换。</p>
-
-<p>2、由于CarbonData在加载数据时需要建立索引和全局字典编码，所以在数据加载和压缩率上比ORC和Parquet都要差，尤其在对一些特殊结构的数据表现较差，更适合一次写多次读且对存储资源使用不敏感的场景。<br/>
-3、截止2016.10.01最新发布版本carbondata-0.1.0，在功能完备性、系统稳定性等方面还有提升空间，社区也在持续改进完善。<br/>
-4、从整体上看，CarbonData优异的查询性能表现及社区的持续改进优化，未来非常值得期待。</p>
-
-<h2>七、参考</h2>
-
-<p>[1] <a href="https://github.com/apache/incubator-carbondata">https://github.com/apache/incubator-carbondata</a><br/>
-[2] <a href="https://cwiki.apache.org/confluence/display/CARBONDATA/CarbonData+Home">https://cwiki.apache.org/confluence/display/CARBONDATA/CarbonData+Home</a><br/>
-[3] <a href="https://www.iteblog.com/archives/1806">https://www.iteblog.com/archives/1806</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/09/13/namenode-repicationmonitor-exception-trace/">NameNode RepicationMonitor异常追查</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-09-13T10:45:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:45 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>集群版本从2.4.1升级到2.7.1之后，出现了一个诡异的问题，虽然没有影响到线上正常读写服务，但是潜在的问题还是比较严重，经过追查彻底解决，这里简单整理追查过程。</p>
+  <entry>
+    <title type="html"><![CDATA[NameNode RepicationMonitor异常追查]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2016/09/13/namenode-repicationmonitor-exception-trace/"/>
+    <updated>2016-09-13T10:45:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2016/09/13/namenode-repicationmonitor-exception-trace</id>
+    <content type="html"><![CDATA[<p>集群版本从2.4.1升级到2.7.1之后，出现了一个诡异的问题，虽然没有影响到线上正常读写服务，但是潜在的问题还是比较严重，经过追查彻底解决，这里简单整理追查过程。</p>
 
 <h2>一、问题描述</h2>
 
@@ -2134,7 +798,7 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 <p>1、两个关键数据结构持续堆积，监控显示UnderReplicatedBlocks和PendingDeletionBlocks表现明显。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/monitor/underreplicatedblocks.png" alt="NameNode UnderReplicatedBlocks数据结构变化趋势" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/monitor/underreplicatedblocks.png" alt="NameNode UnderReplicatedBlocks数据结构变化趋势" align="center"><br />
 <label class=“pic_title” align="center">图1 NameNode UnderReplicatedBlocks数据结构变化趋势</label>
 </div>
 
@@ -2142,7 +806,7 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 <p></p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/monitor/pendingblocks.png" alt="NameNode PendingBlocks数据结构变化趋势" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/monitor/pendingblocks.png" alt="NameNode PendingBlocks数据结构变化趋势" align="center"><br />
 <label class=“pic_title” align="center">图2 NameNode PendingBlocks数据结构变化趋势</label>
 </div>
 
@@ -2151,8 +815,7 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 
 <p><em>说明：没有找到异常同一时间段的监控图，可将上图时间点简单匹配，基本不影响后续的分析。</em></p>
 
-<p>2、从NameNode的jstack获得信息ReplicationMonitor线程在长期执行chooseRandom函数；</p>
-
+<p>2、从NameNode的jstack获得信息ReplicationMonitor线程在长期执行chooseRandom函数；<br/>
 <figure class='code'><figcaption><span>namenode.jstack </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -2175,7 +838,7 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 <span class='line-number'>19</span>
 <span class='line-number'>20</span>
 <span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'>&quot;org.apache.hadoop.hdfs.server.blockmanagement.BlockManager$ReplicationMonitor@254e0df1&quot; daemon prio=10 tid=0x00007f59b4364800 nid=0xa7d9 runnable [0x00007f2baf40b000]
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="ni">&amp;ldquo;</span>org.apache.hadoop.hdfs.server.blockmanagement.BlockManager$ReplicationMonitor@254e0df1<span class="ni">&amp;rdquo;</span> daemon prio=10 tid=0x00007f59b4364800 nid=0xa7d9 runnable [0x00007f2baf40b000]
 </span><span class='line'>   java.lang.Thread.State: RUNNABLE
 </span><span class='line'>        at java.util.AbstractCollection.toArray(AbstractCollection.java:195)
 </span><span class='line'>        at java.lang.String.split(String.java:2311)
@@ -2196,8 +859,7 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 </span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockManager.computeDatanodeWork(BlockManager.java:3719)
 </span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockManager$ReplicationMonitor.run(BlockManager.java:3671)
 </span><span class='line'>        at java.lang.Thread.run(Thread.java:745)
-</span></code></pre></td></tr></table></div></figure>
-
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>由于线上环境的日志级别为INFO，而ReplicationMonitor中INFO级别之上的日志非常少，从中几乎不能获取到任何有用信息；</p>
 
@@ -2216,26 +878,25 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 <p>缺少日志，不能定位问题出现的场景，所以首先需要在关键路径上留下必要的信息，方便追查。由于ReplicationMonitor属于独立线程，合理的日志量输出不至于影响服务性能，经过多次调整基本确定需要收集的日志信息：</p>
 
 <p>1、根据NameNode多次jstack信息，怀疑chooseRandom时不停计算countNumOfAvailableNodes，可能存在死循环，尝试输出两类信息：<br/>
-（1）ReplicationMonitor当前处理的整体参数及正在处理的Block；</p>
-
-<figure class='code'><figcaption><span>BlockManager.java</span><a href='https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L3662'>github </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+（1）ReplicationMonitor当前处理的整体参数及正在处理的Block；
+<figure class='code'><figcaption><span>BlockManager.java <a href="https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L3662">https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L3662</a> github </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;numlive = &quot;</span> <span class="o">+</span> <span class="n">numlive</span><span class="o">);</span>
-</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;blockToProcess = &quot;</span> <span class="o">+</span> <span class="n">blocksToProcess</span><span class="o">);</span>
-</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;nodeToProcess = &quot;</span> <span class="o">+</span> <span class="n">nodesToProcess</span><span class="o">);</span>
-</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;blocksInvalidateWorkPct = &quot;</span> <span class="o">+</span> <span class="k">this</span><span class="o">.</span><span class="na">blocksInvalidateWorkPct</span><span class="o">);</span>
-</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;workFound = &quot;</span> <span class="o">+</span> <span class="n">workFound</span><span class="o">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">numlive</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">numlive</span><span class="o">);</span>
+</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">blockToProcess</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">blocksToProcess</span><span class="o">);</span>
+</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">nodeToProcess</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">nodesToProcess</span><span class="o">);</span>
+</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">blocksInvalidateWorkPct</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="k">this</span><span class="o">.</span><span class="na">blocksInvalidateWorkPct</span><span class="o">);</span>
+</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">workFound</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">workFound</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>（2）chooseRandom逻辑中循环体内（调用了countNumOfAvailableNodes）运行超过1min输出该函数入口的所有参数；问题复现后，日志并没有输出，说明异常并不在chooseRandom逻辑本身；</p>
 
-<p>2、结合NameNode的jstack信息并跟进实现逻辑时发现NetworkTopology.InnerNode#getLoc(String loc)的实现存在性能问题：</p>
-
-<figure class='code'><figcaption><span>NetworkTopology.java</span><a href='https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/net/NetworkTopology.java#L274'>github </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p>2、结合NameNode的jstack信息并跟进实现逻辑时发现NetworkTopology.InnerNode#getLoc(String loc)的实现存在性能问题：<br/>
+<figure class='code'><figcaption><span>NetworkTopology.java <a href="https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/net/NetworkTopology.java#L274">https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/net/NetworkTopology.java#L274</a> github </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -2257,16 +918,16 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 <span class='line-number'>20</span>
 <span class='line-number'>21</span>
 <span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="cm">/** Given a node&#39;s string representation, return a reference to the node</span>
-</span><span class='line'><span class="cm"> * @param loc string location of the form /rack/node</span>
-</span><span class='line'><span class="cm"> * @return null if the node is not found or the childnode is there but</span>
-</span><span class='line'><span class="cm"> * not an instance of {@link InnerNode}</span>
-</span><span class='line'><span class="cm"> */</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">/&lt;</span><span class="n">em</span><span class="o">&gt;*</span> <span class="n">Given</span> <span class="n">a</span> <span class="n">node</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span><span class="n">s</span> <span class="n">string</span> <span class="n">representation</span><span class="o">,</span> <span class="k">return</span> <span class="n">a</span> <span class="n">reference</span> <span class="n">to</span> <span class="n">the</span> <span class="n">node</span>
+</span><span class='line'> <span class="o">*</span> <span class="nd">@param</span> <span class="n">loc</span> <span class="n">string</span> <span class="n">location</span> <span class="n">of</span> <span class="n">the</span> <span class="n">form</span> <span class="o">/</span><span class="n">rack</span><span class="o">/</span><span class="n">node</span>
+</span><span class='line'> <span class="o">*</span> <span class="nd">@return</span> <span class="kc">null</span> <span class="k">if</span> <span class="n">the</span> <span class="n">node</span> <span class="n">is</span> <span class="n">not</span> <span class="n">found</span> <span class="n">or</span> <span class="n">the</span> <span class="n">childnode</span> <span class="n">is</span> <span class="n">there</span> <span class="n">but</span>
+</span><span class='line'> <span class="o">*</span> <span class="n">not</span> <span class="n">an</span> <span class="n">instance</span> <span class="n">of</span> <span class="o">{</span><span class="nd">@link</span> <span class="n">InnerNode</span><span class="o">}</span>
+</span><span class='line'> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;/</span>
 </span><span class='line'><span class="kd">private</span> <span class="n">Node</span> <span class="nf">getLoc</span><span class="o">(</span><span class="n">String</span> <span class="n">loc</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">loc</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">loc</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">loc</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">loc</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="k">return</span> <span class="k">this</span><span class="o">;</span>         <span class="o">&lt;</span><span class="n">br</span><span class="o">/&gt;</span>
 </span><span class='line'>  <span class="n">String</span><span class="o">[]</span> <span class="n">path</span> <span class="o">=</span> <span class="n">loc</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="n">PATH_SEPARATOR_STR</span><span class="o">,</span> <span class="mi">2</span><span class="o">);</span>
 </span><span class='line'>  <span class="n">Node</span> <span class="n">childnode</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
-</span><span class='line'>  <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">children</span><span class="o">.</span><span class="na">size</span><span class="o">();</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span> <span class="n">i</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">children</span><span class="o">.</span><span class="na">size</span><span class="o">();</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
 </span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">children</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">).</span><span class="na">getName</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="n">path</span><span class="o">[</span><span class="mi">0</span><span class="o">]))</span> <span class="o">{</span>
 </span><span class='line'>      <span class="n">childnode</span> <span class="o">=</span> <span class="n">children</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
 </span><span class='line'>    <span class="o">}</span>
@@ -2279,14 +940,13 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 </span><span class='line'>    <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
 </span><span class='line'>  <span class="o">}</span>
 </span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>这段逻辑的用意是通过集群网络拓扑结构中节点的字符串标识（如：/IDC/Rack/hostname）获取该节点的对象。实现方法是从拓扑结构中根节点开始逐层向下搜索，直到找到对应的目标节点，逻辑本身没有问题，但是在line286处应该正常break，实现时出现遗漏，其结果是多出一些不必要的时间开销，对于小集群可能影响不大，但是对于IO比较密集的大集群其实影响还是比较大，线下模拟~5K节点的集群拓扑结构，对于NetworkTopology.InnerNode#getLoc(String loc)本身，break可以提升一半的时间开销。</p>
 
-<p>3、通过前面两个阶段仍然不能完全解决问题，只能继续追加日志，这里再次怀疑可能BlockManager.computeReplicationWorkForBlocks(List&lt;List<Block>> blocksToReplicate)在调用chooseRandom方法时耗时严重，所以在chooseRandom结束后增加了关键的几条日志：</p>
-
-<figure class='code'><figcaption><span>BlockManager.java</span><a href='https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L1322'>github </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p>3、通过前面两个阶段仍然不能完全解决问题，只能继续追加日志，这里再次怀疑可能BlockManager.computeReplicationWorkForBlocks(List&lt;List<Block>> blocksToReplicate)在调用chooseRandom方法时耗时严重，所以在chooseRandom结束后增加了关键的几条日志：<br/>
+<figure class='code'><figcaption><span>BlockManager.java <a href="https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L1322">https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L1322</a> github </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -2302,31 +962,27 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 <span class='line-number'>14</span>
 <span class='line-number'>15</span>
 <span class='line-number'>16</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;ReplicationMonitor: block = &quot;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">block</span><span class="o">);</span>
-</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;ReplicationMonitor: priority = &quot;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">priority</span><span class="o">);</span>
-</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;ReplicationMonitor: srcNode = &quot;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">srcNode</span><span class="o">);</span>
-</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;ReplicationMonitor: storagepolicyid = &quot;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">bc</span><span class="o">.</span><span class="na">getStoragePolicyID</span><span class="o">());</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="nl">ReplicationMonitor:</span> <span class="n">block</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">block</span><span class="o">);</span>
+</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="nl">ReplicationMonitor:</span> <span class="n">priority</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">priority</span><span class="o">);</span>
+</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="nl">ReplicationMonitor:</span> <span class="n">srcNode</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">srcNode</span><span class="o">);</span>
+</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="nl">ReplicationMonitor:</span> <span class="n">storagepolicyid</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">bc</span><span class="o">.</span><span class="na">getStoragePolicyID</span><span class="o">());</span>
 </span><span class='line'><span class="k">if</span> <span class="o">(</span><span class="n">rw</span><span class="o">.</span><span class="na">targets</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">rw</span><span class="o">.</span><span class="na">targets</span><span class="o">.</span><span class="na">length</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;ReplicationMonitor: targets is empty&quot;</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="nl">ReplicationMonitor:</span> <span class="n">targets</span> <span class="n">is</span> <span class="n">empty</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;);</span>
 </span><span class='line'><span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;ReplicationMonitor: targets.length = &quot;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">targets</span><span class="o">.</span><span class="na">length</span><span class="o">);</span>
-</span><span class='line'>  <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">rw</span><span class="o">.</span><span class="na">targets</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;ReplicationMonitor: target = &quot;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">targets</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">+</span> <span class="s">&quot;, StorageType = &quot;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">targets</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">getStorageType</span><span class="o">());</span>
+</span><span class='line'>  <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="nl">ReplicationMonitor:</span> <span class="n">targets</span><span class="o">.</span><span class="na">length</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">targets</span><span class="o">.</span><span class="na">length</span><span class="o">);</span>
+</span><span class='line'>  <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">rw</span><span class="o">.</span><span class="na">targets</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="nl">ReplicationMonitor:</span> <span class="n">target</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">targets</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">+</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="o">;,</span> <span class="n">StorageType</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">targets</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">getStorageType</span><span class="o">());</span>
 </span><span class='line'>  <span class="o">}</span>
 </span><span class='line'><span class="o">}</span>
 </span><span class='line'><span class="k">for</span> <span class="o">(</span><span class="n">Iterator</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;</span> <span class="n">iterator</span> <span class="o">=</span> <span class="n">excludedNodes</span><span class="o">.</span><span class="na">iterator</span><span class="o">();</span> <span class="n">iterator</span><span class="o">.</span><span class="na">hasNext</span><span class="o">();)</span> <span class="o">{</span>
 </span><span class='line'>  <span class="n">DatanodeDescriptor</span> <span class="n">node</span> <span class="o">=</span> <span class="o">(</span><span class="n">DatanodeDescriptor</span><span class="o">)</span> <span class="n">iterator</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
-</span><span class='line'>  <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;ReplicationMonitor: exclude = &quot;</span> <span class="o">+</span> <span class="n">node</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="nl">ReplicationMonitor:</span> <span class="n">exclude</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">node</span><span class="o">);</span>
 </span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>包括当前正在处理的Block，优先级（标识缺块的严重程度），源和目标节点集合；（遗漏了关键的信息：Block的Numbytes，后面后详细解释。）</p>
 
-<p>通过这一步基本上能够收集到异常现场信息，同时也可确定异常时ReplicationMonitor的运行情况，从后续的日志也能说明这一点：</p>
-
+<p>通过这一步基本上能够收集到异常现场信息，同时也可确定异常时ReplicationMonitor的运行情况，从后续的日志也能说明这一点：<br/>
 <figure class='code'><figcaption><span>namenode.log </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -2345,15 +1001,14 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 </span><span class='line'>2016-04-19 20:08:52,328 WARN org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicy: Failed to place enough replicas, still in need of 7 to reach 10 (unavailableStorages=[DISK, ARCHIVE], storagePolicy=BlockStoragePolicy{HOT:7, storageTypes=[DISK], creationFallbacks=[], replicationFallbacks=[ARCHIVE]}, newBlock=false) All required storage types are unavailable: unavailableStorages=[DISK, ARCHIVE], storagePolicy=BlockStoragePolicy{HOT:7, storageTypes=[DISK], creationFallbacks=[], replicationFallbacks=[ARCHIVE]}
 </span><span class='line'>2016-04-19 20:08:52,328 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: block = blk_8206926206_7139007477
 </span><span class='line'>2016-04-19 20:08:52,328 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: priority = 2
-</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: srcNode = 10.16.*.*:*
+</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: srcNode = 10.16.<span class="nt">&lt;em&gt;</span>.<span class="nt">&lt;/em&gt;</span>:<span class="nt">&lt;em&gt;</span>
 </span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: storagepolicyid = 0
 </span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: targets is empty
-</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: exclude = 10.16.*.*:*
-</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: exclude = 10.16.*.*:*
-</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: exclude = 10.16.*.*:*
-</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: exclude = 10.16.*.*:**
-</span></code></pre></td></tr></table></div></figure>
-
+</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: exclude = 10.16.<span class="nt">&lt;/em&gt;</span>.<span class="nt">&lt;em&gt;</span>:<span class="nt">&lt;/em&gt;</span>
+</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: exclude = 10.16.<span class="nt">&lt;em&gt;</span>.<span class="nt">&lt;/em&gt;</span>:<span class="nt">&lt;em&gt;</span>
+</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: exclude = 10.16.<span class="nt">&lt;/em&gt;</span>.<span class="nt">&lt;em&gt;</span>:<span class="nt">&lt;/em&gt;</span>
+</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: exclude = 10.16.<span class="nt">&lt;em&gt;</span>.<span class="nt">&lt;/em&gt;</span>:**
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>日志中容易看到当前发生异常时的场景：</p>
 
@@ -2384,9 +1039,9 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 
 <h3>2.4 调整参数</h3>
 
-<p>期间，我们从前面新增的日志里同时发现了一个有意思的现象，正常情况下workFound的值相对较高，但是一旦出现异常，开始严重下降。workFound标识的是ReplicationMonitor本轮可以调度出去的Block数，影响该值的三个关键参数如下：</p>
-
-<figure class='code'><figcaption><span>hdfs-site.xml</span><a href='http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml'>apache </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p>期间，我们从前面新增的日志里同时发现了一个有意思的现象，正常情况下workFound的值相对较高，但是一旦出现异常，开始严重下降。workFound标识的是ReplicationMonitor本轮可以调度出去的Block数，影响该值的三个关键参数如下：<br/>
+<figure class='code'><figcaption><span>hdfs-site.xml <a href="http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml">http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml</a> apache </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -2426,10 +1081,7 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 </span><span class='line'>        at one time.
 </span><span class='line'>  <span class="nt">&lt;/description&gt;</span>
 </span><span class='line'><span class="nt">&lt;/property&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>为控制单DN并发数默认值为&lt;2,2,4>，此外可调度的Block数与集群规模正相关，正常情况其实完全满足运行需求，但是由于存在Block不符预期，所以造成workFound量会下降。<br/>
 结合集群实际基础环境，尝试大幅提高并发度，设置为&lt;5,50,100>，提高ReplicationMonitor每一轮的处理效率。参数调整后，情况得到了明显改善。</p>
@@ -2440,9 +1092,9 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 
 <h2>三、ReplicationMonitor工作流程</h2>
 
-<p>ReplicationMonitor是NameNode内部线程，负责维护数据块的副本数稳定，包括清理无效块和对不符预期副本数的Block进行增删工作。ReplicationMonitor是周期运行线程，默认每3s执行一次，主要由两个关键函数组成：computeDatanodeWork和processPendingReplications（rescanPostponedMisreplicatedBlocks在NameNode启动/主从切换被调用，不包括在本次异常分析范围内）。</p>
-
-<figure class='code'><figcaption><span>BlockManager.java</span><a href='https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L3621'>github </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p>ReplicationMonitor是NameNode内部线程，负责维护数据块的副本数稳定，包括清理无效块和对不符预期副本数的Block进行增删工作。ReplicationMonitor是周期运行线程，默认每3s执行一次，主要由两个关键函数组成：computeDatanodeWork和processPendingReplications（rescanPostponedMisreplicatedBlocks在NameNode启动/主从切换被调用，不包括在本次异常分析范围内）。<br/>
+<figure class='code'><figcaption><span>BlockManager.java <a href="https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L3621">https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L3621</a> github </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -2461,9 +1113,9 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 <span class='line-number'>17</span>
 <span class='line-number'>18</span>
 <span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">privateclass</span> <span class="n">ReplicationMonitor</span> <span class="kd">implements</span> <span class="n">Runnable</span> <span class="o">{</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">privateclass</span> <span class="n">ReplicationMonitor</span> <span class="kd">implements</span> <span class="n">Runnable</span> <span class="o">{&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="nd">@Override</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>  <span class="nd">@Override</span>
 </span><span class='line'>  <span class="n">publicvoid</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
 </span><span class='line'>    <span class="k">while</span> <span class="o">(</span><span class="n">namesystem</span><span class="o">.</span><span class="na">isRunning</span><span class="o">())</span> <span class="o">{</span>
 </span><span class='line'>      <span class="k">try</span> <span class="o">{</span>
@@ -2475,15 +1127,12 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 </span><span class='line'>        <span class="o">}</span>
 </span><span class='line'>        <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="n">replicationRecheckInterval</span><span class="o">);</span>
 </span><span class='line'>      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Throwable</span> <span class="n">t</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="o">......</span>
+</span><span class='line'>        <span class="o">&amp;</span><span class="n">hellip</span><span class="o">;&amp;</span><span class="n">hellip</span><span class="o">;</span>
 </span><span class='line'>      <span class="o">}</span>
 </span><span class='line'>    <span class="o">}</span>
 </span><span class='line'>  <span class="o">}</span>
 </span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p><strong>computeDatanodeWork</strong><br/>
 （1）从UnderReplicatedBlocks中取出给定阈值（默认为集群节点总数的2倍）数量范围内需要进行复制的Block集合；由于UnderReplicatedBlocks是一个优先级队列，所以每次一定是按照优先级从高到低获取；<br/>
@@ -2498,7 +1147,7 @@ computeDatanodeWork步骤4出现超时后，将对应的Block从pendingReplicati
 <p>可以看出computeDatanodeWork，processPendingReplications和PendingReplicationMonitor组成了一个生产者消费者的环，下图可以说明这个过程。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/monitor/replicationmonitor.png" alt="ReplicationMonitor相关数据流动图示" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/monitor/replicationmonitor.png" alt="ReplicationMonitor相关数据流动图示" align="center"><br />
 <label class=“pic_title” align="center">图3 ReplicationMonitor相关数据流动图示</label>
 </div>
 
@@ -2520,23 +1169,19 @@ computeDatanodeWork步骤4出现超时后，将对应的Block从pendingReplicati
 
 <h2>四、根本原因</h2>
 
-<p>继续追踪日志时，针对触发问题的Block检索了所有日志，发现另外一个现象，每次chooseTarget目标节点选择失败后，总会紧跟一条删除操作的日志：</p>
-
+<p>继续追踪日志时，针对触发问题的Block检索了所有日志，发现另外一个现象，每次chooseTarget目标节点选择失败后，总会紧跟一条删除操作的日志：<br/>
 <figure class='code'><figcaption><span>namenode.log </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'>2016-04-19 09:23:08,453 INFO BlockStateChange: BLOCK* addToInvalidates: blk_8197702254_7129783384 10.16.*.*:* 10.16.*.*:* 10.16.*.*:**
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>2016-04-19 09:23:08,453 INFO BlockStateChange: BLOCK<span class="nt">&lt;em&gt;</span> addToInvalidates: blk_8197702254_7129783384 10.16.<span class="nt">&lt;/em&gt;</span>.<span class="nt">&lt;em&gt;</span>:<span class="nt">&lt;/em&gt;</span> 10.16.<span class="nt">&lt;em&gt;</span>.<span class="nt">&lt;/em&gt;</span>:<span class="nt">&lt;em&gt;</span> 10.16.<span class="nt">&lt;/em&gt;</span>.*:**
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>审计日志中也能对照到同一时间点，对应的文件确实有删除操作。这个现象在多次异常复现时稳定发生。可以猜测与删除操作有关联。</p>
 
 <p>删除操作的流程是先把目录树的节点删除，根据删除结果收集到的Block集合，删除每一个Block。</p>
 
-<p>其中在逐个Block进行删除过程中，发现其逻辑有疑点，主要在block.setNumBytes(BlockCommand.NO_ACK)，其中NO_ACK=Long.MAX_VALUE，也即先将该Block的numbytes设置为最大值，再后续的操作。</p>
-
-<figure class='code'><figcaption><span>BlockManager.java</span><a href='https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L3378'>github </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p>其中在逐个Block进行删除过程中，发现其逻辑有疑点，主要在block.setNumBytes(BlockCommand.NO_ACK)，其中NO_ACK=Long.MAX_VALUE，也即先将该Block的numbytes设置为最大值，再后续的操作。<br/>
+<figure class='code'><figcaption><span>BlockManager.java <a href="https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L3378">https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L3378</a> github </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -2566,14 +1211,13 @@ computeDatanodeWork步骤4出现超时后，将对应的Block从pendingReplicati
 </span><span class='line'>    <span class="n">postponedMisreplicatedBlocksCount</span><span class="o">.</span><span class="na">decrementAndGet</span><span class="o">();</span>
 </span><span class='line'>  <span class="o">}</span>
 </span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>虽然对目录树的操作及removeBlock的操作均会持有全局写锁，但是很自然将Block的NumBytes设置成Long.MAX_VALUE的逻辑与chooseTarget遍历全集群仍不能选出合适节点的事实结合起来。</p>
 
-<p>接下来自然是验证chooseTarget的处理逻辑：</p>
-
-<figure class='code'><figcaption><span>BlockManager.java</span><a href='https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L1390'>github </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p>接下来自然是验证chooseTarget的处理逻辑：<br/>
+<figure class='code'><figcaption><span>BlockManager.java <a href="https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L1390">https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L1390</a> github </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -2591,7 +1235,7 @@ computeDatanodeWork步骤4出现超时后，将对应的Block从pendingReplicati
 <span class='line-number'>16</span>
 <span class='line-number'>17</span>
 <span class='line-number'>18</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">......</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">&amp;</span><span class="n">hellip</span><span class="o">;&amp;</span><span class="n">hellip</span><span class="o">;</span>
 </span><span class='line'><span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
 </span><span class='line'>  <span class="n">namesystem</span><span class="o">.</span><span class="na">writeUnlock</span><span class="o">();</span>
 </span><span class='line'><span class="o">}</span>
@@ -2609,8 +1253,7 @@ computeDatanodeWork步骤4出现超时后，将对应的Block从pendingReplicati
 </span><span class='line'>  <span class="n">rw</span><span class="o">.</span><span class="na">chooseTargets</span><span class="o">(</span><span class="n">blockplacement</span><span class="o">,</span> <span class="n">storagePolicySuite</span><span class="o">,</span> <span class="n">excludedNodes</span><span class="o">);</span>
 </span><span class='line'><span class="o">}</span>
 </span><span class='line'><span class="n">namesystem</span><span class="o">.</span><span class="na">writeLock</span><span class="o">();</span>
-</span></code></pre></td></tr></table></div></figure>
-
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>上面的实现可以看出，chooseTargets之前释放了全局锁，chooseTargets后重新申请到全局锁，唯独中间的chooseTargets在锁之外。至此，问题触发条件、场景等基本清楚：</p>
 
@@ -2641,35 +1284,15 @@ computeDatanodeWork步骤4出现超时后，将对应的Block从pendingReplicati
 <p>3、虽然问题在线上存在了超过两周时间，但是并没有实际影响到集群正常服务，得益于中间合理可控的缓解手段。如果不能彻底解决可以尝试通过各种方法缓解或绕过问题值得借鉴，这种方法论随处可见，但是只有亲自趟过坑后才能印象深刻。</p>
 
 <p>4、回过头再看整个问题，解决问题的思路没有问题，但追查过程其实存在一个严重Bug，不再展开详述。</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/09/04/hdfs-centralized-cache-management/">HDFS集中式缓存管理</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-09-04T10:45:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:45 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>一、背景</h2>
+  <entry>
+    <title type="html"><![CDATA[HDFS集中式缓存管理]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2016/09/04/hdfs-centralized-cache-management/"/>
+    <updated>2016-09-04T10:45:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2016/09/04/hdfs-centralized-cache-management</id>
+    <content type="html"><![CDATA[<h2>一、背景</h2>
 
 <p>Hadoop设计之初借鉴GFS/MapReduce的思想：移动计算的成本远小于移动数据的成本。所以调度通常会尽可能将计算移动到拥有数据的节点上，在作业执行过程中，从HDFS角度看，计算和数据通常是同一个DataNode节点，即存在大量的本地读写。</p>
 
@@ -2699,7 +1322,8 @@ computeDatanodeWork步骤4出现超时后，将对应的Block从pendingReplicati
 
 <p>集群开启HDFS集中式缓存特性非常简单，虽然HDFS本身为集中式缓存在NameNode/DataNode端均提供了多个配置参数，但是大多不是必须配置项，最核心的配置项是DataNode侧一个参数。</p>
 
-<figure class='code'><figcaption><span>hdfs-site.xml</span><a href='http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml'>hdfs-default.xml </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p><figure class='code'><figcaption><span>hdfs-site.xml <a href="http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml">http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml</a> hdfs-default.xml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -2717,7 +1341,7 @@ computeDatanodeWork步骤4出现超时后，将对应的Block从pendingReplicati
 </span><span class='line'>  <span class="nt">&lt;value&gt;</span>0<span class="nt">&lt;/value&gt;</span>
 </span><span class='line'>  <span class="nt">&lt;description&gt;</span>
 </span><span class='line'>    The amount of memory in bytes to use for caching of block replicas in
-</span><span class='line'>    memory on the datanode. The datanode&#39;s maximum locked memory soft ulimit
+</span><span class='line'>    memory on the datanode. The datanode<span class="ni">&amp;rsquo;</span>s maximum locked memory soft ulimit
 </span><span class='line'>    (RLIMIT_MEMLOCK) must be set to at least this value, else the datanode
 </span><span class='line'>    will abort on startup.
 </span><span class='line'>    By default, this parameter is set to 0, which disables in-memory caching.
@@ -2725,8 +1349,7 @@ computeDatanodeWork步骤4出现超时后，将对应的Block从pendingReplicati
 </span><span class='line'>    configuration has no effect.
 </span><span class='line'>  <span class="nt">&lt;/description&gt;</span>
 </span><span class='line'><span class="nt">&lt;/property&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>如配置项描述所述，该配置的默认值为0，表示集中式缓存特性处于关闭状态，选择适当的值打开该特性。</p>
 
@@ -2734,9 +1357,9 @@ computeDatanodeWork步骤4出现超时后，将对应的Block从pendingReplicati
 （1）DataNode的native库必须可用；因为集中式缓存特性通过系统调用<a href="https://en.wikipedia.org/wiki/Mmap">mmap/mlock</a>实现，DataNode需要通过native库支持完成系统调用，否则会导致该特性不生效。<br/>
 （2）系统memlock至少与配置值相同；因为集中式缓存特性通过系统调用mmap/mlock实现，所以系统最大锁定内存空间需要至少与DataNode配置的锁定空间大小相同，否则会导致DataNode进行启动失败。</p>
 
-<p>此外，HDFS还包括了其他可选的配置项：</p>
-
-<figure class='code'><figcaption><span>hdfs-site.xml</span><a href='http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml'>hdfs-default.xml </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p>此外，HDFS还包括了其他可选的配置项：
+<figure class='code'><figcaption><span>hdfs-site.xml <a href="http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml">http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml</a> hdfs-default.xml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -2780,14 +1403,12 @@ computeDatanodeWork步骤4出现超时后，将对应的Block从pendingReplicati
 </span><span class='line'><span class="nt">&lt;value&gt;</span>4<span class="nt">&lt;/value&gt;</span>
 </span><span class='line'><span class="nt">&lt;description&gt;</span>The maximum number of threads per volume to use for caching new data on the datanode. These threads consume both I/O and CPU. This can affect normal datanode operations.<span class="nt">&lt;/description&gt;</span>
 </span><span class='line'><span class="nt">&lt;/property&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
+</span></code></pre></td></tr></table></div></figure></p>
 
 <h3>2.2 使用</h3>
 
 <p>HDFS集中式缓存对数据读写接口并没有影响，正常调用已缓存数据的读写即可使用缓存特性。
-为了便于数据管理，HDFS通过CacheAdmin对外暴露了一系列缓存管理的接口，其中CLI接口如下。</p>
-
+为了便于数据管理，HDFS通过CacheAdmin对外暴露了一系列缓存管理的接口，其中CLI接口如下。<br/>
 <figure class='code'><figcaption><span>CacheAdmin </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -2811,19 +1432,16 @@ computeDatanodeWork步骤4出现超时后，将对应的Block从pendingReplicati
 </span><span class='line'>          [-removePool <span class="nt">&lt;name&gt;</span>]
 </span><span class='line'>          [-listPools [-stats] [<span class="nt">&lt;name&gt;</span>]]
 </span><span class='line'>          [-help <span class="nt">&lt;command-name&gt;</span>]
-</span></code></pre></td></tr></table></div></figure>
-
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>CacheAdmin主要对用户暴露的是对缓存数据/缓存池（在系统架构及原理进行详细解释）的增删改查功能，另外还提供了相关的缓存策略，供用户灵活使用。<br/>
-如这里期望能够缓存数据仓库中被频繁访问的user表数据：</p>
-
+如这里期望能够缓存数据仓库中被频繁访问的user表数据：<br/>
 <figure class='code'><figcaption><span>CacheAdmin CLI </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class='xml'><span class='line'>$HADOOP_HOME/bin/hdfs cacheadmin -addPool factPool -owner hadoop-user -group hadoop-user -mod 777 -limit 1024000000 -ttl 2d
 </span><span class='line'>$HADOOP_HOME/bin/hdfs cacheadmin -addDirective -path /user/hive/warehouse/dw.db/user -pool factPool -force -replication 3 -ttl 1d
-</span></code></pre></td></tr></table></div></figure>
-
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>首先新建名称为factPool的缓存池，并赋予相关的用户组及权限等信息，另外限制该缓存池可以缓存的最大空间及缓存数据的最大TTL等；<br/>
 然后将user表数据加入到缓存池factPool进行缓存，并指定缓存时间为1天，缓存3个副本；<br/>
@@ -2865,7 +1483,7 @@ Quotas</p></blockquote>
 （6）上层调度尽可能将任务调度到数据所在的DataNode，当客户端进行读数据请求时，通过DFSClient直接从内存进行ZeroCopy，从而显著提升性能；</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/cache/cache.png" alt="HDFS集中式缓存管理流程图" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/cache/cache.png" alt="HDFS集中式缓存管理流程图" align="center"><br />
 <label class=“pic_title” align="center">图1 HDFS集中式缓存管理流程图</label>
 </div>
 
@@ -2873,7 +1491,7 @@ Quotas</p></blockquote>
 <p>HDFS集中式缓存的架构如图2所示，这里主要涉及到NameNode和DataNode两侧的管理和实现，NameNode对数据缓存的统一集中管理，并根据策略调度合适的DataNode对具体的数据进行数据的缓存和置换，DataNode根据NameNode的指令执行对数据的实际缓存和置换。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/cache/cachearc.png" alt="HDFS集中式缓存架构图" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/cache/cachearc.png" alt="HDFS集中式缓存架构图" align="center"><br />
 <label class=“pic_title” align="center">图2 HDFS集中式缓存架构图</label>
 </div>
 
@@ -2884,27 +1502,19 @@ Quotas</p></blockquote>
 
 <blockquote><p>Manages caching for an FsDatasetImpl by using the mmap(2) and mlock(2) system calls to lock blocks into memory. Block checksums are verified upon entry into the cache.</p></blockquote>
 
-<p>FsDatasetCache的核心是称为mappableBlockMap的HashMap，用于维护当前缓存的Block集合，其中Key为标记该Block的ExtendedBlockId，为了能够实现与Federation的兼容，在blockid的基础上增加了blockpoolid，这样多个blockpool的block不会因为blockid相同产生冲突；Value是具体的缓存数据及当前的缓存状态。</p>
-
+<p>FsDatasetCache的核心是称为mappableBlockMap的HashMap，用于维护当前缓存的Block集合，其中Key为标记该Block的ExtendedBlockId，为了能够实现与Federation的兼容，在blockid的基础上增加了blockpoolid，这样多个blockpool的block不会因为blockid相同产生冲突；Value是具体的缓存数据及当前的缓存状态。
 <figure class='code'><figcaption><span>FsDatasetCache#mappableBlockMap </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">private</span> <span class="kd">final</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">ExtendedBlockId</span><span class="o">,</span> <span class="n">Value</span><span class="o">&gt;</span> <span class="n">mappableBlockMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">ExtendedBlockId</span><span class="o">,</span> <span class="n">Value</span><span class="o">&gt;();</span>
-</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">private</span> <span class="kd">final</span> <span class="n">HashMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">ExtendedBlockId</span><span class="o">,</span> <span class="n">Value</span><span class="o">&gt;</span> <span class="n">mappableBlockMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">ExtendedBlockId</span><span class="o">,</span> <span class="n">Value</span><span class="o">&gt;();</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
-
-<p></p>
-
-<p>mappableBlockMap更新只有FsdatasetCache提供的两个具体的函数入口：</p>
-
+<p>mappableBlockMap更新只有FsdatasetCache提供的两个具体的函数入口：<br/>
 <figure class='code'><figcaption><span>FsDatasetCache.java </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">synchronized</span> <span class="kt">void</span> <span class="nf">cacheBlock</span><span class="o">(</span><span class="kt">long</span> <span class="n">blockId</span><span class="o">,</span> <span class="n">String</span> <span class="n">bpid</span><span class="o">,</span> <span class="n">String</span> <span class="n">blockFileName</span><span class="o">,</span> <span class="kt">long</span> <span class="n">length</span><span class="o">,</span> <span class="kt">long</span> <span class="n">genstamp</span><span class="o">,</span> <span class="n">Executor</span> <span class="n">volumeExecutor</span><span class="o">)</span>
 </span><span class='line'><span class="kd">synchronized</span> <span class="kt">void</span> <span class="nf">uncacheBlock</span><span class="o">(</span><span class="n">String</span> <span class="n">bpid</span><span class="o">,</span> <span class="kt">long</span> <span class="n">blockId</span><span class="o">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>可以看出，对mappableBlockMap的并发控制实际上放在了cacheBlock和uncacheBlock两个方法上，虽然锁粒度比较大，但是并不会对并发读写带来影响。原因是：cacheBlock在系统调用前构造空Value结构加入mappableBlockMap中，此时该Value维护的Block状态是CACHING，之后将真正缓存数据的任务加入异步任务CachingTask去完成，所以锁很快会被释放，当处于CACHING状态的Block被访问的时候会退化到从HDD访问，异步任务CachingTask完成数据缓存后将其状态置为CACHED；uncacheBlock是同样原理。所以，虽然锁的粒度比较大，但是并不会阻塞后续的数据缓存任务，也不会对数据读写带来额外的开销。</p>
 
@@ -2912,7 +1522,7 @@ Quotas</p></blockquote>
 （1）cacheBlock：唯一的入口是从ANN（HA Active NameNode）下发的指令；</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/cache/cacheblockinvoke.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/cache/cacheblockinvoke.png" align="center"><br />
 <label class=“pic_title” align="center"></label>
 </div>
 
@@ -2920,7 +1530,7 @@ Quotas</p></blockquote>
 <p>（2）uncacheBlock：与cacheBlock不同，uncacheBlock存在三个入口：append，invalidate和uncache。其中uncache也是来自ANN下发的指令；append和invalidate触发uncacheBlock的原因是：append会导致数据发生变化，缓存失效需要清理后重新缓存，invalidate来自删除操作，缓存同样失效需要清理。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/cache/uncacheblockinvoke.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/cache/uncacheblockinvoke.png" align="center"><br />
 <label class=“pic_title” align="center"></label>
 </div>
 
@@ -2930,9 +1540,9 @@ Quotas</p></blockquote>
 <h3>3.3 NameNode</h3>
 
 <p>相比DataNode的实现逻辑，NameNode侧要复杂的多，缓存管理继承了NameNode一贯的模块化思路，通过CacheManager实现了整个集中式缓存在管理端的复杂处理逻辑。<br/>
-CacheManager通过几个关键数据结构组织对数据缓存的实现。</p>
-
-<figure class='code'><figcaption><span>CacheManager.java</span><a href='https://github.com/apache/hadoop/blob/trunk/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/CacheManager.java#L119'>github</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+CacheManager通过几个关键数据结构组织对数据缓存的实现。
+<figure class='code'><figcaption><span>CacheManager.java <a href="https://github.com/apache/hadoop/blob/trunk/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/CacheManager.java#L119">https://github.com/apache/hadoop/blob/trunk/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/CacheManager.java#L119</a> github</span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -2949,27 +1559,24 @@ CacheManager通过几个关键数据结构组织对数据缓存的实现。</p>
 <span class='line-number'>15</span>
 <span class='line-number'>16</span>
 <span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * Cache directives, sorted by ID.</span>
-</span><span class='line'><span class="cm"> */</span>
-</span><span class='line'><span class="kd">private</span> <span class="kd">final</span> <span class="n">TreeMap</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">,</span> <span class="n">CacheDirective</span><span class="o">&gt;</span> <span class="n">directivesById</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TreeMap</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">,</span> <span class="n">CacheDirective</span><span class="o">&gt;();</span>
-</span><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * Cache directives, sorted by path</span>
-</span><span class='line'><span class="cm"> */</span>
-</span><span class='line'><span class="kd">private</span> <span class="kd">final</span> <span class="n">TreeMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">CacheDirective</span><span class="o">&gt;&gt;</span> <span class="n">directivesByPath</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TreeMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">CacheDirective</span><span class="o">&gt;&gt;();</span>
-</span><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * Cache pools, sorted by name.</span>
-</span><span class='line'><span class="cm"> */</span>
-</span><span class='line'><span class="kd">private</span> <span class="kd">final</span> <span class="n">TreeMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">CachePool</span><span class="o">&gt;</span> <span class="n">cachePools</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TreeMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">CachePool</span><span class="o">&gt;();</span>
-</span><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * All cached blocks.</span>
-</span><span class='line'><span class="cm"> */</span>
-</span><span class='line'><span class="kd">private</span> <span class="kd">final</span> <span class="n">GSet</span><span class="o">&lt;</span><span class="n">CachedBlock</span><span class="o">,</span> <span class="n">CachedBlock</span><span class="o">&gt;</span> <span class="n">cachedBlocks</span><span class="o">;</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">/&lt;</span><span class="n">strong</span><span class="o">&gt;</span>
+</span><span class='line'> <span class="o">*</span> <span class="n">Cache</span> <span class="n">directives</span><span class="o">,</span> <span class="n">sorted</span> <span class="n">by</span> <span class="n">ID</span><span class="o">.</span>
+</span><span class='line'> <span class="o">*/</span>
+</span><span class='line'><span class="kd">private</span> <span class="kd">final</span> <span class="n">TreeMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">Long</span><span class="o">,</span> <span class="n">CacheDirective</span><span class="o">&gt;</span> <span class="n">directivesById</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TreeMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">Long</span><span class="o">,</span> <span class="n">CacheDirective</span><span class="o">&gt;();</span>
+</span><span class='line'><span class="o">/&lt;/</span><span class="n">strong</span><span class="o">&gt;</span>
+</span><span class='line'> <span class="o">*</span> <span class="n">Cache</span> <span class="n">directives</span><span class="o">,</span> <span class="n">sorted</span> <span class="n">by</span> <span class="n">path</span>
+</span><span class='line'> <span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;/</span>
+</span><span class='line'><span class="kd">private</span> <span class="kd">final</span> <span class="n">TreeMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">String</span><span class="o">,</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">CacheDirective</span><span class="o">&gt;&gt;</span> <span class="n">directivesByPath</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TreeMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">String</span><span class="o">,</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">CacheDirective</span><span class="o">&gt;&gt;();</span>
+</span><span class='line'><span class="o">/**</span>
+</span><span class='line'> <span class="o">*</span> <span class="n">Cache</span> <span class="n">pools</span><span class="o">,</span> <span class="n">sorted</span> <span class="n">by</span> <span class="n">name</span><span class="o">.</span>
+</span><span class='line'> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;/</span>
+</span><span class='line'><span class="kd">private</span> <span class="kd">final</span> <span class="n">TreeMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">String</span><span class="o">,</span> <span class="n">CachePool</span><span class="o">&gt;</span> <span class="n">cachePools</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TreeMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">String</span><span class="o">,</span> <span class="n">CachePool</span><span class="o">&gt;();</span>
+</span><span class='line'><span class="o">/&lt;</span><span class="n">em</span><span class="o">&gt;*</span>
+</span><span class='line'> <span class="o">*</span> <span class="n">All</span> <span class="n">cached</span> <span class="n">blocks</span><span class="o">.</span>
+</span><span class='line'> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;/</span>
+</span><span class='line'><span class="kd">private</span> <span class="kd">final</span> <span class="n">GSet</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">CachedBlock</span><span class="o">,</span> <span class="n">CachedBlock</span><span class="o">&gt;</span> <span class="n">cachedBlocks</span><span class="o">;</span>
 </span><span class='line'><span class="kd">private</span> <span class="n">CacheReplicationMonitor</span> <span class="n">monitor</span><span class="o">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>通过上述的几个核心集合类数据结构，很容易实现用户层对缓存数据/缓存池的增删改查功能调用的支持。</p>
 
@@ -3015,259 +1622,7 @@ CacheManager通过几个关键数据结构组织对数据缓存的实现。</p>
 [5] <a href="https://en.wikipedia.org/wiki/Mmap">https://en.wikipedia.org/wiki/Mmap</a><br/>
 [6] <a href="https://issues.apache.org/jira/browse/HDFS-347">https://issues.apache.org/jira/browse/HDFS-347</a><br/>
 [7] <a href="https://issues.apache.org/jira/browse/HDFS-2246">https://issues.apache.org/jira/browse/HDFS-2246</a></p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/07/21/namenode-memory-detail/">NameNode内存详解</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-07-21T20:00:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2016</span></span> <span class='time'>8:00 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>一、背景</h2>
-
-<p>NameNode内存数据主要对整个文件系统元数据的管理。Namenode目前元数据管理可以分成两个层次，一个是Namespace的管理层，这一层负责管理HDFS分布式文件系统中的树状目录和文件结构；另一层则为Block管理层，这一层负责管理HDFS分布式文件系统中存储文件到物理块之间的映射关系BlocksMap元数据。其中对Namespace的管理数据除在内存常驻外，会定期Flush到持久化设备中；对BlocksMap元数据的管理只存在内存；当NameNode发生重启，需要从持久化设备中读取Namespace管理数据，并重新构造BlocksMap。这两部分数据结构占用巨大的JVM Heap空间。</p>
-
-<p>除了对文件系统本身元数据的管理外，NameNode还需要维护DataNode本身的元数据，这部分空间相对固定，且占用空间较小。</p>
-
-<p>从实际Hadoop集群环境历史数据看，当Namespace中包含INode（目录和文件总量）~140M，数据块数量~160M，常驻内存使用量达在~50G。随着数据规模的持续增长，内存占用接近同步线性增长。在整个HDFS服务中，NameNode的核心作用及内存数据结构的重要地位，所以分析内存使用情况对维护HDFS服务稳定性至关重要。</p>
-
-<p>这里在《NameNode内存全景》基础上，进一步对NameNode内存中关键数据结构的细节进行详细解读。</p>
-
-<h2>二、内存分析</h2>
-
-<h3>2.1 NetworkTopology</h3>
-
-<p>NameNode除对文件系统本身元数据的管理外还需要维护DataNode的信息，主要通过NetworkTopology中DatanodeDescriptor对DataNode进行表示，该类继承结构如下图示：</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/memory/mem-1.png" align="center"><br />
-</div>
-
-
-<p>在整个继承机构中各个类的内存占用情况：</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/memory/mem-2.png" align="center"><br />
-</div>
-
-
-<p>其中DatanodeDescriptor还包括一部分非常驻内存对象，这里没有详细统计，所以结果可能会有少许误差。</p>
-
-<p>假设集群中包括1000个DataNode节点，仅DataNode部分占用内存情况：</p>
-
-<p>(48+88+64)*1000=200000=195+K</p>
-
-<p>所以仅NetworkTopology维护的DataNode信息，相比整个NameNode所占的内存空间微乎其微。</p>
-
-<h3>2.2 Namespace</h3>
-
-<p>与传统单机文件系统相似，HDFS对文件系统的目录结构也是按照树状结构维护，Namespace保存的正是目录树及每个目录/文件节点的属性，包括：名称（name），编号（id），所属用户（user），所属组（group），权限（permission），修改时间（mtime），访问时间（atime），子目录/文件（children）等信息。</p>
-
-<p>下图为整个Namespace中INode的类图结构，从类图可以看出，INodeFile和INodeDirectory的继承关系。其中目录在内存中由INodeDirectory对象来表示，并用List<INode> children成员列表来标识该目录下的子目录和文件；文件在内存中则由INodeFile来表示，并用BlockInfo[] blocks成员数组来标识该文件由那些blocks分块组成。其他的目录/文件属性在该类继承结构的各个相应子类成员变量标识。</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/memory/mem-3.png" align="center"><br />
-</div>
-
-
-<p>在整个继承关系中不同类的内存占用情况：</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/memory/mem-4.png" align="center"><br />
-</div>
-
-
-<p>其中，除了上面提到的结构外，如目录节点的附加属性等非通用数据结构，没有在统计范围内。另外，INodeFile和INodeDirectory.withQuotaFeature在内存中使用最为广泛的两个结构。</p>
-
-<p>假设Namespace包含INode数为1亿，仅Namespace占用内存情况：<br/>
-(24+104+8+avg(32+44+ 8 * 2, 56+ 8 * 2)) * 100000000=21800000000=20.30GB</p>
-
-<p>Namespace数据会定期持久化到外存设备上，内存也会常驻，在整个NameNode的生命周期内一直缓存在内存中，随着HDFS中存储的数据增多，文件数/目录树也会随之增加，占用内存空间也会同步增加。NameNode进程、单机内存容量及JVM对内存管理能力将成为制约HDFS的主要瓶颈。</p>
-
-<h3>2.3 BlocksMap</h3>
-
-<p>在HDFS中，每个block都对应多个副本，存储在不同的存储节点DataNode上。在NameNode元数据管理上需要维护从Block到DataNode列表的对应关系，描述每一个Block副本实际存储的物理位置，当前BlocksMap解决的即是从Block对对应DataNode列表的映射关系。</p>
-
-<p>BlocksMap内部数据结构如下图示：</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/memory/mem-5.png" align="center"><br />
-</div>
-
-
-<p>随着存储量规模不断增加，BlocksMap在内存中占用的空间会随之增加，社区在BlocksMap的数据结构使用上做过优化，最初直接使用HashMap解决从Block到BlockInfo的映射关系，之后经过优化使用重新实现的LightWeightGSet代替HashMap，该数据结构通过数据保存元素信息，利用链表解决碰撞冲突，达到更少的内存使用。</p>
-
-<p>该数据结构里Block对象中只记录了blockid，blocksize和timestamp。BlockInfo继承自Block，除了Block对象中保存的信息外，最重要的是该block对应的DataNode的列表信息。</p>
-
-<p>内存占用情况如下：</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/memory/mem-6.png" align="center"><br />
-</div>
-
-
-<p>LightWeightGSet与HashMap相比，减少了HashMap在load factor避免冲突的额外内存开销，即使经过优化，BlocksMap也是占用了大量的内存空间，假设HDFS中存在1亿Block ，其占用内存情况：</p>
-
-<p>（40+120+8）* 100000000=16800000000=15.65GB</p>
-
-<p>BlocksMap数据常驻内存，在整个NameNode生命周期内一直缓存内存中，随着数据规模的增加，对应Namespace和Block数会随之增多，NameNode进程、单机内存容量及JVM对内存管理能力将成为主要瓶颈。</p>
-
-<h3>2.4 小结</h3>
-
-<p>根据前述对当前线上集群数据量：Namespace中包含INode（目录和文件总量）：~140M，数据块数量：160M，计算内存使用情况：</p>
-
-<p>Namespace：(24+104+8+avg(32+44+ 8 * 2, 56+ 8 * 2)) * 140M = ~29.0 GB<br/>
-BlocksMap：(40+120+8) * 160M = ~25.0 GB<br/>
-二者组合结果：29.0 GB + 25.0 GB = 53.0 GB</p>
-
-<p>结果来看与监控常驻内存~50GB接近，基本符合实际情况。</p>
-
-<p>从前面的讨论可以看出，在NameNode整个内存对象里，占用空间最大的两个结构即为Namespace和BlocksMap，当数据规模增加后，巨大的内存占用势必会制约NameNode进程的服务能力，尤其对JVM的内存管理会带来极大的挑战。</p>
-
-<p>据了解业界在NameNode上JVM最大使用到180G，结合前面的计算可以得知，元数据总量700M基本上是服务的上限。</p>
-
-<h2>三、结论</h2>
-
-<p>1、NameNode内存使用量预估模型：Total=218 * num(INode) + 168 * num(Blocks)；<br/>
-2、受JVM可管理内存上限等物理因素，180G内存下，NameNode服务上限的元数据量约700M。</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  <div class="pagination">
-    
-      <a class="prev" href="/posts/2">&larr; Older</a>
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
-</div>
-<aside class="sidebar">
-  
-    <section>
-  <h1>Recent Posts</h1>
-  <ul id="recent_posts">
-    
-      <li class="post">
-        <a href="/blog/2018/10/05/recruit/">大数据职位招聘</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/07/13/a-brief-introduction-of-hdfs-blocktoken-mechanism/">HDFS BlockToken机制解析</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/03/30/the-analysis-of-basic-principle-of-hdfs-ha-using-qjm/">HDFS HA Using QJM原理解析</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/02/12/namenode-restart-optimization/">HDFS NameNode重启优化</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/01/18/exact-count-optimization-of-apache-kylin/">Apache Kylin精确去重指标优化</a>
-      </li>
-    
-  </ul>
-</section>
-  
-<section>  
-  <h1>Weibo</h1>  
-  <ul id="weibo">  
-    <li>
-    <iframe 
-	width="100%" 
-	height="550" 
-	class="share_self"  
-	frameborder="0" 
-	scrolling="no" 
-	src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=0&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=1283533382&verifier=9bc28858&dpc=1">
-    </iframe>
-    </li>  
-  </ul>  
-</section>  
-
-<section>
-  <h1>WeChat</h1>
-  <ul id="wechat">
-  <div class=“pic” padding=“0”>
-  <img src="/images/qrcode.jpg"><br />
-  </div>
-  </ul>
-</section>
-
-
-
-
-
-  
-</aside>
-
-    </div>
-  </div>
-  <footer role="contentinfo"><p>
-  Copyright &copy; 2018 - Hexiaoqiao -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
-</p>
-
-</footer>
-  
-
-<script type="text/javascript">
-      var disqus_shortname = 'Hexiaoqiao';
-      
-        
-        var disqus_script = 'count.js';
-      
-    (function () {
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    }());
-</script>
-
-
-
-
-
-
-
-  <script type="text/javascript">
-    (function(){
-      var twitterWidgets = document.createElement('script');
-      twitterWidgets.type = 'text/javascript';
-      twitterWidgets.async = true;
-      twitterWidgets.src = '//platform.twitter.com/widgets.js';
-      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
-    })();
-  </script>
-
-
-
-
-
-</body>
-</html>
+</feed>

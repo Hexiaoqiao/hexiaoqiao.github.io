@@ -1,108 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
 
-<!DOCTYPE html>
-<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
-<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
-<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <title>Hexiaoqiao</title>
-  <meta name="author" content="Hexiaoqiao">
-
-  
-  <meta name="description" content="数据平台 - Hadoop实习工程师 职位描述 1、搭建维护Hadoop、HBase、Spark等集群并进行必要的troubleshooting，保障系统正常运行；
-2、提高集群的使用效率及稳定性，并对整个系统做合理分离，满足各种应用场景的使用；
-3、构建集群监控体系、可视化体系、调度系统， &hellip;">
-  
-
-  <!-- http://t.co/dKP3o1e -->
-  <meta name="HandheldFriendly" content="True">
-  <meta name="MobileOptimized" content="320">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  
-  <link rel="canonical" href="http://hexiaoqiao.github.io/">
-  <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/atom.xml" rel="alternate" title="Hexiaoqiao" type="application/atom+xml">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-
-  
-  <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-72478952-2']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-  </script>
-
-
-</head>
-
-<body   >
-  <header role="banner"><hgroup>
-  <h1><a href="/">Hexiaoqiao</a></h1>
-  
-    <h2>Focus on BigData,Distributed System,Hadoop 2.*</h2>
-  
-</hgroup>
-
-</header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
-  
-</ul>
-  
-<form action="https://www.google.com/search" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="sitesearch" value="hexiaoqiao.github.io">
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
-  
-<ul class="main-navigation">
-  <li><a href="/">Blog</a></li>
-  <li><a href="/blog/archives">Archives</a></li>
-  <li><a href="/about">About</a></li>
-</ul>
-
-</nav>
-  <div id="main">
-    <div id="content">
-      <div class="blog-index">
-  
-  
-  
-    <article>
-      
-  <header>
+  <title><![CDATA[Hexiaoqiao]]></title>
+  <link href="http://hexiaoqiao.github.io/atom.xml" rel="self"/>
+  <link href="http://hexiaoqiao.github.io/"/>
+  <updated>2018-10-09T11:58:28+08:00</updated>
+  <id>http://hexiaoqiao.github.io/</id>
+  <author>
+    <name><![CDATA[Hexiaoqiao]]></name>
     
-      <h1 class="entry-title"><a href="/blog/2018/10/05/recruit/">大数据职位招聘</a></h1>
-    
-    
-      <p class="meta">
-        
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
 
-
-
-
-<time class='entry-date' datetime='2018-10-05T10:45:00+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>10:45 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>数据平台 - Hadoop实习工程师</h2>
+  
+  <entry>
+    <title type="html"><![CDATA[大数据职位招聘]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2018/10/05/recruit/"/>
+    <updated>2018-10-05T10:45:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2018/10/05/recruit</id>
+    <content type="html"><![CDATA[<h2>数据平台 - Hadoop实习工程师</h2>
 
 <h3>职位描述</h3>
 
@@ -164,35 +80,15 @@
 2、有安全技术背景或数据安全管理经验者优先。</p>
 
 <p>联系方式：xq.he2009#gmail.com(#替换@)</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2018/07/13/a-brief-introduction-of-hdfs-blocktoken-mechanism/">HDFS BlockToken机制解析</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2018-07-13T10:45:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>10:45 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>一、背景</h2>
+  <entry>
+    <title type="html"><![CDATA[HDFS BlockToken机制解析]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2018/07/13/a-brief-introduction-of-hdfs-blocktoken-mechanism/"/>
+    <updated>2018-07-13T10:45:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2018/07/13/a-brief-introduction-of-hdfs-blocktoken-mechanism</id>
+    <content type="html"><![CDATA[<h2>一、背景</h2>
 
 <p>敏感信息和隐私数据的安全保障是互联网公司非常关心的问题，尤其进入大数据时代，稍有不慎就会出现重大安全事故，所以数据安全问题就变得越来越重要。</p>
 
@@ -208,7 +104,7 @@
 其中认证问题通过Kerberos能够很好地解决，并通过<a href="https://issues.apache.org/jira/browse/HADOOP-4487">HADOOP-4487</a>在Hadoop内部设计了一套Token机制完美实现了安全认证问题，同时在性能上得到保证，图1为Hadoop安全认证体系概要图示。关于Hadoop Security特性的细节参考<a href="https://issues.apache.org/jira/browse/HADOOP-4487">HADOOP-4487</a>，这里不再展开。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/blocktoken/security.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/blocktoken/security.png" align="center"><br />
 <label class=“pic_title” align="center">图1 Hadoop安全认证体系</label>
 </div>
 
@@ -246,8 +142,8 @@
 <p>开始详细梳理BlockToken原理之前，首先简单梳理下如图2所示的HDFS读写流程：</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/blocktoken/read.png" align="center">
-<img src="/images/blocktoken/write.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/blocktoken/read.png" align="center">
+<img src="http://hexiaoqiao.github.io/images/blocktoken/write.png" align="center"><br />
 <label class=“pic_title” align="center">图2 HDFS读写流程示意图</label>
 </div>
 
@@ -380,7 +276,7 @@
 <p>事实上，HDFS更进一步同时维护三份共享密钥，NameNode一旦发现有SecretKey过期，马上生成新SecretKey补充进来并向前滚动当前激活SecretKey，DataNode心跳过来后及时下发更新后的SecretKey集合，如图3所示。维护三份密钥的代价是NameNode需要同时检查三份数据有效期，但是通常情况过期时间较大（默认是10h）且数据量极小，所以完全不会给NameNode或者DataNode带来负担。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/blocktoken/blocktoken.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/blocktoken/blocktoken.png" align="center"><br />
 <label class=“pic_title” align="center">图3 HDFS BlockToken流程图示</label>
 </div>
 
@@ -466,35 +362,15 @@
 [5] <a href="https://issues.apache.org/jira/browse/HADOOP-4359">https://issues.apache.org/jira/browse/HADOOP-4359</a><br/>
 [6] <a href="https://issues.apache.org/jira/browse/HDFS-13473">https://issues.apache.org/jira/browse/HDFS-13473</a><br/>
 [7] <a href="http://hadoop.apache.org/releases.html">http://hadoop.apache.org/releases.html</a></p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2018/03/30/the-analysis-of-basic-principle-of-hdfs-ha-using-qjm/">HDFS HA Using QJM原理解析</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2018-03-30T10:45:00+08:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>30</span><span class='date-suffix'>th</span>, <span class='date-year'>2018</span></span> <span class='time'>10:45 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>一、前言</h2>
+  <entry>
+    <title type="html"><![CDATA[HDFS HA Using QJM原理解析]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2018/03/30/the-analysis-of-basic-principle-of-hdfs-ha-using-qjm/"/>
+    <updated>2018-03-30T10:45:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2018/03/30/the-analysis-of-basic-principle-of-hdfs-ha-using-qjm</id>
+    <content type="html"><![CDATA[<h2>一、前言</h2>
 
 <p>Hadoop 1.0时代，Hadoop核心组件HDFS NameNode和MapReduce JobTracker都存在单点问题（SPOF），其中以NameNode SPOF尤为严重。HDFS作为整个Hadoop生态的基础组件，一旦NameNode发生故障，包括HDFS在内及其上层依赖组件（YARN/MapReduce/Spark/Hive/Pig/HBase等）都将无法正常工作，另外NameNode恢复过程非常耗时，尤其对大型集群，NameNode重启时间非常可观，给HDFS的可用性带来了极大的挑战，同时在使用场景上也带来明显的限制。</p>
 
@@ -507,7 +383,7 @@
 <p>在Hadoop 1.0时代，HDFS的架构相对简单，组件单一，主要包含NameNode，Seconday NameNode，DataNode和DFSClient四个核心组件（见图1 Hadoop 1.0中HDFS架构），其中NameNode提供元数据管理服务，Secondary NameNode以冷备的状态为NameNode分担Checkpoint工作（定期合并FsImage和Editlog），为避免出现歧义后来也称Secondary NameNode为Checkpoint Node。在这种架构下NameNode是整个系统的单点，一旦出现故障对可用性是致命的。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/ha/hadoop1.0.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/ha/hadoop1.0.png" align="center"><br />
 <label class=“pic_title” align="center">图1 Hadoop 1.0中HDFS架构图</label>
 </div>
 
@@ -523,7 +399,7 @@
 <p>虽然存在问题，但是AvatarNode架构相比Hadoop 1.0已经有了本质的区别，也正是因为其在HA特性上的优秀表现，AvatarNode方案被国内外很多团队采纳和使用。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/ha/facebookavatar.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/ha/facebookavatar.png" align="center"><br />
 <label class=“pic_title” align="center">图2 Facebook提出的HDFS AvatarNode架构图</label>
 </div>
 
@@ -539,7 +415,7 @@
 <p>对比AvatarNode，HA using QJM方案不再存在SPOF问题，High Availability特性明显提升，同时具备了自动Failover能力。正是其良好的设计和容错能力，HDFS HA using QJM方案在2012年随Hadoop 2.0正式发布，此后一直是Hadoop社区默认HDFS HA方案。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/ha/hausingqjm.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/ha/hausingqjm.png" align="center"><br />
 <label class=“pic_title” align="center">图3 HDFS HA using QJM架构图</label>
 </div>
 
@@ -577,7 +453,7 @@
 <p>在JournalNode Cluster中所有JN之间完全对等，不存在Primary/Secondary区别。功能上看也极其简单，Hadoop-2.7.1分支中总共2478行代码实现了完整的JournalNode功能，详细模块见图4JournalNode功能模块。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/ha/journalnode.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/ha/journalnode.png" align="center"><br />
 <label class=“pic_title” align="center">图4 JournalNode功能模块</label>
 </div>
 
@@ -613,7 +489,7 @@
 <p>在ANN进程的整个生命周期里，按照不同阶段，与JournalNode交互的逻辑可以简单划分成三个部分，如图5所示Active NameNode与JournalNode之间交互的状态转换图。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/ha/changestate.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/ha/changestate.png" align="center"><br />
 <label class=“pic_title” align="center">图5 Active NameNode与JournalNode之间交互的状态转换图</label>
 </div>
 
@@ -655,7 +531,7 @@
 <p>所有的准备工作完成，NameNode正式进入Active状态，开启HDFS读写服务。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/ha/recovery.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/ha/recovery.png" align="center"><br />
 <label class=“pic_title” align="center">图6 QJournal Recovery过程图示</label>
 </div>
 
@@ -675,7 +551,7 @@
 <p>3、ANN处理客户端写请求的锁外，NameNode请求执行一次对FSEditLogOp的Sync操作，也就是说NameNode端写缓存是单线程操作，但是Sync可能是批量操作，但是从客户端角度来看写请求都会保证数据安全落到JouranlNode后才会返回，所以整体上看NameNode具备强一致性保证，当然整个文件系统强一致保证由多个部分共同支撑，这里不再展开。ANN端的Sync首先从DoubleBuffer里读出所有准备就绪的数据，通过RPC请求送达JournalNode，这类请求到达JournalNode端会第一时间持久化，保证数据可靠；</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/ha/write.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/ha/write.png" align="center"><br />
 <label class=“pic_title” align="center">图7 Active NameNode写数据到JournalNode示意图</label>
 </div>
 
@@ -707,7 +583,7 @@
 <p>当前实现中，SBN仅回放Finalized状态的Segment。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/ha/read.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/ha/read.png" align="center"><br />
 <label class=“pic_title” align="center">图8 Standby NameNode从JournalNode读数据示意图</label>
 </div>
 
@@ -771,42 +647,22 @@
 [10] <a href="https://issues.apache.org/jira/browse/HDFS-1623">https://issues.apache.org/jira/browse/HDFS-1623</a><br/>
 [11] <a href="https://issues.apache.org/jira/browse/HADOOP-4539">https://issues.apache.org/jira/browse/HADOOP-4539</a><br/>
 [12] <a href="https://issues.apache.org/jira/browse/HDFS-976">https://issues.apache.org/jira/browse/HDFS-976</a></p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2017/02/12/namenode-restart-optimization/">HDFS NameNode重启优化</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2017-02-12T10:45:00+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>10:45 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>一、背景</h2>
+  <entry>
+    <title type="html"><![CDATA[HDFS NameNode重启优化]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2017/02/12/namenode-restart-optimization/"/>
+    <updated>2017-02-12T10:45:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2017/02/12/namenode-restart-optimization</id>
+    <content type="html"><![CDATA[<h2>一、背景</h2>
 
 <p>在Hadoop集群整个生命周期里，由于调整参数、Patch、升级等多种场景需要频繁操作NameNode重启，不论采用何种架构，重启期间集群整体存在可用性和可靠性的风险，所以优化NameNode重启非常关键。</p>
 
 <p>本文基于<a href="https://github.com/apache/hadoop/tree/branch-2">Hadoop-2.x</a>和<a href="http://hadoop.apache.org/docs/r2.7.1/hadoop-project-dist/hadoop-hdfs/HDFSHighAvailabilityWithQJM.html">HA with QJM</a>社区架构和系统设计（如图1所示），通过梳理NameNode重启流程，并在此基础上，阐述对NameNode重启优化实践。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/restartnn/qjm.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/restartnn/qjm.png" align="center"><br />
 <label class=“pic_title” align="center">图1 HDFS HA with QJM架构图示</label>
 </div>
 
@@ -832,7 +688,7 @@
 <p>从线上NameNode历次重启时间数据看，各阶段耗时占比基本接近如图2所示。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/restartnn/namenodetime.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/restartnn/namenodetime.png" align="center"><br />
 <label class=“pic_title” align="center">图2 NameNode重启各阶段耗时占比</label>
 </div>
 
@@ -846,7 +702,7 @@
 <p>如前述，FSImage文件记录了HDFS整个目录树Namespace相关的元数据。从<a href="https://github.com/apache/hadoop/tree/branch-2.4.0">Hadoop-2.4.0</a>起，FSImage开始采用<a href="https://developers.google.com/protocol-buffers/">Google Protobuf</a>编码格式描述（<a href="https://issues.apache.org/jira/browse/HDFS-5698">HDFS-5698</a>），详细描述文件见<a href="https://github.com/apache/hadoop/blob/branch-2.4.0/hadoop-hdfs-project/hadoop-hdfs/src/main/proto/fsimage.proto">fsimage.proto</a>。根据描述文件和实现逻辑，FSImage文件格式如图3所示。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/restartnn/fsimage.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/restartnn/fsimage.png" align="center"><br />
 <label class=“pic_title” align="center">图3 FSImage文件格式</label>
 </div>
 
@@ -875,7 +731,7 @@
 <p>记录在EditLog之中的每个操作又称为一个事务，对应一个整数形式的事务编号。在当前实现中多个事务组成一个Segment，生成独立的EditLog文件，其中文件名称标记了起止的事务编号，正在写入的EditLog文件仅标记起始事务编号。EditLog文件的格式非常简单，没再通过Google Protobuf描述，文件格式如图4所示。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/restartnn/editlog.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/restartnn/editlog.png" align="center"><br />
 <label class=“pic_title” align="center">图4 EditLog文件格式</label>
 </div>
 
@@ -906,7 +762,7 @@
 （2）NameNode重启时所有DataNode集中在同一时间段进行BlockReport请求；</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/restartnn/rpcprocesstime.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/restartnn/rpcprocesstime.png" align="center"><br />
 <label class=“pic_title” align="center">图5 BlockReport和AddBlock两个RPC处理时间对比</label></div>
 
 
@@ -953,7 +809,7 @@ NameNode加载完元数据后，所有DataNode尝试开始进行数据块汇报�
 <p>不论选择HA热备方案SBN（StandbyNameNode）还是冷备方案SNN（SecondaryNameNode）架构，执行Checkpoint的逻辑几乎一致，如图6所示。如果SBN/SNN服务长时间未正常运行，Checkpoint不能按照预期执行，这样会积压大量EditLog。积压的EditLog文件越多，重启NameNode需要加载EditLog时间越长。所以尽可能避免出现SNN/SBN长时间未正常服务的状态。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/restartnn/checkpoint.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/restartnn/checkpoint.png" align="center"><br />
 <label class=“pic_title” align="center">图6 Checkpoint流程</label>
 </div>
 
@@ -982,7 +838,7 @@ NameNode加载完元数据后，所有DataNode尝试开始进行数据块汇报�
 <p>经过多次优化调整，从线上NameNode历次的重启时间监控指标上看，收益非常明显，图7截取了其中几次NameNode重启时元数据量及重启时间开销对比，图中直观显示在500M元数据量级下，重启时间从~4000s优化到~2000s。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/restartnn/time.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/restartnn/time.png" align="center"><br />
 <label class=“pic_title” align="center">图7 NameNode重启时间对比</label>
 </div>
 
@@ -1003,35 +859,15 @@ NameNode加载完元数据后，所有DataNode尝试开始进行数据块汇报�
 [4] Hadoop Source. <a href="https://github.com/apache/hadoop">https://github.com/apache/hadoop</a><br/>
 [5] HDFS Issues. <a href="https://issues.apache.org/jira/browse/HDFS">https://issues.apache.org/jira/browse/HDFS</a><br/>
 [6] Cloudera Blog. <a href="http://blog.cloudera.com/">http://blog.cloudera.com/</a></p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2017/01/18/exact-count-optimization-of-apache-kylin/">Apache Kylin精确去重指标优化</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2017-01-18T10:45:00+08:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>10:45 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>前篇《<a href="http://hexiaoqiao.github.io/blog/2016/11/27/exact-count-and-global-dictionary-of-apache-kylin/">Apache Kylin精确计数与全局字典揭秘</a>》从精确计数使用场景到当前方案存在的问题及Apache Kylin在解决精确计数问题的思路进行了详细介绍。在此基础上，来自团队同学也是Apache Kylin社区Committer的<a href="https://github.com/kangkaisen">@Kangkaisen</a>更进一步，将Apache Kylin超高基数的精确去重指标查询提速数十倍。</p>
+  <entry>
+    <title type="html"><![CDATA[Apache Kylin精确去重指标优化]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2017/01/18/exact-count-optimization-of-apache-kylin/"/>
+    <updated>2017-01-18T10:45:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2017/01/18/exact-count-optimization-of-apache-kylin</id>
+    <content type="html"><![CDATA[<p>前篇《<a href="http://hexiaoqiao.github.io/blog/2016/11/27/exact-count-and-global-dictionary-of-apache-kylin/">Apache Kylin精确计数与全局字典揭秘</a>》从精确计数使用场景到当前方案存在的问题及Apache Kylin在解决精确计数问题的思路进行了详细介绍。在此基础上，来自团队同学也是Apache Kylin社区Committer的<a href="https://github.com/kangkaisen">@Kangkaisen</a>更进一步，将Apache Kylin超高基数的精确去重指标查询提速数十倍。</p>
 
 <h2>一、问题背景</h2>
 
@@ -1085,7 +921,7 @@ NameNode加载完元数据后，所有DataNode尝试开始进行数据块汇报�
 <p>热点代码的分析如图：</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/kylin/expensiveOftoString.png" alt="" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/kylin/expensiveOftoString.png" alt="" align="center"><br />
 <label class=“pic_title” align="center">图1 JMC分析结果图示</label>
 </div>
 
@@ -1187,35 +1023,15 @@ NameNode加载完元数据后，所有DataNode尝试开始进行数据块汇报�
 [4] <a href="https://issues.apache.org/jira/browse/KYLIN-2337">https://issues.apache.org/jira/browse/KYLIN-2337</a><br/>
 [5] <a href="https://issues.apache.org/jira/browse/KYLIN-2349">https://issues.apache.org/jira/browse/KYLIN-2349</a><br/>
 [6] <a href="https://issues.apache.org/jira/browse/KYLIN-2353">https://issues.apache.org/jira/browse/KYLIN-2353</a></p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/11/27/exact-count-and-global-dictionary-of-apache-kylin/">Apache Kylin精确计数与全局字典揭秘</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-11-27T10:45:00+08:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:45 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Apache Kylin是基于Hadoop之上的SQL多维分析引擎，具有支持海量数据、秒级响应、高并发等特点。Kylin中使用的精确去重计数和全局字典技术在相关领域里非常具有借鉴意义。本文作者来自<a href="http://kylin.apache.org/">Apache Kylin</a>社区PMC成员<a href="https://github.com/sunyerui">@Sunyerui</a>，谢绝转载。</p>
+  <entry>
+    <title type="html"><![CDATA[Apache Kylin精确计数与全局字典揭秘]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2016/11/27/exact-count-and-global-dictionary-of-apache-kylin/"/>
+    <updated>2016-11-27T10:45:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2016/11/27/exact-count-and-global-dictionary-of-apache-kylin</id>
+    <content type="html"><![CDATA[<p>Apache Kylin是基于Hadoop之上的SQL多维分析引擎，具有支持海量数据、秒级响应、高并发等特点。Kylin中使用的精确去重计数和全局字典技术在相关领域里非常具有借鉴意义。本文作者来自<a href="http://kylin.apache.org/">Apache Kylin</a>社区PMC成员<a href="https://github.com/sunyerui">@Sunyerui</a>，谢绝转载。</p>
 
 <h2>一、问题背景</h2>
 
@@ -1256,7 +1072,7 @@ NameNode加载完元数据后，所有DataNode尝试开始进行数据块汇报�
 <p>Trie树又名前缀树，是是一种有序树，一个节点的所有子孙都有相同的前缀，也就是这个节点对应的字符串，根节点对应空字符串，而每个字符串对应的编码值由对应节点在树中的位置来决定。图1是一棵典型的Trie树示意图，注意并不是每个节点都有对应的字符串值。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/kylin/trie.png" alt="" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/kylin/trie.png" alt="" align="center"><br />
 <label class=“pic_title” align="center">图1 Trie树结构图示</label>
 </div>
 
@@ -1266,7 +1082,7 @@ NameNode加载完元数据后，所有DataNode尝试开始进行数据块汇报�
 <p>在构造Trie树时，将每个值依次加入到树中，可以分为三种情况，如图2所示。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/kylin/trieaddnode.png" alt="" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/kylin/trieaddnode.png" alt="" align="center"><br />
 <label class=“pic_title” align="center">图2 构建Trie树过程</label>
 </div>
 
@@ -1276,7 +1092,7 @@ NameNode加载完元数据后，所有DataNode尝试开始进行数据块汇报�
 <p>上述的是Trie树在构建过程中的内存模型，当所有数据加入之后，需要将整棵Trie树的数据序列化并持久化。具体的格式如图3所示。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/kylin/trieserialize.png" alt="" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/kylin/trieserialize.png" alt="" align="center"><br />
 <label class=“pic_title” align="center">图3 Trie树序列化图示</label>
 </div>
 
@@ -1288,7 +1104,7 @@ NameNode加载完元数据后，所有DataNode尝试开始进行数据块汇报�
 <p>当需要从字典中检索某个值的映射id时，直接从序列化后的数据读取即可，不需要反序列化整棵Trie树，这样能在保证检索速度的同时保持较低的内存用量。整个过程如图4所示。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/kylin/triesearch.png" alt="" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/kylin/triesearch.png" alt="" align="center"><br />
 <label class=“pic_title” align="center">图4 Trie树检索过程</label>
 </div>
 
@@ -1300,7 +1116,7 @@ NameNode加载完元数据后，所有DataNode尝试开始进行数据块汇报�
 <p>图5是AppendTrie的序列化格式，可以看到和传统Trie树相比，主要区别在于不保留每个节点的子value数，转而将节点对应的映射id保存到序列化数据中，这样虽然增大了存储空间，但使得整棵树是可以追加的。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/kylin/appendtrie.png" alt="" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/kylin/appendtrie.png" alt="" align="center"><br />
 <label class=“pic_title” align="center">图5 AppendTrie序列化图示</label>
 </div>
 
@@ -1310,7 +1126,7 @@ NameNode加载完元数据后，所有DataNode尝试开始进行数据块汇报�
 <p>经过改造，AppendTrie树已经满足了我们的需求，能够支持我们实现对所有数据的统一编码，进而支持精确去重计数。但从实际情况来看，当统计的数据量超过千万时，整颗树的内存占用和序列化数据都会变得很大，因此需要考虑分片，将整颗树拆成多颗子树，通过控制每颗子树的大小，来实现整棵树的容量扩展。为了实现这个目标，当一棵树的大小超过设定阈值后，需要通过分裂算法将一棵树分裂成两棵子树，图6展示了整个过程。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/kylin/appendtriesplit.png" alt="" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/kylin/appendtriesplit.png" alt="" align="center"><br />
 <label class=“pic_title” align="center">图6 AppendTrie分裂过程图示</label>
 </div>
 
@@ -1334,7 +1150,7 @@ NameNode加载完元数据后，所有DataNode尝试开始进行数据块汇报�
 <p>图7展示了整个字典构建到应用的全过程。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/kylin/appendtriesplit.png" alt="" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/kylin/appendtriesplit.png" alt="" align="center"><br />
 <label class=“pic_title” align="center">图7 字典树构建及检索流程</label>
 </div>
 
@@ -1349,35 +1165,15 @@ NameNode加载完元数据后，所有DataNode尝试开始进行数据块汇报�
 （1）目前在内存有限，且字典较大时，容易出现字典分片被频繁换入换成的抖动，导致整体效率不高；<br/>
 （2）全局字典只支持进程内的并发构建，但还不支持跨机器的并发构建；<br/>
 （3）实际场景中，很多列的数据有高度相似性或属于同一来源，有可能共享同一个全局字典；</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/10/01/carbondata-column-based-storage-format/">Apache CarbonData初探</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-10-01T10:45:00+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2016</span></span> <span class='time'>10:45 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><a href="https://github.com/apache/incubator-carbondata">CarbonData</a>是由华为开源并支持<a href="http://hadoop.apache.org/">Hadoop</a>的列式存储文件格式，支持索引、压缩以及解编码等。其目的是为了实现同一份数据达到多种需求，而且能够实现更快的交互查询，目前该项目正处于Apache孵化阶段。本文在简单介绍CarbonData基础上，利用SSB基准测试工具对CarbonData与其他多种列式文件存储格式进行简单测试。部分内容来自<a href="http://weibo.com/207774111">@大月</a>同学。</p>
+  <entry>
+    <title type="html"><![CDATA[Apache CarbonData初探]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2016/10/01/carbondata-column-based-storage-format/"/>
+    <updated>2016-10-01T10:45:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2016/10/01/carbondata-column-based-storage-format</id>
+    <content type="html"><![CDATA[<p><a href="https://github.com/apache/incubator-carbondata">CarbonData</a>是由华为开源并支持<a href="http://hadoop.apache.org/">Hadoop</a>的列式存储文件格式，支持索引、压缩以及解编码等。其目的是为了实现同一份数据达到多种需求，而且能够实现更快的交互查询，目前该项目正处于Apache孵化阶段。本文在简单介绍CarbonData基础上，利用SSB基准测试工具对CarbonData与其他多种列式文件存储格式进行简单测试。部分内容来自<a href="http://weibo.com/207774111">@大月</a>同学。</p>
 
 <h2>一、简介</h2>
 
@@ -1409,7 +1205,7 @@ NameNode加载完元数据后，所有DataNode尝试开始进行数据块汇报�
 <p>每个blocklet又是由许多Data Chunks组成。Data Chunks里面的数据可以按列或者行的形式存储；数据既可以是单独的一列也可以是多列。文件中所有blocklets都包含相同数量和类型的Data Chunks。CarbonData文件格式如图1所示。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/carbondata/carbonformat.png" alt="CarbonData文件格式" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/carbondata/carbonformat.png" alt="CarbonData文件格式" align="center"><br />
 <label class=“pic_title” align="center">图1 CarbonData文件格式</label>
 </div>
 
@@ -1428,7 +1224,7 @@ NameNode加载完元数据后，所有DataNode尝试开始进行数据块汇报�
 <p>SSB的设定为零售业订单的产品、供应商分析场景，Schema包含一张事实表「订单lineorder」和四张维表：「消费者customer」, 「供应商supplier」, 「零件part」, 「日期date」，构成了一个典型的星型模式。图1中，表名下方的"SF * 30,000"代表各表的数据行数。例如，当SF=1时，事实表lineorder包含6,000,000行数据，维表customer包含30,000行数据，Date表的行数固定，不随SF变化。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/carbondata/ssb.png" alt="SSB Schema" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/carbondata/ssb.png" alt="SSB Schema" align="center"><br />
 <label class=“pic_title” align="center">图2 SSB Schema</label>
 </div>
 
@@ -1462,7 +1258,7 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 （4）使用dbgen生成测试数据。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/carbondata/ssbgen.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/carbondata/ssbgen.png" align="center"><br />
 <label class=“pic_title” align="center">图3 dbgen生成测试数据</label>
 </div>
 
@@ -1788,7 +1584,7 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 <p>我们希望测到千万级、亿级和十亿级事实表的规模，因此分别选择了2、20、200的SF（Scale Factor），对应的各表行数如下：</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/carbondata/datascale.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/carbondata/datascale.png" align="center"><br />
 <label class=“pic_title” align="center">图4 测试数据规模</label>
 </div>
 
@@ -2013,7 +1809,7 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 <h4>2、存储资源占用对比</h4>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/carbondata/compressdata.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/carbondata/compressdata.png" align="center"><br />
 <label class=“pic_title” align="center">图5 数据存储空间占用对比结果</label>
 </div>
 
@@ -2021,7 +1817,7 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/carbondata/compressratio.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/carbondata/compressratio.png" align="center"><br />
 <label class=“pic_title” align="center">图6 数据压缩率对比图示</label>
 </div>
 
@@ -2029,7 +1825,7 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 <p></p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/carbondata/compress.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/carbondata/compress.png" align="center"><br />
 <label class=“pic_title” align="center">图7 数据压缩率对比图示</label>
 </div>
 
@@ -2045,7 +1841,7 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 <p><em>注：下面关于查询效率的测试数据中包含了作业提交时间、JVM启动时间等，数据本身存在少许误差。</em></p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/carbondata/ssb2.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/carbondata/ssb2.png" align="center"><br />
 <label class=“pic_title” align="center">图8 数据规模SF2下的查询结果对比</label>
 </div>
 
@@ -2058,7 +1854,7 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 如果考虑到作业提交时间及JVM启动时间的误差，在SF2数据规模下的结果基本没有明显差异；</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/carbondata/ssb20.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/carbondata/ssb20.png" align="center"><br />
 <label class=“pic_title” align="center">图9 数据规模SF20下的查询结果对比</label>
 </div>
 
@@ -2068,7 +1864,7 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 <p><em>注：在SF=20数据规模下的测试结果看，结论与SF=2保持一致；</em></p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/carbondata/ssb200.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/carbondata/ssb200.png" align="center"><br />
 <label class=“pic_title” align="center">图10 数据规模SF200下的查询结果对比</label>
 </div>
 
@@ -2097,35 +1893,15 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 <p>[1] <a href="https://github.com/apache/incubator-carbondata">https://github.com/apache/incubator-carbondata</a><br/>
 [2] <a href="https://cwiki.apache.org/confluence/display/CARBONDATA/CarbonData+Home">https://cwiki.apache.org/confluence/display/CARBONDATA/CarbonData+Home</a><br/>
 [3] <a href="https://www.iteblog.com/archives/1806">https://www.iteblog.com/archives/1806</a></p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/09/13/namenode-repicationmonitor-exception-trace/">NameNode RepicationMonitor异常追查</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-09-13T10:45:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:45 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>集群版本从2.4.1升级到2.7.1之后，出现了一个诡异的问题，虽然没有影响到线上正常读写服务，但是潜在的问题还是比较严重，经过追查彻底解决，这里简单整理追查过程。</p>
+  <entry>
+    <title type="html"><![CDATA[NameNode RepicationMonitor异常追查]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2016/09/13/namenode-repicationmonitor-exception-trace/"/>
+    <updated>2016-09-13T10:45:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2016/09/13/namenode-repicationmonitor-exception-trace</id>
+    <content type="html"><![CDATA[<p>集群版本从2.4.1升级到2.7.1之后，出现了一个诡异的问题，虽然没有影响到线上正常读写服务，但是潜在的问题还是比较严重，经过追查彻底解决，这里简单整理追查过程。</p>
 
 <h2>一、问题描述</h2>
 
@@ -2134,7 +1910,7 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 <p>1、两个关键数据结构持续堆积，监控显示UnderReplicatedBlocks和PendingDeletionBlocks表现明显。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/monitor/underreplicatedblocks.png" alt="NameNode UnderReplicatedBlocks数据结构变化趋势" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/monitor/underreplicatedblocks.png" alt="NameNode UnderReplicatedBlocks数据结构变化趋势" align="center"><br />
 <label class=“pic_title” align="center">图1 NameNode UnderReplicatedBlocks数据结构变化趋势</label>
 </div>
 
@@ -2142,7 +1918,7 @@ FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选
 <p></p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/monitor/pendingblocks.png" alt="NameNode PendingBlocks数据结构变化趋势" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/monitor/pendingblocks.png" alt="NameNode PendingBlocks数据结构变化趋势" align="center"><br />
 <label class=“pic_title” align="center">图2 NameNode PendingBlocks数据结构变化趋势</label>
 </div>
 
@@ -2498,7 +2274,7 @@ computeDatanodeWork步骤4出现超时后，将对应的Block从pendingReplicati
 <p>可以看出computeDatanodeWork，processPendingReplications和PendingReplicationMonitor组成了一个生产者消费者的环，下图可以说明这个过程。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/monitor/replicationmonitor.png" alt="ReplicationMonitor相关数据流动图示" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/monitor/replicationmonitor.png" alt="ReplicationMonitor相关数据流动图示" align="center"><br />
 <label class=“pic_title” align="center">图3 ReplicationMonitor相关数据流动图示</label>
 </div>
 
@@ -2641,35 +2417,15 @@ computeDatanodeWork步骤4出现超时后，将对应的Block从pendingReplicati
 <p>3、虽然问题在线上存在了超过两周时间，但是并没有实际影响到集群正常服务，得益于中间合理可控的缓解手段。如果不能彻底解决可以尝试通过各种方法缓解或绕过问题值得借鉴，这种方法论随处可见，但是只有亲自趟过坑后才能印象深刻。</p>
 
 <p>4、回过头再看整个问题，解决问题的思路没有问题，但追查过程其实存在一个严重Bug，不再展开详述。</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/09/04/hdfs-centralized-cache-management/">HDFS集中式缓存管理</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-09-04T10:45:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:45 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>一、背景</h2>
+  <entry>
+    <title type="html"><![CDATA[HDFS集中式缓存管理]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2016/09/04/hdfs-centralized-cache-management/"/>
+    <updated>2016-09-04T10:45:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2016/09/04/hdfs-centralized-cache-management</id>
+    <content type="html"><![CDATA[<h2>一、背景</h2>
 
 <p>Hadoop设计之初借鉴GFS/MapReduce的思想：移动计算的成本远小于移动数据的成本。所以调度通常会尽可能将计算移动到拥有数据的节点上，在作业执行过程中，从HDFS角度看，计算和数据通常是同一个DataNode节点，即存在大量的本地读写。</p>
 
@@ -2865,7 +2621,7 @@ Quotas</p></blockquote>
 （6）上层调度尽可能将任务调度到数据所在的DataNode，当客户端进行读数据请求时，通过DFSClient直接从内存进行ZeroCopy，从而显著提升性能；</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/cache/cache.png" alt="HDFS集中式缓存管理流程图" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/cache/cache.png" alt="HDFS集中式缓存管理流程图" align="center"><br />
 <label class=“pic_title” align="center">图1 HDFS集中式缓存管理流程图</label>
 </div>
 
@@ -2873,7 +2629,7 @@ Quotas</p></blockquote>
 <p>HDFS集中式缓存的架构如图2所示，这里主要涉及到NameNode和DataNode两侧的管理和实现，NameNode对数据缓存的统一集中管理，并根据策略调度合适的DataNode对具体的数据进行数据的缓存和置换，DataNode根据NameNode的指令执行对数据的实际缓存和置换。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/cache/cachearc.png" alt="HDFS集中式缓存架构图" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/cache/cachearc.png" alt="HDFS集中式缓存架构图" align="center"><br />
 <label class=“pic_title” align="center">图2 HDFS集中式缓存架构图</label>
 </div>
 
@@ -2912,7 +2668,7 @@ Quotas</p></blockquote>
 （1）cacheBlock：唯一的入口是从ANN（HA Active NameNode）下发的指令；</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/cache/cacheblockinvoke.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/cache/cacheblockinvoke.png" align="center"><br />
 <label class=“pic_title” align="center"></label>
 </div>
 
@@ -2920,7 +2676,7 @@ Quotas</p></blockquote>
 <p>（2）uncacheBlock：与cacheBlock不同，uncacheBlock存在三个入口：append，invalidate和uncache。其中uncache也是来自ANN下发的指令；append和invalidate触发uncacheBlock的原因是：append会导致数据发生变化，缓存失效需要清理后重新缓存，invalidate来自删除操作，缓存同样失效需要清理。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/cache/uncacheblockinvoke.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/cache/uncacheblockinvoke.png" align="center"><br />
 <label class=“pic_title” align="center"></label>
 </div>
 
@@ -3015,35 +2771,15 @@ CacheManager通过几个关键数据结构组织对数据缓存的实现。</p>
 [5] <a href="https://en.wikipedia.org/wiki/Mmap">https://en.wikipedia.org/wiki/Mmap</a><br/>
 [6] <a href="https://issues.apache.org/jira/browse/HDFS-347">https://issues.apache.org/jira/browse/HDFS-347</a><br/>
 [7] <a href="https://issues.apache.org/jira/browse/HDFS-2246">https://issues.apache.org/jira/browse/HDFS-2246</a></p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/07/21/namenode-memory-detail/">NameNode内存详解</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-07-21T20:00:00+08:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>21</span><span class='date-suffix'>st</span>, <span class='date-year'>2016</span></span> <span class='time'>8:00 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>一、背景</h2>
+  <entry>
+    <title type="html"><![CDATA[NameNode内存详解]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2016/07/21/namenode-memory-detail/"/>
+    <updated>2016-07-21T20:00:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2016/07/21/namenode-memory-detail</id>
+    <content type="html"><![CDATA[<h2>一、背景</h2>
 
 <p>NameNode内存数据主要对整个文件系统元数据的管理。Namenode目前元数据管理可以分成两个层次，一个是Namespace的管理层，这一层负责管理HDFS分布式文件系统中的树状目录和文件结构；另一层则为Block管理层，这一层负责管理HDFS分布式文件系统中存储文件到物理块之间的映射关系BlocksMap元数据。其中对Namespace的管理数据除在内存常驻外，会定期Flush到持久化设备中；对BlocksMap元数据的管理只存在内存；当NameNode发生重启，需要从持久化设备中读取Namespace管理数据，并重新构造BlocksMap。这两部分数据结构占用巨大的JVM Heap空间。</p>
 
@@ -3060,14 +2796,14 @@ CacheManager通过几个关键数据结构组织对数据缓存的实现。</p>
 <p>NameNode除对文件系统本身元数据的管理外还需要维护DataNode的信息，主要通过NetworkTopology中DatanodeDescriptor对DataNode进行表示，该类继承结构如下图示：</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/memory/mem-1.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/memory/mem-1.png" align="center"><br />
 </div>
 
 
 <p>在整个继承机构中各个类的内存占用情况：</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/memory/mem-2.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/memory/mem-2.png" align="center"><br />
 </div>
 
 
@@ -3086,14 +2822,14 @@ CacheManager通过几个关键数据结构组织对数据缓存的实现。</p>
 <p>下图为整个Namespace中INode的类图结构，从类图可以看出，INodeFile和INodeDirectory的继承关系。其中目录在内存中由INodeDirectory对象来表示，并用List<INode> children成员列表来标识该目录下的子目录和文件；文件在内存中则由INodeFile来表示，并用BlockInfo[] blocks成员数组来标识该文件由那些blocks分块组成。其他的目录/文件属性在该类继承结构的各个相应子类成员变量标识。</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/memory/mem-3.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/memory/mem-3.png" align="center"><br />
 </div>
 
 
 <p>在整个继承关系中不同类的内存占用情况：</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/memory/mem-4.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/memory/mem-4.png" align="center"><br />
 </div>
 
 
@@ -3111,7 +2847,7 @@ CacheManager通过几个关键数据结构组织对数据缓存的实现。</p>
 <p>BlocksMap内部数据结构如下图示：</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/memory/mem-5.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/memory/mem-5.png" align="center"><br />
 </div>
 
 
@@ -3122,7 +2858,7 @@ CacheManager通过几个关键数据结构组织对数据缓存的实现。</p>
 <p>内存占用情况如下：</p>
 
 <div class=“pic” align="center" padding=“0”>
-<img src="/images/memory/mem-6.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/memory/mem-6.png" align="center"><br />
 </div>
 
 
@@ -3150,124 +2886,644 @@ BlocksMap：(40+120+8) * 160M = ~25.0 GB<br/>
 
 <p>1、NameNode内存使用量预估模型：Total=218 * num(INode) + 168 * num(Blocks)；<br/>
 2、受JVM可管理内存上限等物理因素，180G内存下，NameNode服务上限的元数据量约700M。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[HDFS升级过程中重启方式选择]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2016/07/07/restart-cluster-ways-when-upgrade/"/>
+    <updated>2016-07-07T10:45:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2016/07/07/restart-cluster-ways-when-upgrade</id>
+    <content type="html"><![CDATA[<h2>一、背景</h2>
+
+<p>集群在运行过程中，由于升级等原因难免会遇到重启NameNode或整个集群节点的情况，不同的重启方式会影响到整个运维操作的效率。<br/>
+刚接触HDFS时的某次全集群内DataNode升级，遇到一次非预期内的NameNode重启。升级时，NameNode首先进入Safemode模式，全集群禁止写操作。DataNode数据包和配置更新后操作了所有DataNode一次性重启，之后NameNode间歇性不能响应，持续高负载达~45min，之后不得不通过重启NameNode，之后~35min全集群启动完成，服务恢复正常。</p>
+
+<p>由此引出问题：<br/>
+1、造成全集群DataNode重启后NameNode不能正常响应的根本原因是什么？<br/>
+2、重启NameNode为什么能够实现恢复服务？</p>
+
+<h2>二、原因分析</h2>
+
+<h3>1、现场还原</h3>
+
+<p>在集群重启过程中，不管以什么方式进行重启，避免不了DataNode向NameNode进行BlockReport的交互，从NameNode现场截取两个时间段里部分BlockReport日志。</p>
+
+<p>表1 不同重启方式NameNode处理BR时间统计</p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:center;">  <strong>DN Restart Only</strong>   </th>
+<th style="text-align:center;"> - </th>
+<th style="text-align:center;"> - </th>
+<th style="text-align:center;"> <strong>With NN Restart</strong> </th>
+<th style="text-align:center;"> - </th>
+<th style="text-align:center;"> - </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center;"> <strong>Date</strong> </td>
+<td style="text-align:center;"> <strong>Blocks</strong> </td>
+<td style="text-align:center;"> <strong>ProcessTime</strong> </td>
+<td style="text-align:center;"> <strong>Date</strong> </td>
+<td style="text-align:center;"> <strong>Blocks</strong> </td>
+<td style="text-align:center;"> <strong>ProcessTime</strong> </td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:51</td>
+<td style="text-align:center;">   49428</td>
+<td style="text-align:center;">  646 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   66392</td>
+<td style="text-align:center;">  73 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:51</td>
+<td style="text-align:center;">   49428</td>
+<td style="text-align:center;">  646 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   66392</td>
+<td style="text-align:center;">  73 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:51</td>
+<td style="text-align:center;">   49068</td>
+<td style="text-align:center;">  644 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   69978</td>
+<td style="text-align:center;">  84 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:52</td>
+<td style="text-align:center;">   51822</td>
+<td style="text-align:center;">  638 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   78222</td>
+<td style="text-align:center;">  98 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:53</td>
+<td style="text-align:center;">   83131</td>
+<td style="text-align:center;">  1214 msecs      </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   64663</td>
+<td style="text-align:center;">  71 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:53</td>
+<td style="text-align:center;">   90088</td>
+<td style="text-align:center;">  169 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   85106</td>
+<td style="text-align:center;">  99 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:54</td>
+<td style="text-align:center;">   82024</td>
+<td style="text-align:center;">  1107 msecs      </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   87346</td>
+<td style="text-align:center;">  96 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:55</td>
+<td style="text-align:center;">   48114</td>
+<td style="text-align:center;">  637 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   87802</td>
+<td style="text-align:center;">  96 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:55</td>
+<td style="text-align:center;">   49457</td>
+<td style="text-align:center;">  84 msecs        </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   65646</td>
+<td style="text-align:center;">  71 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:56</td>
+<td style="text-align:center;">   82989</td>
+<td style="text-align:center;">  457 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   71025</td>
+<td style="text-align:center;">  86 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:57</td>
+<td style="text-align:center;">   84634</td>
+<td style="text-align:center;">  1181 msecs      </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   66144</td>
+<td style="text-align:center;">  73 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:58</td>
+<td style="text-align:center;">   67321</td>
+<td style="text-align:center;">  885 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   72652</td>
+<td style="text-align:center;">  90 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:59</td>
+<td style="text-align:center;">   70668</td>
+<td style="text-align:center;">  924 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   66118</td>
+<td style="text-align:center;">  76 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:59</td>
+<td style="text-align:center;">   73114</td>
+<td style="text-align:center;">  138 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   67011</td>
+<td style="text-align:center;">  74 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:59</td>
+<td style="text-align:center;">   28215</td>
+<td style="text-align:center;">  692 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   78216</td>
+<td style="text-align:center;">  84 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:00</td>
+<td style="text-align:center;">   30080</td>
+<td style="text-align:center;">  321 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   60988</td>
+<td style="text-align:center;">  66 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:00</td>
+<td style="text-align:center;">   30435</td>
+<td style="text-align:center;">  329 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   52376</td>
+<td style="text-align:center;">  58 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:00</td>
+<td style="text-align:center;">   34350</td>
+<td style="text-align:center;">  360 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   66801</td>
+<td style="text-align:center;">  73 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:01</td>
+<td style="text-align:center;">   32487</td>
+<td style="text-align:center;">  344 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   49134</td>
+<td style="text-align:center;">  53 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:01</td>
+<td style="text-align:center;">   28244</td>
+<td style="text-align:center;">  308 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   66928</td>
+<td style="text-align:center;">  73 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:01</td>
+<td style="text-align:center;">   29138</td>
+<td style="text-align:center;">  308 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   75560</td>
+<td style="text-align:center;">  82 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:02</td>
+<td style="text-align:center;">   29765</td>
+<td style="text-align:center;">  301 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   83880</td>
+<td style="text-align:center;">  92 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:02</td>
+<td style="text-align:center;">   28699</td>
+<td style="text-align:center;">  309 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   82989</td>
+<td style="text-align:center;">  93 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:02</td>
+<td style="text-align:center;">   35377</td>
+<td style="text-align:center;">  370 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   56210</td>
+<td style="text-align:center;">  60 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:03</td>
+<td style="text-align:center;">   49204</td>
+<td style="text-align:center;">  626 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   65517</td>
+<td style="text-align:center;">  78 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:03</td>
+<td style="text-align:center;">   27554</td>
+<td style="text-align:center;">  438 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   76159</td>
+<td style="text-align:center;">  78 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:04</td>
+<td style="text-align:center;">   27285</td>
+<td style="text-align:center;">  326 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   59725</td>
+<td style="text-align:center;">  58 msecs</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>左半部分记录的是重启全集群DataNode后，NameNode处理单个BlockReport请求耗时，右半部分为重启NameNode后，处理单个BlockReport请求耗时。这里只列了部分数据，虽不具统计意义，但是在处理时间的量级上可信。</p>
+
+<p>从数据上可以看到，对于BlockReport类型的RPC请求，不同的重启方式，RPC的处理时间有明显差异。</p>
+
+<h3>2、深度分析</h3>
+
+<p>前面也提到从数据上看，对于BlockReport类型的RPC请求，重启全集群DataNode与重启NameNode，RPC处理时间有一个数量级的差别。这种差别通过代码得到验证。</p>
+
+<figure class='code'><figcaption><span>BlockManager.java</span><a href='https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L1813'>Github </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">if</span> <span class="o">(</span><span class="n">storageInfo</span><span class="o">.</span><span class="na">getBlockReportCount</span><span class="o">()</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="c1">// The first block report can be processed a lot more efficiently than</span>
+</span><span class='line'>  <span class="c1">// ordinary block reports.  This shortens restart times.</span>
+</span><span class='line'>  <span class="n">processFirstBlockReport</span><span class="o">(</span><span class="n">node</span><span class="o">,</span> <span class="n">storage</span><span class="o">.</span><span class="na">getStorageID</span><span class="o">(),</span> <span class="n">newReport</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">invalidatedBlocks</span> <span class="o">=</span> <span class="n">processReport</span><span class="o">(</span><span class="n">node</span><span class="o">,</span> <span class="n">storage</span><span class="o">,</span> <span class="n">newReport</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>可以看到NameNode对BlockReport的处理方式仅区别于是否为初次BlockReport。初次BlockReport显然只发生在NameNode重启期间。<br/>
+processFirstBlockReport：对Standby节点（NameNode重启期间均为Standby），如果汇报的数据块相关元数据还没有加载，会将报告的块信息暂存队列，当Standby节点完成加载相关元数据后，再处理该消息队列； 对第一次块汇报的处理比较特别，为提高处理效率，仅验证块是否损坏，然后判断块状态是否为FINALIZED状态，如果是建立块与DN节点的映射，其他信息一概暂不处理。<br/>
+processReport：对于非初次块汇报，处理逻辑要复杂很多；对报告的每个块信息，不仅会建立块与DN的映射，还会检查是否损坏，是否无效，是否需要删除，是否为UC状态等等。</p>
+
+<p>初次块汇报的处理逻辑单独拿出来，主要原因有两方面：<br/>
+1、加快NameNode的启动时间；统计数据也能说明，初次块汇报的处理时间比正常块汇报的处理时间能节省约一个数量级的时间。<br/>
+2、由于启动过程中，不提供正常读写服务，所以只要确保正常数据（整个Namespace和所有FINALIZED状态Blocks）无误，无效和冗余数据处理完全可以延后到IBR或next BR。<br/>
+说明：<br/>
+1、是否选择processFirstBlockReport处理逻辑不会因为NameNode当前为safemode或者standby发生变化，仅NameNode重启生效；<br/>
+2、BlockReport的处理时间与DataNode数据规模正相关，当前DataNode中Block数处于：200,000 ~ 1,000,000。<br/>
+如果不操作NameNode重启，BlockReport处理时间会因为处理逻辑复杂带来额外的处理时间，统计数据显示，约一个数量级的差别。</p>
+
+<p>NameNode对非第一次BlockReport的复杂处理逻辑只是NameNode负载持续处于高位的诱因，在其诱发下发生了一系列“滚雪球”式的异常放大。<br/>
+1、所有DataNode进程被关闭后，NameNode的CallQueue（默认大小：3200）会被快速消费完；</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/restart/1.png" align="center"><br />
 </div>
-  
-  
 
 
-    </article>
-  
-  <div class="pagination">
-    
-      <a class="prev" href="/posts/2">&larr; Older</a>
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
+<p>2、所有DataNode进程被重启后，NameNode的CallQueue会被迅速填充，主要来自DataNode重启后正常流程里的VersionRequest和registerDataNode两类RPC请求，由于均较轻量，所以也会被迅速消费完；</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/restart/2.png" align="center"><br />
 </div>
-<aside class="sidebar">
+
+
+<p>3、之后DataNode进入BlockReport流程，NameNode的CallQueue填充内容开始从VersionRequest和registerDataNode向BlockReport过渡；</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/restart/3.png" align="center"><br />
+</div>
+
+
+<p>直到CallQueue里几乎被所有BlockReport填充满。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/restart/4.png" align="center"><br />
+</div>
+
+
+<p>前面的统计数据显示，NameNode不重启对BlockReport的处理时间~500ms，另一个关键数据是Client看到的RPC超时时间，默认为60s；在默认的RPC超时时间范围内，CallQueue里最多可能被处理的BlockReport数~120个，其它均会发生超时。
+当发生超时后，Client端（DataNode）会尝试重试，所以NameNode的CallQueue会被持续打满；另一方面，如果NameNode发现RPC Request出现超时会被忽略（可以从日志证实），直到存在未超时的请求，此时从CallQueue拿出来的BlockReport请求虽未超时，但也处于即将超时的边缘，即使处理完成其中的少数几个，CallQueue中的剩余大部分也会出现超时。</p>
+
+<figure class='code'><figcaption><span>namenode.lgo </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>2015-04-28 13:14:48,709 INFO org.apache.hadoop.ipc.Server: IPC Server handler 9 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.16.45.38:37649 Call#650 Retry#0
+</span><span class='line'>2015-04-28 13:14:48,709 INFO org.apache.hadoop.ipc.Server: IPC Server handler 9 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.16.53.5:14839 Call#659 Retry#0
+</span><span class='line'>2015-04-28 13:14:48,709 INFO org.apache.hadoop.ipc.Server: IPC Server handler 9 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.16.62.5:55833 Call#702 Retry#0
+</span><span class='line'>2015-04-28 13:14:48,709 INFO org.apache.hadoop.ipc.Server: IPC Server handler 9 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.16.51.31:41016 Call#655 Retry#0
+</span><span class='line'>2015-04-28 13:14:48,709 INFO org.apache.hadoop.ipc.Server: IPC Server handler 29 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.16.62.36:53163 Call#702 Retry#0
+</span><span class='line'>2015-04-28 13:14:48,709 INFO org.apache.hadoop.ipc.Server: IPC Server handler 9 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.16.46.32:53530 Call#662 Retry#0
+</span><span class='line'>2015-04-28 13:14:48,710 INFO org.apache.hadoop.ipc.Server: IPC Server handler 29 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.16.55.11:52372 Call#662 Retry#0
+</span><span class='line'>2015-04-28 13:14:48,710 INFO org.apache.hadoop.ipc.Server: IPC Server handler 9 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.16.55.44:30295 Call#666 Retry#0
+</span><span class='line'>2015-04-28 13:14:48,710 INFO org.apache.hadoop.ipc.Server: IPC Server handler 29 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.16.50.4:37880 Call#674 Retry#0
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>通过前面的分析，从整个Timeline上看，NameNode长期处于满负荷运行状态，但是有效处理能力非常低（仅针对BlockReport）。这也是为什么1000+ DataNode（每一个DataNode管理的Block数均未超过1,000,000），也即1000+有效BlockReport请求，在~50min内依然没有被处理完成。</p>
+
+<p>如果DataNode进程处于正常运行状态下，重启NameNode后会发生完全不同的情况。<br/>
+1、NameNode重启后，首先加载FsImage，此时，除Namespace外NameNode的元数据几乎为空，此后开始接收DataNode过来的RPC请求（绝大多数为Heartbeat）；</p>
+
+<div class=“pic” align="center" padding=“0”> 
+<img src="http://hexiaoqiao.github.io/images/restart/5.png" align="center"><br />
+</div>
+
+
+<p>2、NameNode接收到Heartbeat后由于在初始状态会要求DataNode重新注册；由于Heartbeat间隔是3s，所以从NameNode的角度看，所有DataNode的后续一系列RPC请求会被散列到3s时间线上；</p>
+
+<div class=“pic” align="center" padding=“0”>  
+<img src="http://hexiaoqiao.github.io/images/restart/6.png" align="center"><br />
+</div>
+
+
+<p>3、DataNode向NameNode注册完成后立即开始BlockReport；由于步骤2里提到的3s时间线散列关系，队列里后半部分BlockReport请求和VersionRequest/registerDataNode请求会出现相互交叉的情况；</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/restart/7.png" align="center"><br />
+</div>
+
+
+<p>4、如前述，处理BlockReport时部分RPC请求一样会发生超时；</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/restart/8.png" align="center"><br />
+</div>
+
+
+<p>5、由于超时重试，所以部分BlockReport和registerDataNode需要重试；可以发现不同于重启所有DataNode时重试的RPC几乎都是BlockReport，这里重试的RPC包括了VersionRequest/registerDataNode（可以从日志证实），这就大幅降低了NameNode的负载，避免了“滚雪球”式高负载RPC堆积，使异常有效收敛。</p>
+
+<figure class='code'><figcaption><span>namenode.log </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.versionRequest from 10.32.73.39:16329 Call#2893 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.32.20.15:54831 Call#2889 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.versionRequest from 10.16.62.38:10818 Call#2835 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.versionRequest from 10.16.52.18:59462 Call#2818 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.registerDatanode from 10.16.39.24:13728 Call#2864 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.versionRequest from 10.32.27.8:58789 Call#2883 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.registerDatanode from 10.32.73.40:56606 Call#2889 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.versionRequest from 10.16.40.21:19961 Call#2843 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.versionRequest from 10.16.43.13:22644 Call#2870 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.registerDatanode from 10.16.43.26:16289 Call#2876 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.versionRequest from 10.16.61.30:31968 Call#2825 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.versionRequest from 10.32.21.5:47752 Call#2879 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.32.49.11:46892 Call#2904 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.versionRequest from 10.16.36.24:12326 Call#2859 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.versionRequest from 10.16.56.4:55321 Call#2833 Retry#0
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>3、避免重启大量DataNode时雪崩</h3>
+
+<p>从前面的分析过程，可以得出两个结论：<br/>
+（1）NameNode对正常BlockReport处理效率是造成可能雪崩的根本原因；<br/>
+（2）BlockReport的堆积让问题完全失控；</p>
+
+<p>从这两个结论出发可以推导出相应的解决办法：</p>
+
+<p>1、解决效率问题：<br/>
+（1）优化代码逻辑；这块代码相对成熟，可优化的空间不大，另外所需的时间成本较高，暂可不考虑；<br/>
+（2）降低BlockReport时数据规模；NameNode处理BR的效率低主要原因还是每次BR所带的Block规模过大造成，所以可以通过调整Block数量阈值，将一次BlockReport分成多盘分别汇报，提高NameNode处理效率。可参考的参数为：dfs.blockreport.split.threshold，默认为1,000,000，当前集群DataNode上Block规模数处于240,000 ~ 940,000，建议调整为500,000；另一方面，可以通过在同一个物理节点上部署多个DataNode实例，分散数据，达到缩小规模的目的，但是这种方案仅能解决当前问题，长期来看依然不能避免，且影响范围比较大，需要多方面权衡。</p>
+
+<p>2、解决堆积问题：<br/>
+（1）控制重启DataNode的数量；按照当前节点数据规模，如果大规模重启DataNode，可采取滚动方式，以~15/单位间隔~1min滚动重启，如果数据规模增长，需要适当调整实例个数；<br/>
+（2）定期清空CallQueue；如前述，当大规模DataNode实例被同时重启后，如果不采取措施一定会发生“雪崩”，若确实存在类似需求或场景，可以通过定期清空CallQueue（dfsadmin -refreshCallQueue）的方式，避免堆积效应；这种方案的弊端在于不能有选择的清空RPC Request，所以当线上服务期时，存在数据读写请求超时、作业失败的风险。</p>
+
+<p>3、选择合适的重启方式：<br/>
+（1）当需要对全集群的DataNode重启操作，且规模较大（包括集群规模和数据规模）时，建议在重启DataNode进程之后将NameNode重启，避免前面的“雪崩”问题；<br/>
+（2）当灰度操作部分DataNode或者集群规模和数据规模均较小时，可采取滚动重启DataNode进程的方式；</p>
+
+<h2>三、总结</h2>
+
+<p>1、重启所有DataNode时，由于处理BlockReport逻辑不同，及由此诱发的“雪崩式”效应，导致重启进度极度缓慢；<br/>
+2、在数据规模达到10K~100K，重启一台DataNode都会给NameNode的正常服务造成瞬时抖动；<br/>
+3、在数据规模到100K量级时，同时重启~15以内DataNode不会对集群造成雪崩式灾难，但是可能出现短时间内服务不可用状态；<br/>
+4、全集群升级时，建议NameNode和DataNode均重启，在预期时间内可恢复服务。</p>
+]]></content>
+  </entry>
   
-    <section>
-  <h1>Recent Posts</h1>
-  <ul id="recent_posts">
-    
-      <li class="post">
-        <a href="/blog/2018/10/05/recruit/">大数据职位招聘</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/07/13/a-brief-introduction-of-hdfs-blocktoken-mechanism/">HDFS BlockToken机制解析</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2018/03/30/the-analysis-of-basic-principle-of-hdfs-ha-using-qjm/">HDFS HA Using QJM原理解析</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/02/12/namenode-restart-optimization/">HDFS NameNode重启优化</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/01/18/exact-count-optimization-of-apache-kylin/">Apache Kylin精确去重指标优化</a>
-      </li>
-    
-  </ul>
-</section>
+  <entry>
+    <title type="html"><![CDATA[NameNode内存全景]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2016/07/06/namenode-memory-overview/"/>
+    <updated>2016-07-06T10:45:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2016/07/06/namenode-memory-overview</id>
+    <content type="html"><![CDATA[<h2>一、概述</h2>
+
+<p>从整个HDFS系统架构上看，NameNode是其中最重要、最复杂也是最容易出现问题的地方，而且一旦NameNode出现故障，整个Hadoop集群就将处于不可服务的状态，同时随着数据规模和集群规模的持续增长，很多小量级时被隐藏的问题逐渐暴露出来。所以，从更高层次掌握NameNode的内部结构和运行机制尤其重要。除特别说明外，本文主要基于社区版本Hadoop-2.4.1[1][2]。</p>
+
+<p>NameNode管理着整个HDFS文件系统的元数据。从架构设计上看，元数据大致分成两个层次：Namespace管理层，负责管理文件系统中的树状目录结构以及文件与数据块的映射关系；块管理层，负责管理文件系统中文件的物理块与实际存储位置的映射关系BlocksMap，如图1所示[1]。Namespace管理的元数据除内存常驻外，也会周期Flush到持久化设备上FsImage文件；BlocksMap元数据只在内存中存在；当NameNode发生重启，首先从持久化设备中读取FsImage构建Namespace，之后根据DataNode的汇报信息重新构造BlocksMap。这两部分数据结构是占据了NameNode大部分JVM Heap空间。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/hdfs/hdfs.png" alt="HDFS结构图" align="center"><br />
+<label class=“pic_title” align="center">图1 HDFS结构图</label>
+</div>
+
+
+<p>除了对文件系统本身元数据的管理之外，NameNode还需要维护整个集群的机架及DataNode的信息、Lease管理以及集中式缓存引入的缓存管理等等。这几部分数据结构空间占用相对固定，且占用较小。</p>
+
+<p>测试数据显示，Namespace目录和文件总量到2亿，数据块总量到3亿后，常驻内存使用量超过90GB。</p>
+
+<h2>二、内存全景</h2>
+
+<p>如前述，NameNode整个内存结构大致可以分成四大部分：Namespace，BlocksMap，NetworkTopology，LeaseManager &amp; SnapshotManager &amp; CacheManager及其他，图2为各数据结构内存逻辑分布图示。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/hdfs/namenodemem.png" alt="namenode内存全景图" align="center"><br />
+<label class=“pic_title” align="center">图2 NameNode内存全景图</label><br>
+</div>
+
+
+<p></p>
+
+<p>Namespace：维护整个文件系统的目录树结构，及目录树上的状态变化；<br/>
+BlocksManager：维护整个文件系统中与数据块相关的信息，及数据块的状态变化；<br/>
+NetworkTopology：维护机架拓扑及DataNode信息，机架感知的基础；<br/>
+LeaseManager：读写的互斥同步就是靠Lease实现，支持HDFS的Write-Once-Read-Many的核心数据结构；<br/>
+CacheManager：Hadoop 2.3.0引入的集中式缓存新特性，支持集中式缓存的管理，实现memory-locality提升读性能；<br/>
+SnapshotManager：Hadoop 2.1.0引入的Snapshot新特性，用于数据备份、回滚，以防止因用户误操作导致集群出现数据问题；<br/>
+DelegationTokenSecretManager：管理HDFS的安全访问；<br/>
+其他：临时数据信息、统计信息metrics等等。</p>
+
+<p>NameNode常驻内存主要被Namespace和BlockManager使用，二者使用占比分别接近50%。其他部分内存开销较小且相对固定，与Namespace和BlockManager相比基本可以忽略。</p>
+
+<h2>三、内存分析</h2>
+
+<h3>3.1 Namespace</h3>
+
+<p>与单机文件系统相似，HDFS对文件系统的目录结构也是按照树状结构维护，Namespace保存了目录树及每个目录/文件节点的属性。除在内存常驻外，这部分数据会定期flush到持久化设备上，生成一个新的FsImage文件，方便NameNode发生重启时，从FsImage及时恢复整个Namespace。图3所示为Namespace内存结构。前述集群中目录和文件总量即整个Namespace目录树中包含的节点总数，可见Namespace本身其实是一棵非常巨大的树。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/hdfs/namespace.png" alt="Namespace内存结构" align="center"><br />
+<label class=“pic_title” align="center">图3 Namespace内存结构</label>
+</div>
+
+
+<p>在整个Namespace目录树中存在两种不同类型的INode数据结构：INodeDirectory和INodeFile。其中INodeDirectory标识的是目录树中的目录，INodeFile标识的是目录树中的文件。由于二者均继承自INode，所以具备大部分相同的公共信息INodeWithAdditionalFields，除常用基础属性外，其中还提供了扩展属性features，如Quota，Snapshot等均通过Feature增加，如果以后出现新属性也可通过Feature方便扩展。不同的是，INodeFile特有的标识副本数和数据块大小组合的header（2.6.1之后又新增了标识存储策略ID的信息）及该文件包含的有序Blocks数组；INodeDirectory则特有子节点的列表children。这里需要特别说明children是默认大小为5的ArrayList，按照子节点name有序存储，虽然在插入时会损失一部分写性能，但是可以方便后续快速二分查找提高读性能，对一般存储系统，读操作比写操作占比要高。具体的继承关系见图4所示。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/hdfs/inode.png" alt="INode继承关系" align="center"><br />
+<label class=“pic_title” align="center">图4 INode继承关系</label>
+</div>
+
+
+<h3>3.2 BlockManager</h3>
+
+<p>BlocksMap在NameNode内存空间占据很大比例，由BlockManager统一管理，相比Namespace，BlockManager管理的这部分数据要复杂的多。Namespace与BlockManager之间通过前面提到的INodeFile有序Blocks数组关联到一起。图5所示BlockManager管理的内存结构。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/hdfs/blockmanager.png" alt="BlockManager管理的内存结构" align="center"><br />
+<label class=“pic_title” align="center">图5 BlockManager管理的内存结构</label>
+</div>
+
+
+<p>每一个INodeFile都会包含数量不等的Block，具体数量由文件大小及每一个Block大小（默认为64M）比值决定，这些Block按照所在文件的先后顺序组成BlockInfo数组，如图5所示的BlockInfo[A~K]，BlockInfo维护的是Block的元数据，结构如图6所示，数据本身是由DataNode管理，所以BlockInfo需要包含实际数据到底由哪些DataNode管理的信息，这里的核心是名为triplets的Object数组，大小为3*replicas，其中replicas是Block副本数量。triplets包含的信息：</p>
+
+<p>triplets[i]：Block所在的DataNode；<br/>
+triplets[i+1]：该DataNode上前一个Block；<br/>
+triplets[i+2]：该DataNode上后一个Block；</p>
+
+<p>其中i表示的是Block的第i个副本，i取值[0,replicas)。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/hdfs/blockinfo.png" alt="BlockInfo继承关系" align="center"><br />
+<label class=“pic_title” align="center">图6 BlockInfo继承关系</label>
+</div>
+
+
+<p>从前面描述可以看到BlockInfo几块重要信息：文件包含了哪些Block，这些Block分别被实际存储在哪些DataNode上，DataNode上所有Block前后链表关系。</p>
+
+<p>如果从信息完整度来看，以上数据足够支持所有关于HDFS文件系统的正常操作，但还存在一个使用场景较多的问题：不能通过blockid快速定位Block，所以引入了BlocksMap。</p>
+
+<p>BlocksMap底层通过LightWeightGSet实现，本质是一个链式解决冲突的哈希表。为了避免rehash过程带来的性能开销，初始化时，索引空间直接给到了整个JVM可用内存的2%，并且不再变化。集群启动过程，DataNode会进行BR（BlockReport），根据BR的每一个Block计算其HashCode，之后将对应的BlockInfo插入到相应位置逐渐构建起来巨大的BlocksMap。前面在INodeFile里也提到的BlockInfo集合，如果我们将BlocksMap里的BlockInfo与所有INodeFile里的BlockInfo分别收集起来，可以发现两个集合完全相同，事实上BlocksMap里所有的BlockInfo就是INodeFile中对应BlockInfo的引用；通过Block查找对应BlockInfo时，也是先对Block计算HashCode，根据结果快速定位到对应的BlockInfo信息。至此涉及到HDFS文件系统本身元数据的问题基本上已经解决了。</p>
+
+<p>前面提到部分都属于静态数据部分，NameNode内存中所有数据都要随读写情况发生变化，BlockManager当然也需要管理这部分动态数据。主要是当Block发生变化不符合预期时需要及时调整Blocks的分布。这里涉及几个核心的数据结构：</p>
+
+<p>excessReplicateMap：若某个Block实际存储的副本数多于预设副本数，这时候需要删除多余副本，这里多余副本会被置于excessReplicateMap中。excessReplicateMap是从DataNode的StorageID到Block集合的映射集。
+neededReplications：若某个Block实际存储的副本数少于预设副本数，这时候需要补充缺少副本，这里哪些Block缺少多少个副本都统一存在neededReplications里，本质上neededReplications是一个优先级队列，缺少副本数越多的Block之后越会被优先处理。
+invalidateBlocks：若某个Block即将被删除，会被置于invalidateBlocks中。invalidateBlocks是从DataNode的StorageID到Block集合的映射集。如某个文件被客户端执行了删除操作，该文件所属的所有Block会先被置于invalidateBlocks中。
+corruptReplicas：有些场景Block由于时间戳/长度不匹配等等造成Block不可用，会被暂存在corruptReplicas中，之后再做处理。</p>
+
+<p>前面几个涉及到Block分布情况动态变化的核心数据结构，这里的数据实际上是过渡性质的，BlocksManager内部的ReplicationMonitor线程（图5标识Thread/Monitor）会持续从其中取出数据并通过逻辑处理后分发给具体的DatanodeDescriptor对应数据结构（3.3 NetworkTopology里会有简单介绍），当对应DataNode的心跳过来之后，NameNode会遍历DatanodeDescriptor里暂存的数据，将其转换成对应指令返回给DataNode，DataNode收到任务并执行完成后再反馈回NameNode，之后DatanodeDescriptor里对应信息被清除。如BlockB预设副本数为3，由于某种原因实际副本变成4（如之前下线的DataNode D重新上线，其中B正好有BlockB的一个副本数据），BlockManager能及时发现副本变化，并将多余的DataNode D上BlockB副本放置到excessReplicateMap中，ReplicationMonitor线程定期检查时发现excessReplicateMap中数据后将其移到DataNode D对应DatanodeDescriptor中invalidateBlocks里，当DataNode D下次心跳过来后，随心跳返回删除Block B的指令，DataNode D收到指令实际删除其上的Block B数据并反馈回NameNode，此后BlockManager将DataNode D上的Block B从内存中清除，至此Block B的副本符合预期，整个流程如图7所示。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/hdfs/blockreplica.png" alt="副本数异常时处理过程" align="center"><br />
+<label class=“pic_title” align="center">图7 副本数异常时处理过程</label>
+</div>
+
+
+<h3>3.3 NetworkTopology</h3>
+
+<p>前面多次提到Block与DataNode之间的关联关系，事实上NameNode确实还需要管理所有DataNode，不仅如此，由于数据写入前需要确定数据块写入位置，NameNode还维护着整个机架拓扑NetworkTopology。图8所示内存中机架拓扑图。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/hdfs/networktopology.png" alt="NetworkTopology内存结构" align="center"><br />
+<label class=“pic_title” align="center">图8 NetworkTopology内存结构</label>
+</div>
+
+
+<p>从图8可以看出这里包含两个部分：机架拓扑结构NetworkTopology和DataNode节点信息。其中树状的机架拓扑是根据机架感知（一般都是外部脚本计算得到）在集群启动完成后建立起来，整个机架的拓扑结构在NameNode的生命周期内一般不会发生变化；另一部分是比较关键的DataNode信息，BlockManager已经提到每一个DataNode上的Blocks集合都会形成一个双向链表，更准确的应该是DataNode的每一个存储单元DatanodeStorageInfo上的所有Blocks集合会形成一个双向链表，这个链表的入口就是机架拓扑结构叶子节点即DataNode管理的DatanodeStorageInfo。此外由于上层应用对数据的增删查随时发生变化，随之DatanodeStorageInfo上的Blocks也会动态变化，所以NetworkTopology上的DataNode对象还会管理这些动态变化的数据结构，如replicateBlocks/recoverBlocks/invalidateBlocks，这些数据结构正好和BlockManager管理的动态数据结构对应，实现了数据的动态变化由BlockManager传达到DataNode内存对象最后通过指令下达到物理DataNode实际执行的流动过程，流程在3.2 BlockManager已经介绍。</p>
+
+<p>这里存在一个问题，为什么DatanodeStorageInfo下所有Block之间会以双向链表组织，而不是其他数据结构？如果结合实际场景就不难发现，对每一个DatanodeStorageInfo下Block的操作集中在快速增加/删除（Block动态增减变化）及顺序遍历（BlockReport期间），所以双向链表是非常合适的数据结构。</p>
+
+<h3>3.4 LeaseManager</h3>
+
+<p>Lease 机制是重要的分布式协议，广泛应用于各种实际的分布式系统中。HDFS支持Write-Once-Read-Many，对文件写操作的互斥同步靠Lease实现。Lease实际上是时间约束锁，其主要特点是排他性。客户端写文件时需要先申请一个Lease，一旦有客户端持有了某个文件的Lease，其他客户端就不可能再申请到该文件的Lease，这就保证了同一时刻对一个文件的写操作只能发生在一个客户端。NameNode的LeaseManager是Lease机制的核心，维护了文件与Lease、客户端与Lease的对应关系，这类信息会随写数据的变化实时发生对应改变。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/hdfs/leasemanager.png" alt="LeaseManager的内存数据结构" align="center"><br />
+<label class=“pic_title” align="center">图9 LeaseManager的内存数据结构</label>
+</div>
+
+
+<p>图9所示为LeaseManager内存结构，包括以下三个主要核心数据结构：</p>
+
+<p>sortedLeases：Lease集合，按照时间先后有序组织，便于检查Lease是否超时；<br/>
+leases：客户端到Lease的映射关系；<br/>
+sortedLeasesByPath：文件路径到Lease的映射关系；</p>
+
+<p>其中每一个写数据的客户端会对应一个Lease，每个Lease里包含至少一个标识文件路径的Path。Lease本身已经维护了其持有者（客户端）及该Lease正在操作的文件路径集合，之所以增加了leases和sortedLeasesByPath为提高通过Lease持有者或文件路径快速索引到Lease的性能。</p>
+
+<p>由于Lease本身的时间约束特性，当Lease发生超时后需要强制回收，内存中与该Lease相关的内容要被及时清除。超时检查及超时后的处理逻辑由LeaseManager.Monitor统一执行。LeaseManager中维护了两个与Lease相关的超时时间：软超时（softLimit）和硬超时（hardLimit），使用场景稍有不同。</p>
+
+<p>正常情况下，客户端向集群写文件前需要向NameNode的LeaseManager申请Lease；写文件过程中定期更新Lease时间，以防Lease过期，周期与softLimit相关；写完数据后申请释放Lease。整个过程可能发生两类问题：（1）写文件过程中客户端没有及时更新Lease时间；（2）写完文件后没有成功释放Lease。两个问题分别对应为softLimit和hardLimit。两种场景都会触发LeaseManager对Lease超时强制回收。如果客户端写文件过程中没有及时更新Lease超过softLimit时间后，另一客户端尝试对同一文件进行写操作时触发Lease软超时强制回收；如果客户端写文件完成但是没有成功释放Lease，则会由LeaseManager的后台线程LeaseManager.Monitor检查是否硬超时后统一触发超时回收。不管是softLimit还是hardLimit超时触发的强制Lease回收，处理逻辑都一样：FSNamesystem.internalReleaseLease，逻辑本身比较复杂，这里不再展开，简单的说先对Lease过期前最后一次写入的Block进行检查和修复，之后释放超时持有的Lease，保证后面其他客户端的写入能够正常申请到该文件的Lease。</p>
+
+<p>NameNode内存数据结构非常丰富，这里对几个重要的数据结构进行了简单的描述，除了前面罗列之外，其实还有如SnapShotManager/CacheManager等，由于其内存占用有限且有一些特性还尚未稳定，这里不再展开。</p>
+
+<h2>四、问题</h2>
+
+<p>随着集群中数据规模的不断积累，NameNode内存占用随之成比例增长。不可避免的NameNode内存将逐渐成为集群发展的瓶颈，并开始暴漏诸多问题。</p>
+
+<p>1、启动时间变长。NameNode的启动过程可以分成FsImage数据加载、editlogs回放、Checkpoint、DataNode的BlockReport几个阶段。数据规模较小时，启动时间可以控制在~10min以内，当元数据规模达到5亿（Namespace中INode数超过2亿，Block数接近3亿），FsImage文件大小将接近到20GB，加载FsImage数据就需要~14min，Checkpoint需要~6min，再加上其他阶段整个重启过程将持续~50min，极端情况甚至超过60min，虽然经过多轮优化重启过程已经能够稳定在~30min，但也非常耗时。如果数据规模继续增加，启动过程将同步增加。</p>
+
+<p>2、性能开始下降。HDFS文件系统的所有元数据相关操作基本上均在NameNode端完成，当数据规模的增加致内存占用变大后，元数据的增删改查性能会出现下降，且这种下降趋势会因规模效应及复杂的处理逻辑被放大，相对复杂的RPC请求（如addblock）性能下降更加明显。</p>
+
+<p>3、NameNode JVM FGC（Full GC）风险较高。主要体现在两个方面：（1）FGC频率增加；（2）FGC时间增加且风险不可控。针对NameNode的应用场景，目前看CMS内存回收算法比较主流，正常情况下，对超过100GB内存进行回收处理时，可以控制到秒级别的停顿时间，但是如果回收失败被降级到串行内存回收时，应用的停顿时间将达到数百秒，这对应用本身是致命的。</p>
+
+<p>4、超大JVM Heap Size调试问题。如果线上集群性能表现变差，不得不通过分析内存才能得到结论时，会成为一件异常困难的事情。且不说Dump本身极其费时费力，Dump超大内存时存在极大概率使NameNode不可服务。</p>
+
+<p>针对NameNode内存增长带来的诸多问题，社区和业界都在持续关注并尝试不同的解决方案。整体上两个思路：（1）扩展NameNode分散单点负载；（2）引入外部系统支持NameNode内存数据。</p>
+
+<p>从2010年开始社区就投入大量精力持续解决，Federation方案[3]通过对NameNode进行水平扩展分散单点负载的方式解决NameNode的问题，经过几年的发展该方案逐渐稳定，目前已经被业界广泛使用。除此之外，社区也在尝试将Namespace存储值外部的KV存储系统如LevelDB[4]，从而降低NameNode内存负载。</p>
+
+<p>除社区外，业界也在尝试自己的解决方案。Baidu HDFS2[5]将元数据管理通过主从架构的集群形式提供服务，本质上是将原生NameNode管理的Namespace和BlockManagement进行物理拆分。其中Namespace负责管理整个文件系统的目录树及文件到BlockID集合的映射关系，BlockID到DataNode的映射关系是按照一定的规则分到多个服务节点分布式管理，这种方案与Lustre有相似之处（Hash-based Partition）。Taobao HDFS2[6]尝试过采用另外的思路，借助高速存储设备，将元数据通过外存设备进行持久化存储，保持NameNode完全无状态，实现NameNode无限扩展的可能。其他类似的诸多方案不一而足。</p>
+
+<p>尽管社区和业界均对NameNode内存瓶颈有成熟的解决方案，但是不一定适用所有的场景，尤其是中小规模集群。结合实践过程和集群规模发展期可能遇到的NameNode内存相关问题这里有几点建议：</p>
+
+<p>1、合并小文件。正如前面提到，目录/文件和Block均会占用NameNode内存空间，大量小文件会降低内存使用效率；另外，小文件的读写性能远远低于大文件的读写，主要原因对小文件读写需要在多个数据源切换，严重影响性能。</p>
+
+<p>2、调整合适的BlockSize。主要针对集群内文件较大的业务场景，可以通过调整默认的Block Size大小（参数：dfs.blocksize，默认128M），降低NameNode的内存增长趋势。</p>
+
+<p>3、HDFS Federation方案。当集群和数据均达到一定规模时，仅通过垂直扩展NameNode已不能很好的支持业务发展，可以考虑HDFS Federation方案实现对NameNode的水平扩展，在解决NameNode的内存问题的同时通过Federation可以达到良好的隔离性，不会因为单一应用压垮整集群。</p>
+
+<h2>五、总结</h2>
+
+<p>NameNode在整个HDFS系统架构中占据举足轻重的位置，内部数据和处理逻辑相对复杂，本文简单梳理了NameNode的内存全景及对其中几个关键数据结构，从NameNode内存核心数据视角对NameNode进行了简单的解读，并结合实际场景介绍了随着数据规模的增加NameNode内存可能遇到的问题及业界各种可借鉴的解决方案。</p>
+
+<h2>六、参考</h2>
+
+<p>[1] Apache Hadoop. <a href="https://hadoop.apache.org/.">https://hadoop.apache.org/.</a><br/>
+[2] Apache Hadoop Source Code. <a href="https://github.com/apache/hadoop/tree/branch-2.4.1/.">https://github.com/apache/hadoop/tree/branch-2.4.1/.</a><br/>
+[3] HDFS Federation. <a href="https://issues.apache.org/jira/browse/HDFS-1052.">https://issues.apache.org/jira/browse/HDFS-1052.</a><br/>
+[4] NemeNode Scalability. <a href="https://issues.apache.org/jira/browse/HDFS-5389.">https://issues.apache.org/jira/browse/HDFS-5389.</a><br/>
+[5] Baidu HDFS2. <a href="http://static.zhizuzhefu.com/wordpress_cp/uploads/2013/04/a9.pdf.">http://static.zhizuzhefu.com/wordpress_cp/uploads/2013/04/a9.pdf.</a><br/>
+[6] Taobao HDFS2. <a href="https://github.com/taobao/ADFS.">https://github.com/taobao/ADFS.</a></p>
+]]></content>
+  </entry>
   
-<section>  
-  <h1>Weibo</h1>  
-  <ul id="weibo">  
-    <li>
-    <iframe 
-	width="100%" 
-	height="550" 
-	class="share_self"  
-	frameborder="0" 
-	scrolling="no" 
-	src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=0&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=1283533382&verifier=9bc28858&dpc=1">
-    </iframe>
-    </li>  
-  </ul>  
-</section>  
-
-<section>
-  <h1>WeChat</h1>
-  <ul id="wechat">
-  <div class=“pic” padding=“0”>
-  <img src="/images/qrcode.jpg"><br />
-  </div>
-  </ul>
-</section>
-
-
-
-
-
-  
-</aside>
-
-    </div>
-  </div>
-  <footer role="contentinfo"><p>
-  Copyright &copy; 2018 - Hexiaoqiao -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
-</p>
-
-</footer>
-  
-
-<script type="text/javascript">
-      var disqus_shortname = 'Hexiaoqiao';
-      
-        
-        var disqus_script = 'count.js';
-      
-    (function () {
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    }());
-</script>
-
-
-
-
-
-
-
-  <script type="text/javascript">
-    (function(){
-      var twitterWidgets = document.createElement('script');
-      twitterWidgets.type = 'text/javascript';
-      twitterWidgets.async = true;
-      twitterWidgets.src = '//platform.twitter.com/widgets.js';
-      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
-    })();
-  </script>
-
-
-
-
-
-</body>
-</html>
+</feed>

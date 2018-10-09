@@ -1,0 +1,1631 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Namenode | Hexiaoqiao]]></title>
+  <link href="http://hexiaoqiao.github.io/blog/categories/namenode/atom.xml" rel="self"/>
+  <link href="http://hexiaoqiao.github.io/"/>
+  <updated>2018-10-09T11:58:28+08:00</updated>
+  <id>http://hexiaoqiao.github.io/</id>
+  <author>
+    <name><![CDATA[Hexiaoqiao]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[HDFS NameNode重启优化]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2017/02/12/namenode-restart-optimization/"/>
+    <updated>2017-02-12T10:45:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2017/02/12/namenode-restart-optimization</id>
+    <content type="html"><![CDATA[<h2>一、背景</h2>
+
+<p>在Hadoop集群整个生命周期里，由于调整参数、Patch、升级等多种场景需要频繁操作NameNode重启，不论采用何种架构，重启期间集群整体存在可用性和可靠性的风险，所以优化NameNode重启非常关键。</p>
+
+<p>本文基于<a href="https://github.com/apache/hadoop/tree/branch-2">Hadoop-2.x</a>和<a href="http://hadoop.apache.org/docs/r2.7.1/hadoop-project-dist/hadoop-hdfs/HDFSHighAvailabilityWithQJM.html">HA with QJM</a>社区架构和系统设计（如图1所示），通过梳理NameNode重启流程，并在此基础上，阐述对NameNode重启优化实践。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/restartnn/qjm.png" align="center"><br />
+<label class=“pic_title” align="center">图1 HDFS HA with QJM架构图示</label>
+</div>
+
+
+<p></p>
+
+<h2>二、NameNode重启流程</h2>
+
+<p>在HDFS的整个运行期里，所有元数据均在NameNode的内存集中管理，但是由于内存易失特性，一旦出现进程退出、宕机等异常情况，所有元数据都会丢失，给整个系统的数据安全会造成不可恢复的灾难。为了更好的容错能力，NameNode会周期进行Checkpoint，将其中的一部分元数据（文件系统的目录树Namespace）刷到持久化设备上，即二进制文件FSImage，这样的话即使NameNode出现异常也能从持久化设备上恢复元数据，保证了数据的安全可靠。</p>
+
+<p>但是仅周期进行Checkpoint仍然无法保证所有数据的可靠，如前次Checkpoint之后写入的数据依然存在丢失的问题，所以将两次Checkpoint之间对Namespace写操作实时写入EditLog文件，通过这种方式可以保证HDFS元数据的绝对安全可靠。</p>
+
+<p>事实上，除Namespace外，NameNode还管理非常重要的元数据BlocksMap，描述数据块Block与DataNode节点之间的对应关系。NameNode并没有对这部分元数据同样操作持久化，原因是每个DataNode已经持有属于自己管理的Block集合，将所有DataNode的Block集合汇总后即可构造出完整BlocksMap。</p>
+
+<p>HA with QJM架构下，NameNode的整个重启过程中始终以SBN（StandbyNameNode）角色完成。与前述流程对应，启动过程分以下几个阶段：<br/>
+0、加载FSImage；<br/>
+1、回放EditLog；<br/>
+2、执行Checkpoint；（非必须步骤，结合实际情况和参数确定，后续详述）<br/>
+3、收集所有DataNode的注册和数据块汇报；</p>
+
+<p>默认情况下，NameNode会保存两个FSImage文件，与此对应，也会保存对应两次Checkpoint之后的所有EditLog文件。一般来说，NameNode重启后，通过对FSImage文件名称判断，选择加载最新的FSImage文件及回放该Checkpoint之后生成的所有EditLog，完成后根据加载的EditLog中操作条目数及距上次Checkpoint时间间隔（后续详述）确定是否需要执行Checkpoint，之后进入等待所有DataNode注册和元数据汇报阶段，当这部分数据收集完成后，NameNode的重启流程结束。</p>
+
+<p>从线上NameNode历次重启时间数据看，各阶段耗时占比基本接近如图2所示。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/restartnn/namenodetime.png" align="center"><br />
+<label class=“pic_title” align="center">图2 NameNode重启各阶段耗时占比</label>
+</div>
+
+
+<p></p>
+
+<p>经过优化，在元数据总量540M（目录树240M，数据块300M），超过4K规模的集群上重启NameNode总时间~35min，其中加载FSImage耗时~15min，秒级回放EditLog，数据块汇报耗时~20min，基本能够满足生产环境的需求。</p>
+
+<h3>2.1 加载FSImage</h3>
+
+<p>如前述，FSImage文件记录了HDFS整个目录树Namespace相关的元数据。从<a href="https://github.com/apache/hadoop/tree/branch-2.4.0">Hadoop-2.4.0</a>起，FSImage开始采用<a href="https://developers.google.com/protocol-buffers/">Google Protobuf</a>编码格式描述（<a href="https://issues.apache.org/jira/browse/HDFS-5698">HDFS-5698</a>），详细描述文件见<a href="https://github.com/apache/hadoop/blob/branch-2.4.0/hadoop-hdfs-project/hadoop-hdfs/src/main/proto/fsimage.proto">fsimage.proto</a>。根据描述文件和实现逻辑，FSImage文件格式如图3所示。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/restartnn/fsimage.png" align="center"><br />
+<label class=“pic_title” align="center">图3 FSImage文件格式</label>
+</div>
+
+
+<p></p>
+
+<p>从fsimage.proto和FSImage文件存储格式容易看到，除了必要的文件头部校验（MAGIC）和尾部文件索引（FILESUMMARY）外，主要包含以下核心数据：</p>
+
+<p>（0）NS_INFO（NameSystemSection）：记录HDFS文件系统的全局信息，包括NameSystem的ID，当前已经分配出去的最大BlockID以及TransactionId等信息；<br/>
+（1）INODE（INodeSection）：整个目录树所有节点数据，包括INodeFile/INodeDirectory/INodeSymlink等所有类型节点的属性数据，其中记录了如节点id，节点名称，访问权限，创建和访问时间等等信息；<br/>
+（2）INODE_DIR（INodeDirectorySection）：整个目录树中所有节点之间的父子关系，配合INODE可构建完整的目录树；<br/>
+（3）FILES_UNDERCONSTRUCTION（FilesUnderConstructionSection）：尚未完成写入的文件集合，主要为重启时重建Lease集合；<br/>
+（4）SNAPSHOT（SnapshotSection）：记录Snapshot数据，快照是Hadoop 2.1.0引入的新特性，用于数据备份、回滚，以防止因用户误操作导致集群出现数据问题；<br/>
+（5）SNAPSHOT_DIFF（SnapshotDiffSection）：执行快照操作的目录/文件的Diff集合数据，与SNAPSHOT一起构建较完整的快照管理能力；<br/>
+（6）INODE_REFERENCE（INodeReferenceSection）：当目录/文件被操作处于快照，且该目录/文件被重命名后，会存在多条访问路径，INodeReference就是为了解决该问题；<br/>
+（7）SECRET_MANAGER（SecretManagerSection）：记录DelegationKey和DelegationToken数据，根据DelegationKey及由DelegationToken构造出的DelegationTokenIdentifier方便进一步计算密码，以上数据可以完善所有合法Token集合；<br/>
+（8）CACHE_MANAGER（CacheManagerSection）：集中式缓存特性全局信息，集中式缓存特性是Hadoop-2.3.0为提升数据读性能引入的新特性；<br/>
+（9）STRING_TABLE（StringTableSection）：字符串到id的映射表，维护目录/文件的Permission字符到ID的映射，节省存储空间；</p>
+
+<p>NameNode执行Checkpoint时，遵循Protobuf定义及上述文件格式描述，重启加载FSImage时，同样按照Protobuf定义的格式从文件流中读出相应数据构建整个目录树Namespace及其他元数据。将FSImage文件从持久化设备加载到内存并构建出目录树结构后，实际上并没有完全恢复元数据到最新状态，因为每次Checkpoint之后还可能存在大量HDFS写操作。</p>
+
+<h3>2.2 回放EditLog</h3>
+
+<p>NameNode在响应客户端的写请求前，会首先更新内存相关元数据，然后再把这些操作记录在EditLog文件中，可以看到内存状态实际上要比EditLog数据更及时。</p>
+
+<p>记录在EditLog之中的每个操作又称为一个事务，对应一个整数形式的事务编号。在当前实现中多个事务组成一个Segment，生成独立的EditLog文件，其中文件名称标记了起止的事务编号，正在写入的EditLog文件仅标记起始事务编号。EditLog文件的格式非常简单，没再通过Google Protobuf描述，文件格式如图4所示。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/restartnn/editlog.png" align="center"><br />
+<label class=“pic_title” align="center">图4 EditLog文件格式</label>
+</div>
+
+
+<p></p>
+
+<p>一个完整的EditLog文件包括四个部分内容，分别是：<br/>
+（0）LAYOUTVERSION：版本信息；<br/>
+（1）OP_START_LOG_SEGMENT：标识文件开始；<br/>
+（2）RECORD：顺序逐个记录HDFS写操作的事务内容；<br/>
+（3）OP_END_LOG_SEGMENT：标记文件结束；</p>
+
+<p>NameNode加载FSImage完成后，即开始对该FSImage文件之后（通过比较FSImage文件名称中包含的事务编号与EditLog文件名称的起始事务编号大小确定）生成的所有EditLog严格按照事务编号从小到大逐个遵循上述的格式进行每一个HDFS写操作事务回放。</p>
+
+<p>NameNode加载完所有必需的EditLog文件数据后，内存中的目录树即恢复到了最新状态。</p>
+
+<h3>2.3 DataNode注册汇报</h3>
+
+<p>经过前面两个步骤，主要的元数据被构建，HDFS的整个目录树被完整建立，但是并没有掌握从数据块Block与DataNode之间的对应关系BlocksMap，甚至对DataNode的情况都不掌握，所以需要等待DataNode注册，并完成对从DataNode汇报上来的数据块汇总。待汇总的数据量达到预设比例（dfs.namenode.safemode.threshold-pct）后退出Safemode。</p>
+
+<p>NameNode重启经过加载FSImage和回放EditLog后，所有DataNode不管进程是否发生过重启，都必须经过以下两个步骤：<br/>
+（0）DataNode重新注册RegisterDataNode；<br/>
+（1）DataNode汇报所有数据块BlockReport；</p>
+
+<p>对于节点规模较大和元数据量较大的集群，这个阶段的耗时会非常可观。主要有三点原因：<br/>
+（0）处理BlockReport的逻辑比较复杂，相对其他RPC操作耗时较长。图5对比了BlockReport和AddBlock两种不同RPC的处理时间，尽管AddBlock操作也相对复杂，但是对比来看，BlockReport的处理时间显著高于AddBlock处理时间；<br/>
+（1）NameNode对每一个BlockReport的RPC请求处理都需要持有全局锁，也就是说对于BlockReport类型RPC请求实际上是串行处理；<br/>
+（2）NameNode重启时所有DataNode集中在同一时间段进行BlockReport请求；</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/restartnn/rpcprocesstime.png" align="center"><br />
+<label class=“pic_title” align="center">图5 BlockReport和AddBlock两个RPC处理时间对比</label></div>
+
+
+<p></p>
+
+<p>前文<a href="http://hexiaoqiao.github.io/blog/2016/07/06/namenode-memory-overview/">NameNode内存全景</a>中详细描述过Block在NameNode元数据中的关键作用及与Namespace/DataNode/BlocksMap的复杂关系，从中也可以看出，每个新增Block需要维护多个关系，更何况重启过程中所有Block都需要建立同样复杂关系，所以耗时相对较高。</p>
+
+<h2>三、重启优化</h2>
+
+<p>根据前面对NameNode重启过程的简单梳理，在各个阶段可以适当的实施优化以加快NameNode重启过程。</p>
+
+<p>0、<a href="https://issues.apache.org/jira/browse/HDFS-7097">HDFS-7097</a> 解决重启过程中SBN执行Checkpoint时不能处理BlockReport请求的问题；</p>
+
+<p>Fix：<a href="https://issues.apache.org/jira/browse/HDFS/fixforversion/12327584">2.7.0</a><br/>
+Hadoop-2.7.0版本前，SBN（StandbyNameNode）在执行Checkpoint操作前会先获得全局读写锁fsLock，在此期间，BlockReport请求由于不能获得全局写锁会持续处于等待状态，直到Checkpoint完成后释放了fsLock锁后才能继续。NameNode重启的第三个阶段，同样存在这种情况。而且对于规模较大的集群，每次Checkpoint时间在分钟级别，对整个重启过程影响非常大。实际上，Checkpoint是对目录树的持久化操作，并不涉及BlocksMap数据结构，所以Checkpoint期间是可以让BlockReport请求直接通过，这样可以节省期间BlockReport排队等待带来的时间开销，<a href="https://issues.apache.org/jira/browse/HDFS-7097">HDFS-7097</a>正是将锁粒度放小解决了Checkpoint过程不能处理BlockReport类型RPC请求的问题。</p>
+
+<p>与<a href="https://issues.apache.org/jira/browse/HDFS-7097">HDFS-7097</a>相对，另一种思路也值得借鉴，就是重启过程尽可能避免出现Checkpoint。触发Checkpoint有两种情况：时间周期或HDFS写操作事务数，分别通过参数dfs.namenode.checkpoint.period和dfs.namenode.checkpoint.txns控制，默认值分别是3600s和1,000,000，即默认情况下一个小时或者写操作的事务数超过1,000,000触发一次Checkpoint。为了避免在重启过程中频繁执行Checkpoint，可以适当调大dfs.namenode.checkpoint.txns，建议值10,000,000 ~ 20,000,000，带来的影响是EditLog文件累计的个数会稍有增加。从实践经验上看，对一个有亿级别元数据量的NameNode，回放一个EditLog文件（默认1,000,000写操作事务）时间在秒级，但是执行一次Checkpoint时间通常在分钟级别，综合权衡减少Checkpoint次数和增加EditLog文件数收益比较明显。</p>
+
+<p>1、<a href="https://issues.apache.org/jira/browse/HDFS-6763">HDFS-6763</a> 解决SBN每间隔1min全局计算和验证Quota值导致进程Hang住数秒的问题；</p>
+
+<p>Fix：<a href="https://issues.apache.org/jira/browse/HDFS/fixforversion/12329057">2.8.0</a><br/>
+ANN（ActiveNameNode）将HDFS写操作实时写入JN的EditLog文件，为同步数据，SBN默认间隔1min从JN拉取一次EditLog文件并进行回放，完成后执行全局Quota检查和计算，当Namespace规模变大后，全局计算和检查Quota会非常耗时，在此期间，整个SBN的Namenode进程会被Hang住，以至于包括DN心跳和BlockReport在内的所有RPC请求都不能及时处理。NameNode重启过程中这个问题影响突出。<br/>
+实际上，SBN在EditLog Tailer阶段计算和检查Quota完全没有必要，HDFS-6763将这段处理逻辑后移到主从切换时进行，解决SBN进程间隔1min被Hang住的问题。<br/>
+从优化效果上看，对一个拥有接近五亿元数据量，其中两亿数据块的NameNode，优化前数据块汇报阶段耗时~30min，其中触发超过20次由于计算和检查Quota导致进程Hang住~20s的情况，整个BlockReport阶段存在超过5min无效时间开销，优化后可到~25min。</p>
+
+<p>2、<a href="https://issues.apache.org/jira/browse/HDFS-7980">HDFS-7980</a> 简化首次BlockReport处理逻辑优化重启时间；</p>
+
+<p>Fix：<a href="https://issues.apache.org/jira/browse/HDFS/fixforversion/12331979">2.7.1</a><br/>
+NameNode加载完元数据后，所有DataNode尝试开始进行数据块汇报，如果汇报的数据块相关元数据还没有加载，先暂存消息队列，当NameNode完成加载相关元数据后，再处理该消息队列。对第一次块汇报的处理比较特别（NameNode重启后，所有DataNode的BlockReport都会被标记成首次数据块汇报），为提高处理速度，仅验证块是否损坏，之后判断块状态是否为FINALIZED，若是建立数据块与DataNode的映射关系，建立与目录树中文件的关联关系，其他信息一概暂不处理。对于非初次数据块汇报，处理逻辑要复杂很多，对报告的每个数据块，不仅检查是否损坏，是否为FINALIZED状态，还会检查是否无效，是否需要删除，是否为UC状态等等；验证通过后建立数据块与DataNode的映射关系，建立与目录树中文件的关联关系。</p>
+
+<p>初次数据块汇报的处理逻辑独立出来，主要原因有两方面：<br/>
+（0）加快NameNode的启动时间；测试数据显示含~500M元数据的NameNode在处理800K个数据块的初次块汇报的处理时间比正常块汇报的处理时间可降低一个数量级；<br/>
+（1）启动过程中，不提供正常读写服务，所以只要确保正常数据（整个Namespace和所有FINALIZED状态Blocks）无误，无效和冗余数据处理完全可以延后到IBR（IncrementalBlockReport）或下次BR（BlockReport）；</p>
+
+<p>这本来是非常合理和正常的设计逻辑，但是实现时NameNode在判断是否为首次数据块块汇报的逻辑一直存在问题，导致这段非常好的改进点逻辑实际上长期并未真正执行到，直到<a href="https://issues.apache.org/jira/browse/HDFS-7980">HDFS-7980</a>在Hadoop-2.7.1修复该问题。<a href="https://issues.apache.org/jira/browse/HDFS-7980">HDFS-7980</a>的优化效果非常明显，测试显示，对含80K Blocks的BlockReport RPC请求的处理时间从~500ms可优化到~100ms，从重启期整个BlockReport阶段看，在超过600M元数据，其中300M数据块的NameNode显示该阶段从~50min优化到~25min。</p>
+
+<p>3、<a href="https://issues.apache.org/jira/browse/HDFS-7503">HDFS-7503</a> 解决重启前大删除操作会造成重启后锁内写日志降低处理能力；</p>
+
+<p>Fix：<a href="https://issues.apache.org/jira/browse/HDFS/fixforversion/12327584">2.7.0</a><br/>
+若NameNode重启前产生过大删除操作，当NameNode加载完FSImage并回放了所有EditLog构建起最新目录树结构后，在处理DataNode的BlockReport时，会发现有大量Block不属于任何文件，Hadoop-2.7.0版本前，对于这类情况的输出日志逻辑在全局锁内，由于存在大量IO操作的耗时，会严重拉长处理BlockReport的处理时间，影响NameNode重启时间。<a href="https://issues.apache.org/jira/browse/HDFS-7503">HDFS-7503</a>的解决办法非常简单，把日志输出逻辑移出全局锁外。线上效果上看对同类场景优化比较明显，不过如果重启前不触发大的删除操作影响不大。</p>
+
+<p>4、防止热备节点SBN（StandbyNameNode）/冷备节点SNN（SecondaryNameNode）长时间未正常运行堆积大量Editlog拖慢NameNode重启时间；</p>
+
+<p>不论选择HA热备方案SBN（StandbyNameNode）还是冷备方案SNN（SecondaryNameNode）架构，执行Checkpoint的逻辑几乎一致，如图6所示。如果SBN/SNN服务长时间未正常运行，Checkpoint不能按照预期执行，这样会积压大量EditLog。积压的EditLog文件越多，重启NameNode需要加载EditLog时间越长。所以尽可能避免出现SNN/SBN长时间未正常服务的状态。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/restartnn/checkpoint.png" align="center"><br />
+<label class=“pic_title” align="center">图6 Checkpoint流程</label>
+</div>
+
+
+<p></p>
+
+<p>在一个有500M元数据的NameNode上测试加载一个200K次HDFS事务操作的EditLog文件耗时~5s，按照默认2min的EditLog滚动周期，如果一周时间SBN/SNN未能正常工作，则会累积~5K个EditLog文件，此后一旦发生NameNode重启，仅加载EditLog文件的时间就需要~7h，也就是整个集群存在超过7h不可用风险，所以切记要保证SBN/SNN不能长时间故障。</p>
+
+<p>5、<a href="https://issues.apache.org/jira/browse/HDFS-6425">HDFS-6425</a> <a href="https://issues.apache.org/jira/browse/HDFS-6772">HDFS-6772</a> NameNode重启后DataNode快速退出blockContentsStale状态防止PostponedMisreplicatedBlocks过大影响对其他RPC请求的处理能力；</p>
+
+<p>Fix: <a href="https://issues.apache.org/jira/browse/HDFS/fixforversion/12327181">2.6.0</a>, <a href="https://issues.apache.org/jira/browse/HDFS/fixforversion/12327584">2.7.0</a><br/>
+当集群中大量数据块的实际存储副本个数超过副本数时（跨机房架构下这种情况比较常见），NameNode重启后会迅速填充到PostponedMisreplicatedBlocks，直到相关数据块所在的所有DataNode汇报完成且退出Stale状态后才能被清理。如果PostponedMisreplicatedBlocks数据量较大，每次全遍历需要消耗大量时间，且整个过程也要持有全局锁，严重影响处理BlockReport的性能，<a href="https://issues.apache.org/jira/browse/HDFS-6425">HDFS-6425</a>和<a href="https://issues.apache.org/jira/browse/HDFS-6772">HDFS-6772</a>分别将可能在BlockReport逻辑内部遍历非常大的数据结构PostponedMisreplicatedBlocks优化到异步执行，并在NameNode重启后让DataNode快速退出blockContentsStale状态避免PostponedMisreplicatedBlocks过大入手优化重启效率。</p>
+
+<p>6、降低BlockReport时数据规模；</p>
+
+<p>NameNode处理BlockReport的效率低主要原因还是每次BlockReport所带的Block规模过大造成，所以可以通过调整Block数量阈值，将一次BlockReport分成多盘分别汇报，以提高NameNode对BlockReport的处理效率。可参考的参数为：dfs.blockreport.split.threshold，默认值1,000,000，即当DataNode本地的Block个数超过1,000,000时才会分盘进行汇报，建议将该参数适当调小，具体数值可结合NameNode的处理BlockReport时间及集群中所有DataNode管理的Block量分布确定。</p>
+
+<p>7、重启完成后对比检查数据块上报情况；</p>
+
+<p>前面提到NameNode汇总DataNode上报的数据块量达到预设比例（dfs.namenode.safemode.threshold-pct）后就会退出Safemode，一般情况下，当NameNode退出Safemode后，我们认为已经具备提供正常服务的条件。但是对规模较大的集群，按照这种默认策略及时执行主从切换后，容易出现短时间丢块的问题。考虑在200M数据块的集群，默认配置项dfs.namenode.safemode.threshold-pct=0.999，也就是当NameNode收集到200M*0.999=199.8M数据块后即可退出Safemode，此时实际上还有200K数据块没有上报，如果强行执行主从切换，会出现大量的丢块问题，直到数据块汇报完成。应对的办法比较简单，尝试调大dfs.namenode.safemode.threshold-pct到1，这样只有所有数据块上报后才会退出Safemode。但是这种办法一样不能保证万无一失，如果启动过程中有DataNode汇报完数据块后进程挂掉，同样存在短时间丢失数据的问题，因为NameNode汇总上报数据块时并不检查副本数，所以更稳妥的解决办法是利用主从NameNode的JMX数据对比所有DataNode当前汇报数据块量的差异，当差异都较小后再执行主从切换可以保证不发生上述问题。</p>
+
+<p>8、其他；</p>
+
+<p>除了优化NameNode重启时间，实际运维中还会遇到需要滚动重启集群所有节点或者一次性重启整集群的情况，不恰当的重启方式也会严重影响服务的恢复时间，所以合理控制重启的节奏或选择合适的重启方式尤为关键，<a href="http://hexiaoqiao.github.io/blog/2016/07/07/restart-cluster-ways-when-upgrade/">HDFS集群启动方式分析</a>一文对集群重启方式进行了详细的阐述，这里就不再展开。</p>
+
+<p>经过多次优化调整，从线上NameNode历次的重启时间监控指标上看，收益非常明显，图7截取了其中几次NameNode重启时元数据量及重启时间开销对比，图中直观显示在500M元数据量级下，重启时间从~4000s优化到~2000s。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/restartnn/time.png" align="center"><br />
+<label class=“pic_title” align="center">图7 NameNode重启时间对比</label>
+</div>
+
+
+<p></p>
+
+<p>这里罗列了一小部分实践过程中可以有效优化重启NameNode时间或者重启全集群的点，其中包括了社区成熟Patch和相关参数优化，虽然实现逻辑都很小，但是实践收益非常明显。当然除了上述提到，NameNode重启还有很多可以优化的地方，比如优化FSImage格式，并行加载等等，社区也在持续关注和优化，部分讨论的思路也值得关注、借鉴和参考。</p>
+
+<h2>四、总结</h2>
+
+<p>NameNode重启甚至全集群重启在整个Hadoop集群的生命周期内是比较频繁的运维操作，优化重启时间可以极大提升运维效率，避免可能存在的风险。本文通过分析NameNode启动流程，并结合实践过程简单罗列了几个供参考的有效优化点，借此希望能给实践过程提供可优化的方向和思路。</p>
+
+<h2>五、参考</h2>
+
+<p>[1] NameNode内存全景. <a href="http://tech.meituan.com/namenode.html">http://tech.meituan.com/namenode.html</a><br/>
+[2] NameNode内存详解. <a href="http://tech.meituan.com/namenode-memory-detail.html">http://tech.meituan.com/namenode-memory-detail.html</a><br/>
+[3] Apache Hadoop. <a href="http://hadoop.apache.org/">http://hadoop.apache.org/</a><br/>
+[4] Hadoop Source. <a href="https://github.com/apache/hadoop">https://github.com/apache/hadoop</a><br/>
+[5] HDFS Issues. <a href="https://issues.apache.org/jira/browse/HDFS">https://issues.apache.org/jira/browse/HDFS</a><br/>
+[6] Cloudera Blog. <a href="http://blog.cloudera.com/">http://blog.cloudera.com/</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[NameNode RepicationMonitor异常追查]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2016/09/13/namenode-repicationmonitor-exception-trace/"/>
+    <updated>2016-09-13T10:45:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2016/09/13/namenode-repicationmonitor-exception-trace</id>
+    <content type="html"><![CDATA[<p>集群版本从2.4.1升级到2.7.1之后，出现了一个诡异的问题，虽然没有影响到线上正常读写服务，但是潜在的问题还是比较严重，经过追查彻底解决，这里简单整理追查过程。</p>
+
+<h2>一、问题描述</h2>
+
+<p>异常初次出现时收集到的集群异常表现信息有两条：</p>
+
+<p>1、两个关键数据结构持续堆积，监控显示UnderReplicatedBlocks和PendingDeletionBlocks表现明显。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/monitor/underreplicatedblocks.png" alt="NameNode UnderReplicatedBlocks数据结构变化趋势" align="center"><br />
+<label class=“pic_title” align="center">图1 NameNode UnderReplicatedBlocks数据结构变化趋势</label>
+</div>
+
+
+<p></p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/monitor/pendingblocks.png" alt="NameNode PendingBlocks数据结构变化趋势" align="center"><br />
+<label class=“pic_title” align="center">图2 NameNode PendingBlocks数据结构变化趋势</label>
+</div>
+
+
+<p></p>
+
+<p><em>说明：没有找到异常同一时间段的监控图，可将上图时间点简单匹配，基本不影响后续的分析。</em></p>
+
+<p>2、从NameNode的jstack获得信息ReplicationMonitor线程在长期执行chooseRandom函数；<br/>
+<figure class='code'><figcaption><span>namenode.jstack </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="ni">&amp;ldquo;</span>org.apache.hadoop.hdfs.server.blockmanagement.BlockManager$ReplicationMonitor@254e0df1<span class="ni">&amp;rdquo;</span> daemon prio=10 tid=0x00007f59b4364800 nid=0xa7d9 runnable [0x00007f2baf40b000]
+</span><span class='line'>   java.lang.Thread.State: RUNNABLE
+</span><span class='line'>        at java.util.AbstractCollection.toArray(AbstractCollection.java:195)
+</span><span class='line'>        at java.lang.String.split(String.java:2311)
+</span><span class='line'>        at org.apache.hadoop.net.NetworkTopology$InnerNode.getLoc(NetworkTopology.java:282)
+</span><span class='line'>        at org.apache.hadoop.net.NetworkTopology$InnerNode.getLoc(NetworkTopology.java:292)
+</span><span class='line'>        at org.apache.hadoop.net.NetworkTopology$InnerNode.access$000(NetworkTopology.java:82)
+</span><span class='line'>        at org.apache.hadoop.net.NetworkTopology.getNode(NetworkTopology.java:539)
+</span><span class='line'>        at org.apache.hadoop.net.NetworkTopology.countNumOfAvailableNodes(NetworkTopology.java:775)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicyDefault.chooseRandom(BlockPlacementPolicyDefault.java:707)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicyDefault.chooseTarget(BlockPlacementPolicyDefault.java:383)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicyDefault.chooseTarget(BlockPlacementPolicyDefault.java:432)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicyDefault.chooseTarget(BlockPlacementPolicyDefault.java:225)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicyDefault.chooseTarget(BlockPlacementPolicyDefault.java:120)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockManager$ReplicationWork.chooseTargets(BlockManager.java:3783)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockManager$ReplicationWork.access$200(BlockManager.java:3748)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockManager.computeReplicationWorkForBlocks(BlockManager.java:1408)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockManager.computeReplicationWork(BlockManager.java:1314)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockManager.computeDatanodeWork(BlockManager.java:3719)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockManager$ReplicationMonitor.run(BlockManager.java:3671)
+</span><span class='line'>        at java.lang.Thread.run(Thread.java:745)
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>由于线上环境的日志级别为INFO，而ReplicationMonitor中INFO级别之上的日志非常少，从中几乎不能获取到任何有用信息；</p>
+
+<p>异常出现场景：<br/>
+1、坏盘、DataNode Decommision或进程异常退出，但不能稳定复现；<br/>
+2、外部环境无任何变化和异常，正常读写服务期偶发。</p>
+
+<h2>二、追查过程</h2>
+
+<h3>2.1 处理线上问题</h3>
+
+<p>ReplicationMonitor线程运行异常，造成数据块的副本不能及时补充，如果异常长期存在，极有可能出现丢数据的情况，在没有其他信息辅助解决的情况下，唯一的办法就是重启NameNode（传说中的“三大招”之一），好在HA架构的支持，不至于影响到正常数据生产。</p>
+
+<h3>2.2 日志</h3>
+
+<p>缺少日志，不能定位问题出现的场景，所以首先需要在关键路径上留下必要的信息，方便追查。由于ReplicationMonitor属于独立线程，合理的日志量输出不至于影响服务性能，经过多次调整基本确定需要收集的日志信息：</p>
+
+<p>1、根据NameNode多次jstack信息，怀疑chooseRandom时不停计算countNumOfAvailableNodes，可能存在死循环，尝试输出两类信息：<br/>
+（1）ReplicationMonitor当前处理的整体参数及正在处理的Block；
+<figure class='code'><figcaption><span>BlockManager.java <a href="https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L3662">https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L3662</a> github </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">numlive</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">numlive</span><span class="o">);</span>
+</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">blockToProcess</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">blocksToProcess</span><span class="o">);</span>
+</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">nodeToProcess</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">nodesToProcess</span><span class="o">);</span>
+</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">blocksInvalidateWorkPct</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="k">this</span><span class="o">.</span><span class="na">blocksInvalidateWorkPct</span><span class="o">);</span>
+</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="n">workFound</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">workFound</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>（2）chooseRandom逻辑中循环体内（调用了countNumOfAvailableNodes）运行超过1min输出该函数入口的所有参数；问题复现后，日志并没有输出，说明异常并不在chooseRandom逻辑本身；</p>
+
+<p>2、结合NameNode的jstack信息并跟进实现逻辑时发现NetworkTopology.InnerNode#getLoc(String loc)的实现存在性能问题：<br/>
+<figure class='code'><figcaption><span>NetworkTopology.java <a href="https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/net/NetworkTopology.java#L274">https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/net/NetworkTopology.java#L274</a> github </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">/&lt;</span><span class="n">em</span><span class="o">&gt;*</span> <span class="n">Given</span> <span class="n">a</span> <span class="n">node</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="o">;</span><span class="n">s</span> <span class="n">string</span> <span class="n">representation</span><span class="o">,</span> <span class="k">return</span> <span class="n">a</span> <span class="n">reference</span> <span class="n">to</span> <span class="n">the</span> <span class="n">node</span>
+</span><span class='line'> <span class="o">*</span> <span class="nd">@param</span> <span class="n">loc</span> <span class="n">string</span> <span class="n">location</span> <span class="n">of</span> <span class="n">the</span> <span class="n">form</span> <span class="o">/</span><span class="n">rack</span><span class="o">/</span><span class="n">node</span>
+</span><span class='line'> <span class="o">*</span> <span class="nd">@return</span> <span class="kc">null</span> <span class="k">if</span> <span class="n">the</span> <span class="n">node</span> <span class="n">is</span> <span class="n">not</span> <span class="n">found</span> <span class="n">or</span> <span class="n">the</span> <span class="n">childnode</span> <span class="n">is</span> <span class="n">there</span> <span class="n">but</span>
+</span><span class='line'> <span class="o">*</span> <span class="n">not</span> <span class="n">an</span> <span class="n">instance</span> <span class="n">of</span> <span class="o">{</span><span class="nd">@link</span> <span class="n">InnerNode</span><span class="o">}</span>
+</span><span class='line'> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;/</span>
+</span><span class='line'><span class="kd">private</span> <span class="n">Node</span> <span class="nf">getLoc</span><span class="o">(</span><span class="n">String</span> <span class="n">loc</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">loc</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">loc</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="k">return</span> <span class="k">this</span><span class="o">;</span>         <span class="o">&lt;</span><span class="n">br</span><span class="o">/&gt;</span>
+</span><span class='line'>  <span class="n">String</span><span class="o">[]</span> <span class="n">path</span> <span class="o">=</span> <span class="n">loc</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="n">PATH_SEPARATOR_STR</span><span class="o">,</span> <span class="mi">2</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">Node</span> <span class="n">childnode</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>  <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span> <span class="n">i</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">children</span><span class="o">.</span><span class="na">size</span><span class="o">();</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">children</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">).</span><span class="na">getName</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="n">path</span><span class="o">[</span><span class="mi">0</span><span class="o">]))</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">childnode</span> <span class="o">=</span> <span class="n">children</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">childnode</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="k">return</span> <span class="kc">null</span><span class="o">;</span> <span class="c1">// non-existing node</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">path</span><span class="o">.</span><span class="na">length</span> <span class="o">==</span> <span class="mi">1</span><span class="o">)</span> <span class="k">return</span> <span class="n">childnode</span><span class="o">;</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">childnode</span> <span class="k">instanceof</span> <span class="n">InnerNode</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="o">((</span><span class="n">InnerNode</span><span class="o">)</span><span class="n">childnode</span><span class="o">).</span><span class="na">getLoc</span><span class="o">(</span><span class="n">path</span><span class="o">[</span><span class="mi">1</span><span class="o">]);</span>
+</span><span class='line'>  <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>这段逻辑的用意是通过集群网络拓扑结构中节点的字符串标识（如：/IDC/Rack/hostname）获取该节点的对象。实现方法是从拓扑结构中根节点开始逐层向下搜索，直到找到对应的目标节点，逻辑本身没有问题，但是在line286处应该正常break，实现时出现遗漏，其结果是多出一些不必要的时间开销，对于小集群可能影响不大，但是对于IO比较密集的大集群其实影响还是比较大，线下模拟~5K节点的集群拓扑结构，对于NetworkTopology.InnerNode#getLoc(String loc)本身，break可以提升一半的时间开销。</p>
+
+<p>3、通过前面两个阶段仍然不能完全解决问题，只能继续追加日志，这里再次怀疑可能BlockManager.computeReplicationWorkForBlocks(List&lt;List<Block>> blocksToReplicate)在调用chooseRandom方法时耗时严重，所以在chooseRandom结束后增加了关键的几条日志：<br/>
+<figure class='code'><figcaption><span>BlockManager.java <a href="https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L1322">https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L1322</a> github </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="nl">ReplicationMonitor:</span> <span class="n">block</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">block</span><span class="o">);</span>
+</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="nl">ReplicationMonitor:</span> <span class="n">priority</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">priority</span><span class="o">);</span>
+</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="nl">ReplicationMonitor:</span> <span class="n">srcNode</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">srcNode</span><span class="o">);</span>
+</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="nl">ReplicationMonitor:</span> <span class="n">storagepolicyid</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">bc</span><span class="o">.</span><span class="na">getStoragePolicyID</span><span class="o">());</span>
+</span><span class='line'><span class="k">if</span> <span class="o">(</span><span class="n">rw</span><span class="o">.</span><span class="na">targets</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">rw</span><span class="o">.</span><span class="na">targets</span><span class="o">.</span><span class="na">length</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="nl">ReplicationMonitor:</span> <span class="n">targets</span> <span class="n">is</span> <span class="n">empty</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;);</span>
+</span><span class='line'><span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="nl">ReplicationMonitor:</span> <span class="n">targets</span><span class="o">.</span><span class="na">length</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">targets</span><span class="o">.</span><span class="na">length</span><span class="o">);</span>
+</span><span class='line'>  <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span> <span class="n">rw</span><span class="o">.</span><span class="na">targets</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="nl">ReplicationMonitor:</span> <span class="n">target</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">targets</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">+</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="o">;,</span> <span class="n">StorageType</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">targets</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">getStorageType</span><span class="o">());</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="k">for</span> <span class="o">(</span><span class="n">Iterator</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;</span> <span class="n">iterator</span> <span class="o">=</span> <span class="n">excludedNodes</span><span class="o">.</span><span class="na">iterator</span><span class="o">();</span> <span class="n">iterator</span><span class="o">.</span><span class="na">hasNext</span><span class="o">();)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">DatanodeDescriptor</span> <span class="n">node</span> <span class="o">=</span> <span class="o">(</span><span class="n">DatanodeDescriptor</span><span class="o">)</span> <span class="n">iterator</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
+</span><span class='line'>  <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(&amp;</span><span class="n">ldquo</span><span class="o">;</span><span class="nl">ReplicationMonitor:</span> <span class="n">exclude</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">rdquo</span><span class="o">;</span> <span class="o">+</span> <span class="n">node</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>包括当前正在处理的Block，优先级（标识缺块的严重程度），源和目标节点集合；（遗漏了关键的信息：Block的Numbytes，后面后详细解释。）</p>
+
+<p>通过这一步基本上能够收集到异常现场信息，同时也可确定异常时ReplicationMonitor的运行情况，从后续的日志也能说明这一点：<br/>
+<figure class='code'><figcaption><span>namenode.log </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>2016-04-19 20:08:52,328 WARN org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicy: Failed to place enough replicas, still in need of 7 to reach 10 (unavailableStorages=[], storagePolicy=BlockStoragePolicy{HOT:7, storageTypes=[DISK], creationFallbacks=[], replicationFallbacks=[ARCHIVE]}, newBlock=false) For more information, please enable DEBUG log level on org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicy
+</span><span class='line'>2016-04-19 20:08:52,328 WARN org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicy: Failed to place enough replicas, still in need of 7 to reach 10 (unavailableStorages=[DISK], storagePolicy=BlockStoragePolicy{HOT:7, storageTypes=[DISK], creationFallbacks=[], replicationFallbacks=[ARCHIVE]}, newBlock=false) For more information, please enable DEBUG log level on org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicy
+</span><span class='line'>2016-04-19 20:08:52,328 WARN org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicy: Failed to place enough replicas, still in need of 7 to reach 10 (unavailableStorages=[DISK, ARCHIVE], storagePolicy=BlockStoragePolicy{HOT:7, storageTypes=[DISK], creationFallbacks=[], replicationFallbacks=[ARCHIVE]}, newBlock=false) All required storage types are unavailable: unavailableStorages=[DISK, ARCHIVE], storagePolicy=BlockStoragePolicy{HOT:7, storageTypes=[DISK], creationFallbacks=[], replicationFallbacks=[ARCHIVE]}
+</span><span class='line'>2016-04-19 20:08:52,328 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: block = blk_8206926206_7139007477
+</span><span class='line'>2016-04-19 20:08:52,328 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: priority = 2
+</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: srcNode = 10.16.<span class="nt">&lt;em&gt;</span>.<span class="nt">&lt;/em&gt;</span>:<span class="nt">&lt;em&gt;</span>
+</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: storagepolicyid = 0
+</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: targets is empty
+</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: exclude = 10.16.<span class="nt">&lt;/em&gt;</span>.<span class="nt">&lt;em&gt;</span>:<span class="nt">&lt;/em&gt;</span>
+</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: exclude = 10.16.<span class="nt">&lt;em&gt;</span>.<span class="nt">&lt;/em&gt;</span>:<span class="nt">&lt;em&gt;</span>
+</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: exclude = 10.16.<span class="nt">&lt;/em&gt;</span>.<span class="nt">&lt;em&gt;</span>:<span class="nt">&lt;/em&gt;</span>
+</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: exclude = 10.16.<span class="nt">&lt;em&gt;</span>.<span class="nt">&lt;/em&gt;</span>:**
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>日志中容易看到当前发生异常时的场景：</p>
+
+<p>（1）Block的副本数尝试从3调整的10；（异常时还有其他副本增加的请求）<br/>
+（2）ReplicationMonitor尝试进行副本调整时失败，原因是遍历全集群后并没有找到一个合适的节点给该Block提供副本存储，日志显示全集群的节点均被加入到了exclude；</p>
+
+<p>基本能够确定由于chooseRandom函数遍历了全集群导致处理某（些）Block耗时严重，类似情况累积会恶化这种问题；</p>
+
+<p>到这里基本可以解释为什么几个关键数据结构（UnderReplicatedBlocks和PendingDeletionBlocks）的量持续增加，根本原因在于ReplicationMonitor在尝试对某个Block进行副本调整时，遍历全集群不能选出合适的节点，导致处理一个Block都会耗时严重，如果多个类似Block累积会滚雪球式使情况恶化，而且更加糟糕的是UnderReplicatedBlocks本质是一个优先级队列，如果正好这些Block的优先级较高，处理失败发生超时后还会回到原来的优先队列里，导致后续正常Block也会被阻塞，即使在超时时间范围内ReplicationMonitor可以正常工作，限于其本身的限流及周期（3s）运行机制，实际上可处理的规模非常小，而UnderReplicatedBlocks及PendingDeletionBlocks的生产者丝毫没有变慢，所以造成了数据源源不断的进入队列，但是消费非常缓慢。线上监控数据看到某次极端情况一度累积到1000K规模的UnderReplicatedBlocks，其实风险已经非常高了。</p>
+
+<p>虽然从日志能够解释通UnderReplicatedBlocks和PendingDeletionBlocks持续升高了，但是仍然遗留了一个关键问题：为什么在副本调整时全集群遍历都没有选出合适的节点？</p>
+
+<h3>2.3 暴力破解</h3>
+
+<p>此前已经在社区找到类似问题反馈：
+<a href="https://issues.apache.org/jira/browse/HDFS-8718">https://issues.apache.org/jira/browse/HDFS-8718</a>
+但是很遗憾没看到解决方案；</p>
+
+<p>尝试从各种可能和怀疑中解释前面留下的问题并在线下进行各种场景复现：<br/>
+（1）线下模拟了~5000节点集群规模遍历的时间开销，基本能够反映线上的情况；<br/>
+（2）构造负载严重不均衡时节点选择的场景，不能复现；<br/>
+（3）异构存储实现逻辑可能造成的chooseRandom遍历全集群，尝试构造各种异构存储组合并，不能复现；<br/>
+（4）并发进行删除和副本调整，没有复现；（后面详细介绍）</p>
+
+<p>其实（2）和（3）的验证必要性不是很大，负载问题通过源码简单分析即可，异构存储线上并没有开启。复现结果是：没有结果。</p>
+
+<p>不得已选择临时解决方案：在BlockManager.computeReplicationWorkForBlocks(List&lt;List<Block>> blocksToReplicate)的第二个阶段，针对需要调整副本的Block集合批量进行chooseTargets时加入时间判断，并设定了阈值，当超时发生时退出本轮目标选择逻辑，可以解决PendingDeletionBlocks长时间不能被处理到的问题，代价是牺牲少量处理UnderReplicatedBlocks的时间；上线后符合预期，PendingDeletionBlocks规模得到了有效控制，但是UnderReplicatedBlocks的问题依然存在。</p>
+
+<h3>2.4 调整参数</h3>
+
+<p>期间，我们从前面新增的日志里同时发现了一个有意思的现象，正常情况下workFound的值相对较高，但是一旦出现异常，开始严重下降。workFound标识的是ReplicationMonitor本轮可以调度出去的Block数，影响该值的三个关键参数如下：<br/>
+<figure class='code'><figcaption><span>hdfs-site.xml <a href="http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml">http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml</a> apache </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;property&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;name&gt;</span>dfs.namenode.replication.work.multiplier.per.iteration<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;value&gt;</span>5<span class="nt">&lt;/value&gt;</span>
+</span><span class='line'><span class="nt">&lt;/property&gt;</span>
+</span><span class='line'><span class="nt">&lt;property&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;name&gt;</span>dfs.namenode.replication.max-streams<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;value&gt;</span>50<span class="nt">&lt;/value&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;description&gt;</span>
+</span><span class='line'>        The maximum number of outgoing replication streams a given node should have
+</span><span class='line'>        at one time considering all but the highest priority replications needed.
+</span><span class='line'>  <span class="nt">&lt;/description&gt;</span>
+</span><span class='line'><span class="nt">&lt;/property&gt;</span>
+</span><span class='line'><span class="nt">&lt;property&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;name&gt;</span>dfs.namenode.replication.max-streams-hard-limit<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;value&gt;</span>100<span class="nt">&lt;/value&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;description&gt;</span>
+</span><span class='line'>        The maximum number of outgoing replication streams a given node should have
+</span><span class='line'>        at one time.
+</span><span class='line'>  <span class="nt">&lt;/description&gt;</span>
+</span><span class='line'><span class="nt">&lt;/property&gt;</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>为控制单DN并发数默认值为&lt;2,2,4>，此外可调度的Block数与集群规模正相关，正常情况其实完全满足运行需求，但是由于存在Block不符预期，所以造成workFound量会下降。<br/>
+结合集群实际基础环境，尝试大幅提高并发度，设置为&lt;5,50,100>，提高ReplicationMonitor每一轮的处理效率。参数调整后，情况得到了明显改善。</p>
+
+<p><em>说明：结合实际情况谨慎调整该参数，可能会给集群内的网络带来压力。</em></p>
+
+<p>虽然通过一系列调整能够暂缓和改善线上情况，但是依然没有回答前面留下的疑问，也没有彻底解决问题。只有从头再来梳理流程。</p>
+
+<h2>三、ReplicationMonitor工作流程</h2>
+
+<p>ReplicationMonitor是NameNode内部线程，负责维护数据块的副本数稳定，包括清理无效块和对不符预期副本数的Block进行增删工作。ReplicationMonitor是周期运行线程，默认每3s执行一次，主要由两个关键函数组成：computeDatanodeWork和processPendingReplications（rescanPostponedMisreplicatedBlocks在NameNode启动/主从切换被调用，不包括在本次异常分析范围内）。<br/>
+<figure class='code'><figcaption><span>BlockManager.java <a href="https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L3621">https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L3621</a> github </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">privateclass</span> <span class="n">ReplicationMonitor</span> <span class="kd">implements</span> <span class="n">Runnable</span> <span class="o">{&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>  <span class="nd">@Override</span>
+</span><span class='line'>  <span class="n">publicvoid</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">while</span> <span class="o">(</span><span class="n">namesystem</span><span class="o">.</span><span class="na">isRunning</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// Process replication work only when active NN is out of safe mode.</span>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">namesystem</span><span class="o">.</span><span class="na">isPopulatingReplQueues</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">computeDatanodeWork</span><span class="o">();</span>
+</span><span class='line'>          <span class="n">processPendingReplications</span><span class="o">();</span>
+</span><span class='line'>          <span class="n">rescanPostponedMisreplicatedBlocks</span><span class="o">();</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="n">replicationRecheckInterval</span><span class="o">);</span>
+</span><span class='line'>      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Throwable</span> <span class="n">t</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="o">&amp;</span><span class="n">hellip</span><span class="o">;&amp;</span><span class="n">hellip</span><span class="o">;</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p><strong>computeDatanodeWork</strong><br/>
+（1）从UnderReplicatedBlocks中取出给定阈值（默认为集群节点总数的2倍）数量范围内需要进行复制的Block集合；由于UnderReplicatedBlocks是一个优先级队列，所以每次一定是按照优先级从高到低获取；<br/>
+（2）遍历选出的Block集合，对于每一个Block，根据当前副本分布及chooseTarget策略，选择合适的DataNode集合作为目标节点，准备副本复制；<br/>
+（3）将Block进行副本复制的指令分发到NameNode里对应DatanodeDescriptor数据结构中，待该DataNode下次heartbeat过来后及时下发，同时将该Block从UnderReplicatedBlocks拿出来暂存到pendingReplications；<br/>
+（4）DataNode接收到指令后把对应Block复制到目标节点，复制结束后，目标节点向NameNode汇报RECEIVED_BLOCK，此后便可以从pendingReplications中删除对应的Block；这里引入pendingReplications的目的是防止Block在复制过程中出现异常后超时，当在给定时间内（默认为5min）仍没有完成复制，需要将其从pendingReplications转移到timedOutItems集合中；超时检查的工作由PendingReplicationBlocks#PendingReplicationMonitor负责。<br/>
+（5）将InvalidateBlocks中待删除的Blocks按照DataNode分组后取出分发到NameNode里对应DatanodeDescriptor数据结构中，同样待该DataNode的heartbeat过来后及时下发删除指令；</p>
+
+<p><strong>processPendingReplications</strong><br/>
+computeDatanodeWork步骤4出现超时后，将对应的Block从pendingReplications转移到timedOutItems后并没有其他处理逻辑，但是Block复制的事情还得继续，所以还需要将Block再拿回到UnderReplicatedBlocks后重复前面的工作；从timedOutItems拿回到UnderReplicatedBlocks的工作即由processPendingReplications来负责；</p>
+
+<p>可以看出computeDatanodeWork，processPendingReplications和PendingReplicationMonitor组成了一个生产者消费者的环，下图可以说明这个过程。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/monitor/replicationmonitor.png" alt="ReplicationMonitor相关数据流动图示" align="center"><br />
+<label class=“pic_title” align="center">图3 ReplicationMonitor相关数据流动图示</label>
+</div>
+
+
+<p></p>
+
+<p>ReplicationMonitor涉及到两个关键的数据结构：UnderReplicatedBlocks和InvalidateBlocks；这两个数据结构到底是什么，数据哪里来。</p>
+
+<p>（1）UnderReplicatedBlocks：副本数不足的Block集合；<br/>
+* 写数据完成时进行副本检查，副本不足Block；<br/>
+* 用户调用setReplication增加副本；<br/>
+* DataNode节点异常，其上的所有Block；</p>
+
+<p>（2）InvalidateBlocks：无效Block集合；<br/>
+* 文件删除操作；<br/>
+* 用户调用setReplication降低副本；</p>
+
+<p>可以简单理解副本调整和数据删除本质上是一个异步操作，当NameNode接收到客户端的setReplication或delete请求后，简单处理后即可返回，实际的工作是由ReplicationMonitor周期异步进行处理。</p>
+
+<h2>四、根本原因</h2>
+
+<p>继续追踪日志时，针对触发问题的Block检索了所有日志，发现另外一个现象，每次chooseTarget目标节点选择失败后，总会紧跟一条删除操作的日志：<br/>
+<figure class='code'><figcaption><span>namenode.log </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>2016-04-19 09:23:08,453 INFO BlockStateChange: BLOCK<span class="nt">&lt;em&gt;</span> addToInvalidates: blk_8197702254_7129783384 10.16.<span class="nt">&lt;/em&gt;</span>.<span class="nt">&lt;em&gt;</span>:<span class="nt">&lt;/em&gt;</span> 10.16.<span class="nt">&lt;em&gt;</span>.<span class="nt">&lt;/em&gt;</span>:<span class="nt">&lt;em&gt;</span> 10.16.<span class="nt">&lt;/em&gt;</span>.*:**
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>审计日志中也能对照到同一时间点，对应的文件确实有删除操作。这个现象在多次异常复现时稳定发生。可以猜测与删除操作有关联。</p>
+
+<p>删除操作的流程是先把目录树的节点删除，根据删除结果收集到的Block集合，删除每一个Block。</p>
+
+<p>其中在逐个Block进行删除过程中，发现其逻辑有疑点，主要在block.setNumBytes(BlockCommand.NO_ACK)，其中NO_ACK=Long.MAX_VALUE，也即先将该Block的numbytes设置为最大值，再后续的操作。<br/>
+<figure class='code'><figcaption><span>BlockManager.java <a href="https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L3378">https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L3378</a> github </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">removeBlock</span><span class="o">(</span><span class="n">Block</span> <span class="n">block</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">assert</span> <span class="n">namesystem</span><span class="o">.</span><span class="na">hasWriteLock</span><span class="o">();</span>
+</span><span class='line'>  <span class="c1">// No need to ACK blocks that are being removed entirely</span>
+</span><span class='line'>  <span class="c1">// from the namespace, since the removal of the associated</span>
+</span><span class='line'>  <span class="c1">// file already removes them from the block map below.</span>
+</span><span class='line'>  <span class="n">block</span><span class="o">.</span><span class="na">setNumBytes</span><span class="o">(</span><span class="n">BlockCommand</span><span class="o">.</span><span class="na">NO_ACK</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">addToInvalidates</span><span class="o">(</span><span class="n">block</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">removeBlockFromMap</span><span class="o">(</span><span class="n">block</span><span class="o">);</span>
+</span><span class='line'>  <span class="c1">// Remove the block from pendingReplications and neededReplications</span>
+</span><span class='line'>  <span class="n">pendingReplications</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">block</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">neededReplications</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">block</span><span class="o">,</span> <span class="n">UnderReplicatedBlocks</span><span class="o">.</span><span class="na">LEVEL</span><span class="o">);</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">postponedMisreplicatedBlocks</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">block</span><span class="o">))</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">postponedMisreplicatedBlocksCount</span><span class="o">.</span><span class="na">decrementAndGet</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>虽然对目录树的操作及removeBlock的操作均会持有全局写锁，但是很自然将Block的NumBytes设置成Long.MAX_VALUE的逻辑与chooseTarget遍历全集群仍不能选出合适节点的事实结合起来。</p>
+
+<p>接下来自然是验证chooseTarget的处理逻辑：<br/>
+<figure class='code'><figcaption><span>BlockManager.java <a href="https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L1390">https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L1390</a> github </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">&amp;</span><span class="n">hellip</span><span class="o">;&amp;</span><span class="n">hellip</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">namesystem</span><span class="o">.</span><span class="na">writeUnlock</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="kd">final</span> <span class="n">Set</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;</span> <span class="n">excludedNodes</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashSet</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;();</span>
+</span><span class='line'><span class="k">for</span><span class="o">(</span><span class="n">ReplicationWork</span> <span class="n">rw</span> <span class="o">:</span> <span class="n">work</span><span class="o">){</span>
+</span><span class='line'>  <span class="c1">// Exclude all of the containing nodes from being targets.</span>
+</span><span class='line'>  <span class="c1">// This list includes decommissioning or corrupt nodes.</span>
+</span><span class='line'>  <span class="n">excludedNodes</span><span class="o">.</span><span class="na">clear</span><span class="o">();</span>
+</span><span class='line'>  <span class="k">for</span> <span class="o">(</span><span class="n">DatanodeDescriptor</span> <span class="n">dn</span> <span class="o">:</span> <span class="n">rw</span><span class="o">.</span><span class="na">containingNodes</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">excludedNodes</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">dn</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="c1">// choose replication targets: NOT HOLDING THE GLOBAL LOCK</span>
+</span><span class='line'>  <span class="c1">// It is costly to extract the filename for which chooseTargets is called,</span>
+</span><span class='line'>  <span class="c1">// so for now we pass in the block collection itself.</span>
+</span><span class='line'>  <span class="n">rw</span><span class="o">.</span><span class="na">chooseTargets</span><span class="o">(</span><span class="n">blockplacement</span><span class="o">,</span> <span class="n">storagePolicySuite</span><span class="o">,</span> <span class="n">excludedNodes</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="n">namesystem</span><span class="o">.</span><span class="na">writeLock</span><span class="o">();</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>上面的实现可以看出，chooseTargets之前释放了全局锁，chooseTargets后重新申请到全局锁，唯独中间的chooseTargets在锁之外。至此，问题触发条件、场景等基本清楚：</p>
+
+<p>（1）setReplication将文件的副本调大，此时会有一批属于该文件的Block进入UnderReplicatedBlocks等待ReplicationMonitor处理；<br/>
+（2）ReplicationMonitor从UnderReplicatedBlocks中取出部分Block，并在前期根据处理逻辑初始化相关参数，将每个Block打包成ReplicationWork，取出的所有Block完成打包后组成ReplicationWork集合，这个过程持有全局锁；<br/>
+（3）当步骤2释放完全局锁后，被删除请求的RPC抢到全局锁，恰好这次删除操作对应文件即是步骤（1）中的文件，此时Block的NumBytes被设置成Long.MAX_VALUE，并被从BlocksMap,pendingReplications及UnderReplicatedBlocks中删除，但是该Block对象的引用还被步骤（2）中的ReplicationWork集合持有，不会被JVM回收，不同的是ReplicationWork集合中对应Block的NumBytes已经被修改成Long.MAX_VALUE；<br/>
+（4）ReplicationMonitor中computeReplicationWorkForBlocks继续进行chooseTarget时显然已经不可能在集群中选出合适的节点，即使遍历完整个集群，本质上还是由于块大小已经是Long.MAX_VALUE，不可能有节点能满足需求。</p>
+
+<p>通过单元测试对该场景能够稳定复现。</p>
+
+<h2>五、解决方式</h2>
+
+<p>问题分析完后，解决办法其实比较简单：</p>
+
+<p>（1）如果ReplicationMonitor遇到了Block的NumBytes=BlockCommand.NO_ACK，直接将该Block从UnderReplicatedBlocks中删除；<br/>
+（2）如果chooseTarget时遇到了Block的NumBytes=BlockCommand.NO_ACK，直接返回空，无需再遍历整个集群节点；</p>
+
+<p>至此彻底解决了线上隐藏将近了一个月的Bug。线上再没有出现该异常。详细Patch见：<a href="https://issues.apache.org/jira/browse/HDFS-10453">https://issues.apache.org/jira/browse/HDFS-10453</a> 。</p>
+
+<h2>六、经验</h2>
+
+<p>回头看追查的整个过程，有几点值得总结的经验：</p>
+
+<p>1、日志经过多次才调整到位，中间遗漏了关键的信息（block.getNumBytes），如果开始及时收集到这个信息，可以省去很多时间，所以如果能够准确快速收集关键数据，问题已经解决一半；</p>
+
+<p>2、场景复现时提高并发其实是可以复现的，当时仅利用小工具模拟简单的场景，没有在真实环境进行高并发复现，错过一次可以定位的机会，合理的假设怀疑和严谨的场景复现很重要；</p>
+
+<p>3、虽然问题在线上存在了超过两周时间，但是并没有实际影响到集群正常服务，得益于中间合理可控的缓解手段。如果不能彻底解决可以尝试通过各种方法缓解或绕过问题值得借鉴，这种方法论随处可见，但是只有亲自趟过坑后才能印象深刻。</p>
+
+<p>4、回过头再看整个问题，解决问题的思路没有问题，但追查过程其实存在一个严重Bug，不再展开详述。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[HDFS集中式缓存管理]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2016/09/04/hdfs-centralized-cache-management/"/>
+    <updated>2016-09-04T10:45:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2016/09/04/hdfs-centralized-cache-management</id>
+    <content type="html"><![CDATA[<h2>一、背景</h2>
+
+<p>Hadoop设计之初借鉴GFS/MapReduce的思想：移动计算的成本远小于移动数据的成本。所以调度通常会尽可能将计算移动到拥有数据的节点上，在作业执行过程中，从HDFS角度看，计算和数据通常是同一个DataNode节点，即存在大量的本地读写。</p>
+
+<p>但是HDFS最初实现时，并没有区分本地读和远程读，二者的实现方式完全一样，都是先由DataNode读取数据，然后通过DFSClient与DataNode之间的Socket管道进行数据交互。这样的实现方式很显然由于经过DataNode中转对数据读性能有一定的影响。</p>
+
+<p>社区很早也关注到了这一问题，先后提出过两种方案来提升性能，分别是<a href="https://issues.apache.org/jira/browse/HDFS-347">HDFS-347</a>和<a href="https://issues.apache.org/jira/browse/HDFS-2246">HDFS-2246</a>。</p>
+
+<p>HDFS-2246是比较直接和自然的想法，既然DFSClient和DataNode在同一个节点上，当DFSClient对数据发出读请求后，DataNode提供给DFSClient包括文件路径，偏移量和长度的三元组（path,offset,length）,DFSClient拿到这些信息后直接从文件系统读取数据，从而绕过DataNode避免一次数据中转的过程。但是这个方案存在两个问题，首先，HDFS需要为所有用户配置白名单，赋予其可读权限，当增加新用户需要更新白名单，维护不方便；其次，当为用户赋权后，意味着用户拥有了访问所有数据的权限，相当于超级用户，从而导致数据存在安全漏洞。</p>
+
+<p>HDFS-347使用UNIX提供的Unix Domain Socket进程通讯机制实现了安全的本地短路读取。DFSClient向DataNode请求数据时，DataNode打开块文件和元数据文件，通过Unix Domain Socket将对应的文件描述符传给DFSClient，而不再是路径、偏移量和长度等三元组。文件描述符是只读的，DFSClient不能随意修改接收到的文件。同时由于DFSClient自身无法访问块所在的目录，也就不能访问未授权数据。</p>
+
+<p>虽然本地短路读在性能上有了明显的提升，但是从全集群看，依然存在几个性能问题：<br/>
+（1）DFSClient向DataNode发起数据读请求后，DataNode在OS Buffer对数据会进行Cache，但是数据Cache的分布情况并没有显式暴漏给上层，对任务调度透明，造成Cache浪费。比如同一Block多个副本可能被Cache在多个存储这些副本的DataNode OS Buffer，造成内存资源浪费。<br/>
+（2）由于Cache的分布对任务调度透明，一些低优先级任务的读请求有可能将高优先级任务正在使用的数据从Cache中淘汰出去，造成数据必须从磁盘读，增加读数据的开销从而影响任务的完成时间，甚至影响到关键生产任务SLA。</p>
+
+<p>针对这些问题，社区在2013年提出集中式缓存方案（Centralized cache management）<a href="https://issues.apache.org/jira/browse/HDFS-4949">HDFS-4949</a>，由NameNode对DataNode的Cache进行统一集中管理，并将缓存接口显式暴漏给上层应用，该功能在2.3.0发布。这个功能对于提升HDFS读性能和上层应用的执行效率与实时性有很大帮助。</p>
+
+<p>集中式缓存方案的主要优势：<br/>
+（1）用户可以指定常用数据或者高优先级任务对应的数据常驻内存，避免被淘汰到磁盘。例如在数据仓库应用中事实表会频繁与其他表JOIN，如果将这些事实表常驻内存，当DataNode内存使用紧张的时候也不会把这些数据淘汰出去，可以很好的实现了对于关键生产任务的SLA保障；<br/>
+（2）由NameNode统一进行缓存的集中管理，DFSClient根据Block被Cache分布情况调度任务，尽可能实现本地内存读，减少资源浪费；<br/>
+（3）明显提升读性能。当DFSClient要读取的数据被Cache在同一DataNode时，可以通过<a href="https://en.wikipedia.org/wiki/Zero-copy">ZeroCopy</a>直接从内存读，略过磁盘IO和checksum校验等环节，从而提升读性能；<br/>
+（4）由于NameNode统一管理并作为元数据的一部分进行持久化处理，即使DataNode节点出现宕机，Block移动，集群重启，Cache不会受到影响。</p>
+
+<h2>二、部署与使用</h2>
+
+<h3>2.1 部署</h3>
+
+<p>集群开启HDFS集中式缓存特性非常简单，虽然HDFS本身为集中式缓存在NameNode/DataNode端均提供了多个配置参数，但是大多不是必须配置项，最核心的配置项是DataNode侧一个参数。</p>
+
+<p><figure class='code'><figcaption><span>hdfs-site.xml <a href="http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml">http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml</a> hdfs-default.xml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;property&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;name&gt;</span>dfs.datanode.max.locked.memory<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;value&gt;</span>0<span class="nt">&lt;/value&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;description&gt;</span>
+</span><span class='line'>    The amount of memory in bytes to use for caching of block replicas in
+</span><span class='line'>    memory on the datanode. The datanode<span class="ni">&amp;rsquo;</span>s maximum locked memory soft ulimit
+</span><span class='line'>    (RLIMIT_MEMLOCK) must be set to at least this value, else the datanode
+</span><span class='line'>    will abort on startup.
+</span><span class='line'>    By default, this parameter is set to 0, which disables in-memory caching.
+</span><span class='line'>    If the native libraries are not available to the DataNode, this
+</span><span class='line'>    configuration has no effect.
+</span><span class='line'>  <span class="nt">&lt;/description&gt;</span>
+</span><span class='line'><span class="nt">&lt;/property&gt;</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>如配置项描述所述，该配置的默认值为0，表示集中式缓存特性处于关闭状态，选择适当的值打开该特性。</p>
+
+<p>开启集中式缓存特性需要注意两个前提：<br/>
+（1）DataNode的native库必须可用；因为集中式缓存特性通过系统调用<a href="https://en.wikipedia.org/wiki/Mmap">mmap/mlock</a>实现，DataNode需要通过native库支持完成系统调用，否则会导致该特性不生效。<br/>
+（2）系统memlock至少与配置值相同；因为集中式缓存特性通过系统调用mmap/mlock实现，所以系统最大锁定内存空间需要至少与DataNode配置的锁定空间大小相同，否则会导致DataNode进行启动失败。</p>
+
+<p>此外，HDFS还包括了其他可选的配置项：
+<figure class='code'><figcaption><span>hdfs-site.xml <a href="http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml">http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml</a> hdfs-default.xml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;property&gt;</span>
+</span><span class='line'><span class="nt">&lt;name&gt;</span>dfs.namenode.path.based.cache.refresh.interval.ms<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'><span class="nt">&lt;value&gt;</span>30000<span class="nt">&lt;/value&gt;</span>
+</span><span class='line'><span class="nt">&lt;description&gt;</span>The amount of milliseconds between subsequent path cache rescans. Path cache rescans are when we calculate which blocks should be cached, and on what datanodes. By default, this parameter is set to 30 seconds.<span class="nt">&lt;/description&gt;</span>
+</span><span class='line'><span class="nt">&lt;/property&gt;</span>
+</span><span class='line'><span class="nt">&lt;property&gt;</span>
+</span><span class='line'><span class="nt">&lt;name&gt;</span>
+</span><span class='line'>dfs.namenode.path.based.cache.block.map.allocation.percent
+</span><span class='line'><span class="nt">&lt;/name&gt;</span>
+</span><span class='line'><span class="nt">&lt;value&gt;</span>0.25<span class="nt">&lt;/value&gt;</span>
+</span><span class='line'><span class="nt">&lt;description&gt;</span>The percentage of the Java heap which we will allocate to the cached blocks map. The cached blocks map is a hash map which uses chained hashing. Smaller maps may be accessed more slowly if the number of cached blocks is large; larger maps will consume more memory.<span class="nt">&lt;/description&gt;</span>
+</span><span class='line'><span class="nt">&lt;/property&gt;</span>
+</span><span class='line'><span class="nt">&lt;property&gt;</span>
+</span><span class='line'><span class="nt">&lt;name&gt;</span>dfs.cachereport.intervalMsec<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'><span class="nt">&lt;value&gt;</span>10000<span class="nt">&lt;/value&gt;</span>
+</span><span class='line'><span class="nt">&lt;description&gt;</span>Determines cache reporting interval in milliseconds. After this amount of time, the DataNode sends a full report of its cache state to the NameNode. The NameNode uses the cache report to update its map of cached blocks to DataNode locations. This configuration has no effect if in-memory caching has been disabled by setting dfs.datanode.max.locked.memory to 0 (which is the default). If the native libraries are not available to the DataNode, this configuration has no effect.<span class="nt">&lt;/description&gt;</span>
+</span><span class='line'><span class="nt">&lt;/property&gt;</span>
+</span><span class='line'>property&gt;
+</span><span class='line'><span class="nt">&lt;name&gt;</span>dfs.datanode.fsdatasetcache.max.threads.per.volume<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'><span class="nt">&lt;value&gt;</span>4<span class="nt">&lt;/value&gt;</span>
+</span><span class='line'><span class="nt">&lt;description&gt;</span>The maximum number of threads per volume to use for caching new data on the datanode. These threads consume both I/O and CPU. This can affect normal datanode operations.<span class="nt">&lt;/description&gt;</span>
+</span><span class='line'><span class="nt">&lt;/property&gt;</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h3>2.2 使用</h3>
+
+<p>HDFS集中式缓存对数据读写接口并没有影响，正常调用已缓存数据的读写即可使用缓存特性。
+为了便于数据管理，HDFS通过CacheAdmin对外暴露了一系列缓存管理的接口，其中CLI接口如下。<br/>
+<figure class='code'><figcaption><span>CacheAdmin </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>Usage: bin/hdfs cacheadmin [COMMAND]
+</span><span class='line'>          [-addDirective -path <span class="nt">&lt;path&gt;</span> -pool <span class="nt">&lt;pool-name&gt;</span> [-force] [-replication <span class="nt">&lt;replication&gt;</span>] [-ttl <span class="nt">&lt;time-to-live&gt;</span>]]
+</span><span class='line'>          [-modifyDirective -id <span class="nt">&lt;id&gt;</span> [-path <span class="nt">&lt;path&gt;</span>] [-force] [-replication <span class="nt">&lt;replication&gt;</span>] [-pool <span class="nt">&lt;pool-name&gt;</span>] [-ttl <span class="nt">&lt;time-to-live&gt;</span>]]
+</span><span class='line'>          [-listDirectives [-stats] [-path <span class="nt">&lt;path&gt;</span>] [-pool <span class="nt">&lt;pool&gt;</span>] [-id <span class="nt">&lt;id&gt;</span>]
+</span><span class='line'>          [-removeDirective <span class="nt">&lt;id&gt;</span>]
+</span><span class='line'>          [-removeDirectives -path <span class="nt">&lt;path&gt;</span>]
+</span><span class='line'>          [-addPool <span class="nt">&lt;name&gt;</span> [-owner <span class="nt">&lt;owner&gt;</span>] [-group <span class="nt">&lt;group&gt;</span>] [-mode <span class="nt">&lt;mode&gt;</span>] [-limit <span class="nt">&lt;limit&gt;</span>] [-maxTtl <span class="nt">&lt;maxTtl&gt;</span>]
+</span><span class='line'>          [-modifyPool <span class="nt">&lt;name&gt;</span> [-owner <span class="nt">&lt;owner&gt;</span>] [-group <span class="nt">&lt;group&gt;</span>] [-mode <span class="nt">&lt;mode&gt;</span>] [-limit <span class="nt">&lt;limit&gt;</span>] [-maxTtl <span class="nt">&lt;maxTtl&gt;</span>]]
+</span><span class='line'>          [-removePool <span class="nt">&lt;name&gt;</span>]
+</span><span class='line'>          [-listPools [-stats] [<span class="nt">&lt;name&gt;</span>]]
+</span><span class='line'>          [-help <span class="nt">&lt;command-name&gt;</span>]
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>CacheAdmin主要对用户暴露的是对缓存数据/缓存池（在系统架构及原理进行详细解释）的增删改查功能，另外还提供了相关的缓存策略，供用户灵活使用。<br/>
+如这里期望能够缓存数据仓库中被频繁访问的user表数据：<br/>
+<figure class='code'><figcaption><span>CacheAdmin CLI </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>$HADOOP_HOME/bin/hdfs cacheadmin -addPool factPool -owner hadoop-user -group hadoop-user -mod 777 -limit 1024000000 -ttl 2d
+</span><span class='line'>$HADOOP_HOME/bin/hdfs cacheadmin -addDirective -path /user/hive/warehouse/dw.db/user -pool factPool -force -replication 3 -ttl 1d
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>首先新建名称为factPool的缓存池，并赋予相关的用户组及权限等信息，另外限制该缓存池可以缓存的最大空间及缓存数据的最大TTL等；<br/>
+然后将user表数据加入到缓存池factPool进行缓存，并指定缓存时间为1天，缓存3个副本；<br/>
+之后当有读user表数据的请求过来后即可调度到缓存节点上从内存直接读取，从而提升读性能。其它CLI的用法可类比这里不再一一罗列。</p>
+
+<h3>2.3 适用场景</h3>
+
+<p>当前内存相比HDD成本还比较高，另外对于Hadoop集群，节点的内存大部分是分配给YARN供计算使用，所以剩余的内存资源其实非常有限，能够提供给HDFS集中式缓存使用的部分更少，为了使有限的资源发挥出最好的效率，这里提供几点建议：<br/>
+（1）数据仓库中存在一部分事实表被频繁访问，与其他事实表/维度表JOIN，将访问频率较高的部分事实表进行缓存，可以提高数据生产的效率；<br/>
+（2）根据局部性原理，最近写入的数据最容易被访问到，从数据仓库应用来看，每天有大量报表统计任务，需要读取前一天数据做分析，事实上大量表都是按天进行分区，可以把符合要求的热点分区数据做缓存处理，过期后清理缓存，也能大幅提升生产和统计效率；<br/>
+（3）资源数据，当前存在非常多的计算框架依赖JAR/SO等一些公共资源，传统的做法是将这些资源数据写入到HDFS，通过Distributed Cache进行全局共享，也便于管理，如Spark/Tez/Hive/Kafaka等使用到的公共JAR包。如果将这部分资源数据进行长期缓存，可以优化JVM初始化时间，进而提升效率；<br/>
+（4）其他；</p>
+
+<h2>三、系统架构及原理</h2>
+
+<h3>3.1 架构</h3>
+
+<p>设计文档中定义集中式缓存机制（Centralized cache management）：</p>
+
+<blockquote><p>An explicit caching mechanism that allows users to specify paths to be cached by HDFS.</p></blockquote>
+
+<p>其中包含了若干具体的目标：</p>
+
+<blockquote><p>Strong semantics for cached paths<br/>
+Exposing cache state to framework schedulers<br/>
+Defer cache policy decisions to higher­ level frameworks<br/>
+Backwards compatibility<br/>
+Management, debugging, metrics<br/>
+Security<br/>
+Quotas</p></blockquote>
+
+<p>为了实现上述目标，首先引入两个重要的概念：CacheDirective，CachePool。其中CacheDirective定义了缓存基本单元，本质上是文件系统的目录或文件与具体缓存策略等属性的集合；为了便于灵活管理，将属性类似的一组CacheDirective组成缓存池（CachePool），在缓存池CachePool上可以进行权限、Quota、缓存策略和统计信息等灵活控制。<br/>
+在具体展开集中式缓存的系统架构和原理前，首先梳理对CacheDirective缓存的详细流程，具体如图1：<br/>
+（1）用户通过调用客户端接口向NameNode发起对CacheDirective（Directory/File）缓存请求；<br/>
+（2）NameNode接收到缓存请求后，将CacheDirective转换成需要缓存的Block集合，并根据一定的策略并将其加入到缓存队列中；<br/>
+（3）NameNode接收到DataNode心跳后，将缓存Block的指令下发到DataNode；<br/>
+（4）DataNode接收到NameNode发下的缓存指令后根据实际情况触发Native JNI进行系统调用，对Block数据进行实际缓存；<br/>
+（5）此后DataNode定期（默认10s）向NameNode进行缓存汇报，更新当前节点的缓存状态；<br/>
+（6）上层调度尽可能将任务调度到数据所在的DataNode，当客户端进行读数据请求时，通过DFSClient直接从内存进行ZeroCopy，从而显著提升性能；</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/cache/cache.png" alt="HDFS集中式缓存管理流程图" align="center"><br />
+<label class=“pic_title” align="center">图1 HDFS集中式缓存管理流程图</label>
+</div>
+
+
+<p>HDFS集中式缓存的架构如图2所示，这里主要涉及到NameNode和DataNode两侧的管理和实现，NameNode对数据缓存的统一集中管理，并根据策略调度合适的DataNode对具体的数据进行数据的缓存和置换，DataNode根据NameNode的指令执行对数据的实际缓存和置换。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/cache/cachearc.png" alt="HDFS集中式缓存架构图" align="center"><br />
+<label class=“pic_title” align="center">图2 HDFS集中式缓存架构图</label>
+</div>
+
+
+<h3>3.2 DataNode</h3>
+
+<p>DataNode是执行缓存和置换的具体执行者，具体来说即cacheBlock和uncacheBlock调用。FsDatasetImpl#FsDatasetCache类是该操作的执行入口。</p>
+
+<blockquote><p>Manages caching for an FsDatasetImpl by using the mmap(2) and mlock(2) system calls to lock blocks into memory. Block checksums are verified upon entry into the cache.</p></blockquote>
+
+<p>FsDatasetCache的核心是称为mappableBlockMap的HashMap，用于维护当前缓存的Block集合，其中Key为标记该Block的ExtendedBlockId，为了能够实现与Federation的兼容，在blockid的基础上增加了blockpoolid，这样多个blockpool的block不会因为blockid相同产生冲突；Value是具体的缓存数据及当前的缓存状态。
+<figure class='code'><figcaption><span>FsDatasetCache#mappableBlockMap </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">private</span> <span class="kd">final</span> <span class="n">HashMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">ExtendedBlockId</span><span class="o">,</span> <span class="n">Value</span><span class="o">&gt;</span> <span class="n">mappableBlockMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">ExtendedBlockId</span><span class="o">,</span> <span class="n">Value</span><span class="o">&gt;();</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>mappableBlockMap更新只有FsdatasetCache提供的两个具体的函数入口：<br/>
+<figure class='code'><figcaption><span>FsDatasetCache.java </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">synchronized</span> <span class="kt">void</span> <span class="nf">cacheBlock</span><span class="o">(</span><span class="kt">long</span> <span class="n">blockId</span><span class="o">,</span> <span class="n">String</span> <span class="n">bpid</span><span class="o">,</span> <span class="n">String</span> <span class="n">blockFileName</span><span class="o">,</span> <span class="kt">long</span> <span class="n">length</span><span class="o">,</span> <span class="kt">long</span> <span class="n">genstamp</span><span class="o">,</span> <span class="n">Executor</span> <span class="n">volumeExecutor</span><span class="o">)</span>
+</span><span class='line'><span class="kd">synchronized</span> <span class="kt">void</span> <span class="nf">uncacheBlock</span><span class="o">(</span><span class="n">String</span> <span class="n">bpid</span><span class="o">,</span> <span class="kt">long</span> <span class="n">blockId</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>可以看出，对mappableBlockMap的并发控制实际上放在了cacheBlock和uncacheBlock两个方法上，虽然锁粒度比较大，但是并不会对并发读写带来影响。原因是：cacheBlock在系统调用前构造空Value结构加入mappableBlockMap中，此时该Value维护的Block状态是CACHING，之后将真正缓存数据的任务加入异步任务CachingTask去完成，所以锁很快会被释放，当处于CACHING状态的Block被访问的时候会退化到从HDD访问，异步任务CachingTask完成数据缓存后将其状态置为CACHED；uncacheBlock是同样原理。所以，虽然锁的粒度比较大，但是并不会阻塞后续的数据缓存任务，也不会对数据读写带来额外的开销。</p>
+
+<p>顺着自底向上的思路，再来看触发cacheBlock和uncacheBlock的场景，通过函数调用关系容易看到缓存和置换的触发场景都比较简单。<br/>
+（1）cacheBlock：唯一的入口是从ANN（HA Active NameNode）下发的指令；</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/cache/cacheblockinvoke.png" align="center"><br />
+<label class=“pic_title” align="center"></label>
+</div>
+
+
+<p>（2）uncacheBlock：与cacheBlock不同，uncacheBlock存在三个入口：append，invalidate和uncache。其中uncache也是来自ANN下发的指令；append和invalidate触发uncacheBlock的原因是：append会导致数据发生变化，缓存失效需要清理后重新缓存，invalidate来自删除操作，缓存同样失效需要清理。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/cache/uncacheblockinvoke.png" align="center"><br />
+<label class=“pic_title” align="center"></label>
+</div>
+
+
+<p>DataNode的处理逻辑比较简单，到这里整个实现的主路径基本梳理完成。</p>
+
+<h3>3.3 NameNode</h3>
+
+<p>相比DataNode的实现逻辑，NameNode侧要复杂的多，缓存管理继承了NameNode一贯的模块化思路，通过CacheManager实现了整个集中式缓存在管理端的复杂处理逻辑。<br/>
+CacheManager通过几个关键数据结构组织对数据缓存的实现。
+<figure class='code'><figcaption><span>CacheManager.java <a href="https://github.com/apache/hadoop/blob/trunk/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/CacheManager.java#L119">https://github.com/apache/hadoop/blob/trunk/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/CacheManager.java#L119</a> github</span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">/&lt;</span><span class="n">strong</span><span class="o">&gt;</span>
+</span><span class='line'> <span class="o">*</span> <span class="n">Cache</span> <span class="n">directives</span><span class="o">,</span> <span class="n">sorted</span> <span class="n">by</span> <span class="n">ID</span><span class="o">.</span>
+</span><span class='line'> <span class="o">*/</span>
+</span><span class='line'><span class="kd">private</span> <span class="kd">final</span> <span class="n">TreeMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">Long</span><span class="o">,</span> <span class="n">CacheDirective</span><span class="o">&gt;</span> <span class="n">directivesById</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TreeMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">Long</span><span class="o">,</span> <span class="n">CacheDirective</span><span class="o">&gt;();</span>
+</span><span class='line'><span class="o">/&lt;/</span><span class="n">strong</span><span class="o">&gt;</span>
+</span><span class='line'> <span class="o">*</span> <span class="n">Cache</span> <span class="n">directives</span><span class="o">,</span> <span class="n">sorted</span> <span class="n">by</span> <span class="n">path</span>
+</span><span class='line'> <span class="o">&lt;</span><span class="n">em</span><span class="o">&gt;/</span>
+</span><span class='line'><span class="kd">private</span> <span class="kd">final</span> <span class="n">TreeMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">String</span><span class="o">,</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">CacheDirective</span><span class="o">&gt;&gt;</span> <span class="n">directivesByPath</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TreeMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">String</span><span class="o">,</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">CacheDirective</span><span class="o">&gt;&gt;();</span>
+</span><span class='line'><span class="o">/**</span>
+</span><span class='line'> <span class="o">*</span> <span class="n">Cache</span> <span class="n">pools</span><span class="o">,</span> <span class="n">sorted</span> <span class="n">by</span> <span class="n">name</span><span class="o">.</span>
+</span><span class='line'> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;/</span>
+</span><span class='line'><span class="kd">private</span> <span class="kd">final</span> <span class="n">TreeMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">String</span><span class="o">,</span> <span class="n">CachePool</span><span class="o">&gt;</span> <span class="n">cachePools</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TreeMap</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">String</span><span class="o">,</span> <span class="n">CachePool</span><span class="o">&gt;();</span>
+</span><span class='line'><span class="o">/&lt;</span><span class="n">em</span><span class="o">&gt;*</span>
+</span><span class='line'> <span class="o">*</span> <span class="n">All</span> <span class="n">cached</span> <span class="n">blocks</span><span class="o">.</span>
+</span><span class='line'> <span class="o">&lt;/</span><span class="n">em</span><span class="o">&gt;/</span>
+</span><span class='line'><span class="kd">private</span> <span class="kd">final</span> <span class="n">GSet</span><span class="o">&amp;</span><span class="n">lt</span><span class="o">;</span><span class="n">CachedBlock</span><span class="o">,</span> <span class="n">CachedBlock</span><span class="o">&gt;</span> <span class="n">cachedBlocks</span><span class="o">;</span>
+</span><span class='line'><span class="kd">private</span> <span class="n">CacheReplicationMonitor</span> <span class="n">monitor</span><span class="o">;</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>通过上述的几个核心集合类数据结构，很容易实现用户层对缓存数据/缓存池的增删改查功能调用的支持。</p>
+
+<p>虽然上述的几个核心集合类数据结构能够容易支持用户对相关接口的调用，但是从整个集中式缓存全局来看，并没有将用户调用接口对目录/文件的缓存同DataNode实际数据缓存建立起有效连接。CacheReplicationMonitor发挥的即是这种作用，CacheReplicationMonitor使得缓存接口调用、核心数据结构以及数据缓存真正有序流动起来。</p>
+
+<p>如果对BlockManager#ReplicationMonitor比较熟悉的话，可以发现CacheReplicationMonitor的工作模式几乎从ReplicationMonitor复制而来，CacheReplicationMonitor本质上也是一个定时线程，与ReplicationMonitor稍微不同的是，CacheReplicationMonitor除了定时触发外用户的缓存调用也会触发。其核心是其rescan方法，具体来看主要做三个具体工作：<br/>
+（1）resetStatistics：对CacheManager从CacheDirective和CachePool两个维度对统计信息进行更新；<br/>
+（2）rescanCacheDirectives：顺序扫描CacheManager#directivesById数据结构（与CacheManager#directivesByPath实际上等价），检查哪些CacheDirective（目录或文件）需要进行cache处理，一旦发现有文件需要进行缓存，立即将该文件的所有Block加入到CacheReplicationMonitor#cachedBlocks（GSet&lt;CachedBlock, CachedBlock> cachedBlocks）中，后续工作由rescanCachedBlockMap接着进行；<br/>
+（3）rescanCachedBlockMap：顺序扫描CacheReplicationMonitor#cachedBlocks的所有CacheBlock，由于CacheBlock也有副本个数的概念，rescanCachedBlockMap在扫描的过程中会发现实际缓存的Block副本数与预设的缓存副本有差异，比如新增缓存请求/节点宕机/心跳异常/节点下线等等导致Cache Block副本数与期望值之间产生差异，所以需要CacheReplicationMonitor进行周期检查和修复，根据差异多少关系将对应的CacheBlock加入到DatanodeManager管理的对应DatanodeDescriptor#{pendingCached,pendingUncached}数据结构中，待对应的DataNode心跳过来后将其转化成对应的执行指令下发给DataNode实际执行。关于心跳与指令下发的细节已经在之前文章中多处提到，这里不再展开。</p>
+
+<p>这里还遗留一个问题，由于Block与CacheBlock均存在多副本的关系，如何选择具体的DataNode执行缓存或置换。<br/>
+（1）uncacheBlock：uncacheBlock选择对应的DataNode其实比较简单，顺序遍历所有已经缓存了该Block的DataNode，为其准备uncacheBlock指令，直到缓存副本达到预期即可；<br/>
+（2）cacheBlock：cacheBlock稍微复杂，先从Block副本所在的所有DataNode集合中排除DecommissionInProgress/Decommissioned/CorruptBlock所在DataNode/已经缓存了该Block的DataNode之后，在剩下的DataNode集合中随机进行选择即可。</p>
+
+<p>DataNode实际执行完成NameNode下发的cacheBlock/uncacheBlock指令后，在下次cacheReport（默认时间间隔10s）汇报给NameNode，CacheManager根据汇报情况对缓存执行情况对CacheManager#cachedBlocks进行更新。</p>
+
+<p>至此，NameNode端的集中式缓存逻辑形成了合理有效的闭环，基本实现了设计目标。</p>
+
+<h3>3.3 DFSClient</h3>
+
+<p>客户端本身的读数据逻辑基本没有变化，与传统的读模式区别在于，当客户端向DataNode发出REQUEST_SHORT_CIRCUIT_FDS请求到达DataNode后，DataNode会首先判断数据是否被缓存，如果数据已经缓存，将缓存信息返回到客户端后续直接进行内存数据的ZeroCopy；如果数据没有缓存采用传统方式进行ShortCircuit-Read。</p>
+
+<h2>四、总结</h2>
+
+<p>通过前述分析，可以看到HDFS集中式缓存优势非常明显：<br/>
+1、显著提升数据读性能；<br/>
+2、提升集群内存利用率；</p>
+
+<p>虽然优势明显，但是HDFS集中式缓存目前还有一些不足：<br/>
+1、内存置换策略（LRU/LFU/etc.）尚不支持，如果内存资源不足，缓存会失败；<br/>
+2、集中式缓存与Balancer之间还不能很好的兼容，大量的Block迁移会造成频繁内存数据交换；<br/>
+3、缓存能力仅对读有效，对写来说其实存在副作用，尤其是Append；<br/>
+4、与Federation的兼容非常不友好；</p>
+
+<p>总之，内存模式在存储和计算的多个方向上已经成为业界广泛关注的方向和趋势，Hadoop社区也在投入精力持续在内存上发力，从集中式缓存来看，收益非常明显，但是还存在一些小问题，在实际应用过程中还需要优化和改进。</p>
+
+<h2>五、引用</h2>
+
+<p>[1] <a href="https://issues.apache.org/jira/browse/HDFS-4949">https://issues.apache.org/jira/browse/HDFS-4949</a><br/>
+[2] <a href="http://hadoop.apache.org/docs/r2.7.1/hadoop-project-dist/hadoop-hdfs/CentralizedCacheManagement.html">http://hadoop.apache.org/docs/r2.7.1/hadoop-project-dist/hadoop-hdfs/CentralizedCacheManagement.html</a><br/>
+[3] <a href="https://issues.apache.org/jira/secure/attachment/12610186/caching-design-doc-2013-10-24.pdf">https://issues.apache.org/jira/secure/attachment/12610186/caching-design-doc-2013-10-24.pdf</a><br/>
+[4] <a href="https://en.wikipedia.org/wiki/Zero-copy">https://en.wikipedia.org/wiki/Zero-copy</a><br/>
+[5] <a href="https://en.wikipedia.org/wiki/Mmap">https://en.wikipedia.org/wiki/Mmap</a><br/>
+[6] <a href="https://issues.apache.org/jira/browse/HDFS-347">https://issues.apache.org/jira/browse/HDFS-347</a><br/>
+[7] <a href="https://issues.apache.org/jira/browse/HDFS-2246">https://issues.apache.org/jira/browse/HDFS-2246</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[NameNode内存详解]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2016/07/21/namenode-memory-detail/"/>
+    <updated>2016-07-21T20:00:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2016/07/21/namenode-memory-detail</id>
+    <content type="html"><![CDATA[<h2>一、背景</h2>
+
+<p>NameNode内存数据主要对整个文件系统元数据的管理。Namenode目前元数据管理可以分成两个层次，一个是Namespace的管理层，这一层负责管理HDFS分布式文件系统中的树状目录和文件结构；另一层则为Block管理层，这一层负责管理HDFS分布式文件系统中存储文件到物理块之间的映射关系BlocksMap元数据。其中对Namespace的管理数据除在内存常驻外，会定期Flush到持久化设备中；对BlocksMap元数据的管理只存在内存；当NameNode发生重启，需要从持久化设备中读取Namespace管理数据，并重新构造BlocksMap。这两部分数据结构占用巨大的JVM Heap空间。</p>
+
+<p>除了对文件系统本身元数据的管理外，NameNode还需要维护DataNode本身的元数据，这部分空间相对固定，且占用空间较小。</p>
+
+<p>从实际Hadoop集群环境历史数据看，当Namespace中包含INode（目录和文件总量）~140M，数据块数量~160M，常驻内存使用量达在~50G。随着数据规模的持续增长，内存占用接近同步线性增长。在整个HDFS服务中，NameNode的核心作用及内存数据结构的重要地位，所以分析内存使用情况对维护HDFS服务稳定性至关重要。</p>
+
+<p>这里在《NameNode内存全景》基础上，进一步对NameNode内存中关键数据结构的细节进行详细解读。</p>
+
+<h2>二、内存分析</h2>
+
+<h3>2.1 NetworkTopology</h3>
+
+<p>NameNode除对文件系统本身元数据的管理外还需要维护DataNode的信息，主要通过NetworkTopology中DatanodeDescriptor对DataNode进行表示，该类继承结构如下图示：</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/memory/mem-1.png" align="center"><br />
+</div>
+
+
+<p>在整个继承机构中各个类的内存占用情况：</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/memory/mem-2.png" align="center"><br />
+</div>
+
+
+<p>其中DatanodeDescriptor还包括一部分非常驻内存对象，这里没有详细统计，所以结果可能会有少许误差。</p>
+
+<p>假设集群中包括1000个DataNode节点，仅DataNode部分占用内存情况：</p>
+
+<p>(48+88+64)*1000=200000=195+K</p>
+
+<p>所以仅NetworkTopology维护的DataNode信息，相比整个NameNode所占的内存空间微乎其微。</p>
+
+<h3>2.2 Namespace</h3>
+
+<p>与传统单机文件系统相似，HDFS对文件系统的目录结构也是按照树状结构维护，Namespace保存的正是目录树及每个目录/文件节点的属性，包括：名称（name），编号（id），所属用户（user），所属组（group），权限（permission），修改时间（mtime），访问时间（atime），子目录/文件（children）等信息。</p>
+
+<p>下图为整个Namespace中INode的类图结构，从类图可以看出，INodeFile和INodeDirectory的继承关系。其中目录在内存中由INodeDirectory对象来表示，并用List<INode> children成员列表来标识该目录下的子目录和文件；文件在内存中则由INodeFile来表示，并用BlockInfo[] blocks成员数组来标识该文件由那些blocks分块组成。其他的目录/文件属性在该类继承结构的各个相应子类成员变量标识。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/memory/mem-3.png" align="center"><br />
+</div>
+
+
+<p>在整个继承关系中不同类的内存占用情况：</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/memory/mem-4.png" align="center"><br />
+</div>
+
+
+<p>其中，除了上面提到的结构外，如目录节点的附加属性等非通用数据结构，没有在统计范围内。另外，INodeFile和INodeDirectory.withQuotaFeature在内存中使用最为广泛的两个结构。</p>
+
+<p>假设Namespace包含INode数为1亿，仅Namespace占用内存情况：<br/>
+(24+104+8+avg(32+44+ 8 * 2, 56+ 8 * 2)) * 100000000=21800000000=20.30GB</p>
+
+<p>Namespace数据会定期持久化到外存设备上，内存也会常驻，在整个NameNode的生命周期内一直缓存在内存中，随着HDFS中存储的数据增多，文件数/目录树也会随之增加，占用内存空间也会同步增加。NameNode进程、单机内存容量及JVM对内存管理能力将成为制约HDFS的主要瓶颈。</p>
+
+<h3>2.3 BlocksMap</h3>
+
+<p>在HDFS中，每个block都对应多个副本，存储在不同的存储节点DataNode上。在NameNode元数据管理上需要维护从Block到DataNode列表的对应关系，描述每一个Block副本实际存储的物理位置，当前BlocksMap解决的即是从Block对对应DataNode列表的映射关系。</p>
+
+<p>BlocksMap内部数据结构如下图示：</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/memory/mem-5.png" align="center"><br />
+</div>
+
+
+<p>随着存储量规模不断增加，BlocksMap在内存中占用的空间会随之增加，社区在BlocksMap的数据结构使用上做过优化，最初直接使用HashMap解决从Block到BlockInfo的映射关系，之后经过优化使用重新实现的LightWeightGSet代替HashMap，该数据结构通过数据保存元素信息，利用链表解决碰撞冲突，达到更少的内存使用。</p>
+
+<p>该数据结构里Block对象中只记录了blockid，blocksize和timestamp。BlockInfo继承自Block，除了Block对象中保存的信息外，最重要的是该block对应的DataNode的列表信息。</p>
+
+<p>内存占用情况如下：</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/memory/mem-6.png" align="center"><br />
+</div>
+
+
+<p>LightWeightGSet与HashMap相比，减少了HashMap在load factor避免冲突的额外内存开销，即使经过优化，BlocksMap也是占用了大量的内存空间，假设HDFS中存在1亿Block ，其占用内存情况：</p>
+
+<p>（40+120+8）* 100000000=16800000000=15.65GB</p>
+
+<p>BlocksMap数据常驻内存，在整个NameNode生命周期内一直缓存内存中，随着数据规模的增加，对应Namespace和Block数会随之增多，NameNode进程、单机内存容量及JVM对内存管理能力将成为主要瓶颈。</p>
+
+<h3>2.4 小结</h3>
+
+<p>根据前述对当前线上集群数据量：Namespace中包含INode（目录和文件总量）：~140M，数据块数量：160M，计算内存使用情况：</p>
+
+<p>Namespace：(24+104+8+avg(32+44+ 8 * 2, 56+ 8 * 2)) * 140M = ~29.0 GB<br/>
+BlocksMap：(40+120+8) * 160M = ~25.0 GB<br/>
+二者组合结果：29.0 GB + 25.0 GB = 53.0 GB</p>
+
+<p>结果来看与监控常驻内存~50GB接近，基本符合实际情况。</p>
+
+<p>从前面的讨论可以看出，在NameNode整个内存对象里，占用空间最大的两个结构即为Namespace和BlocksMap，当数据规模增加后，巨大的内存占用势必会制约NameNode进程的服务能力，尤其对JVM的内存管理会带来极大的挑战。</p>
+
+<p>据了解业界在NameNode上JVM最大使用到180G，结合前面的计算可以得知，元数据总量700M基本上是服务的上限。</p>
+
+<h2>三、结论</h2>
+
+<p>1、NameNode内存使用量预估模型：Total=218 * num(INode) + 168 * num(Blocks)；<br/>
+2、受JVM可管理内存上限等物理因素，180G内存下，NameNode服务上限的元数据量约700M。</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[HDFS升级过程中重启方式选择]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2016/07/07/restart-cluster-ways-when-upgrade/"/>
+    <updated>2016-07-07T10:45:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2016/07/07/restart-cluster-ways-when-upgrade</id>
+    <content type="html"><![CDATA[<h2>一、背景</h2>
+
+<p>集群在运行过程中，由于升级等原因难免会遇到重启NameNode或整个集群节点的情况，不同的重启方式会影响到整个运维操作的效率。<br/>
+刚接触HDFS时的某次全集群内DataNode升级，遇到一次非预期内的NameNode重启。升级时，NameNode首先进入Safemode模式，全集群禁止写操作。DataNode数据包和配置更新后操作了所有DataNode一次性重启，之后NameNode间歇性不能响应，持续高负载达~45min，之后不得不通过重启NameNode，之后~35min全集群启动完成，服务恢复正常。</p>
+
+<p>由此引出问题：<br/>
+1、造成全集群DataNode重启后NameNode不能正常响应的根本原因是什么？<br/>
+2、重启NameNode为什么能够实现恢复服务？</p>
+
+<h2>二、原因分析</h2>
+
+<h3>1、现场还原</h3>
+
+<p>在集群重启过程中，不管以什么方式进行重启，避免不了DataNode向NameNode进行BlockReport的交互，从NameNode现场截取两个时间段里部分BlockReport日志。</p>
+
+<p>表1 不同重启方式NameNode处理BR时间统计</p>
+
+<table>
+<thead>
+<tr>
+<th style="text-align:center;">  <strong>DN Restart Only</strong>   </th>
+<th style="text-align:center;"> - </th>
+<th style="text-align:center;"> - </th>
+<th style="text-align:center;"> <strong>With NN Restart</strong> </th>
+<th style="text-align:center;"> - </th>
+<th style="text-align:center;"> - </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center;"> <strong>Date</strong> </td>
+<td style="text-align:center;"> <strong>Blocks</strong> </td>
+<td style="text-align:center;"> <strong>ProcessTime</strong> </td>
+<td style="text-align:center;"> <strong>Date</strong> </td>
+<td style="text-align:center;"> <strong>Blocks</strong> </td>
+<td style="text-align:center;"> <strong>ProcessTime</strong> </td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:51</td>
+<td style="text-align:center;">   49428</td>
+<td style="text-align:center;">  646 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   66392</td>
+<td style="text-align:center;">  73 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:51</td>
+<td style="text-align:center;">   49428</td>
+<td style="text-align:center;">  646 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   66392</td>
+<td style="text-align:center;">  73 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:51</td>
+<td style="text-align:center;">   49068</td>
+<td style="text-align:center;">  644 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   69978</td>
+<td style="text-align:center;">  84 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:52</td>
+<td style="text-align:center;">   51822</td>
+<td style="text-align:center;">  638 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   78222</td>
+<td style="text-align:center;">  98 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:53</td>
+<td style="text-align:center;">   83131</td>
+<td style="text-align:center;">  1214 msecs      </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   64663</td>
+<td style="text-align:center;">  71 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:53</td>
+<td style="text-align:center;">   90088</td>
+<td style="text-align:center;">  169 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   85106</td>
+<td style="text-align:center;">  99 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:54</td>
+<td style="text-align:center;">   82024</td>
+<td style="text-align:center;">  1107 msecs      </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   87346</td>
+<td style="text-align:center;">  96 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:55</td>
+<td style="text-align:center;">   48114</td>
+<td style="text-align:center;">  637 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   87802</td>
+<td style="text-align:center;">  96 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:55</td>
+<td style="text-align:center;">   49457</td>
+<td style="text-align:center;">  84 msecs        </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   65646</td>
+<td style="text-align:center;">  71 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:56</td>
+<td style="text-align:center;">   82989</td>
+<td style="text-align:center;">  457 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   71025</td>
+<td style="text-align:center;">  86 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:57</td>
+<td style="text-align:center;">   84634</td>
+<td style="text-align:center;">  1181 msecs      </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   66144</td>
+<td style="text-align:center;">  73 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:58</td>
+<td style="text-align:center;">   67321</td>
+<td style="text-align:center;">  885 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   72652</td>
+<td style="text-align:center;">  90 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:59</td>
+<td style="text-align:center;">   70668</td>
+<td style="text-align:center;">  924 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:57</td>
+<td style="text-align:center;">   66118</td>
+<td style="text-align:center;">  76 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:59</td>
+<td style="text-align:center;">   73114</td>
+<td style="text-align:center;">  138 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   67011</td>
+<td style="text-align:center;">  74 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:15:59</td>
+<td style="text-align:center;">   28215</td>
+<td style="text-align:center;">  692 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   78216</td>
+<td style="text-align:center;">  84 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:00</td>
+<td style="text-align:center;">   30080</td>
+<td style="text-align:center;">  321 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   60988</td>
+<td style="text-align:center;">  66 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:00</td>
+<td style="text-align:center;">   30435</td>
+<td style="text-align:center;">  329 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   52376</td>
+<td style="text-align:center;">  58 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:00</td>
+<td style="text-align:center;">   34350</td>
+<td style="text-align:center;">  360 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   66801</td>
+<td style="text-align:center;">  73 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:01</td>
+<td style="text-align:center;">   32487</td>
+<td style="text-align:center;">  344 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   49134</td>
+<td style="text-align:center;">  53 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:01</td>
+<td style="text-align:center;">   28244</td>
+<td style="text-align:center;">  308 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   66928</td>
+<td style="text-align:center;">  73 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:01</td>
+<td style="text-align:center;">   29138</td>
+<td style="text-align:center;">  308 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   75560</td>
+<td style="text-align:center;">  82 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:02</td>
+<td style="text-align:center;">   29765</td>
+<td style="text-align:center;">  301 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   83880</td>
+<td style="text-align:center;">  92 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:02</td>
+<td style="text-align:center;">   28699</td>
+<td style="text-align:center;">  309 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   82989</td>
+<td style="text-align:center;">  93 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:02</td>
+<td style="text-align:center;">   35377</td>
+<td style="text-align:center;">  370 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   56210</td>
+<td style="text-align:center;">  60 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:03</td>
+<td style="text-align:center;">   49204</td>
+<td style="text-align:center;">  626 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   65517</td>
+<td style="text-align:center;">  78 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:03</td>
+<td style="text-align:center;">   27554</td>
+<td style="text-align:center;">  438 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   76159</td>
+<td style="text-align:center;">  78 msecs</td>
+</tr>
+<tr>
+<td style="text-align:center;">2015-04-28 13:16:04</td>
+<td style="text-align:center;">   27285</td>
+<td style="text-align:center;">  326 msecs       </td>
+<td style="text-align:center;">2015-04-28 14:00:58</td>
+<td style="text-align:center;">   59725</td>
+<td style="text-align:center;">  58 msecs</td>
+</tr>
+</tbody>
+</table>
+
+
+<p>左半部分记录的是重启全集群DataNode后，NameNode处理单个BlockReport请求耗时，右半部分为重启NameNode后，处理单个BlockReport请求耗时。这里只列了部分数据，虽不具统计意义，但是在处理时间的量级上可信。</p>
+
+<p>从数据上可以看到，对于BlockReport类型的RPC请求，不同的重启方式，RPC的处理时间有明显差异。</p>
+
+<h3>2、深度分析</h3>
+
+<p>前面也提到从数据上看，对于BlockReport类型的RPC请求，重启全集群DataNode与重启NameNode，RPC处理时间有一个数量级的差别。这种差别通过代码得到验证。</p>
+
+<p><figure class='code'><figcaption><span>BlockManager.java <a href="https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L1813">https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L1813</a> Github </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">if</span> <span class="o">(</span><span class="n">storageInfo</span><span class="o">.</span><span class="na">getBlockReportCount</span><span class="o">()</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="c1">// The first block report can be processed a lot more efficiently than</span>
+</span><span class='line'>  <span class="c1">// ordinary block reports.  This shortens restart times.</span>
+</span><span class='line'>  <span class="n">processFirstBlockReport</span><span class="o">(</span><span class="n">node</span><span class="o">,</span> <span class="n">storage</span><span class="o">.</span><span class="na">getStorageID</span><span class="o">(),</span> <span class="n">newReport</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">invalidatedBlocks</span> <span class="o">=</span> <span class="n">processReport</span><span class="o">(</span><span class="n">node</span><span class="o">,</span> <span class="n">storage</span><span class="o">,</span> <span class="n">newReport</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>可以看到NameNode对BlockReport的处理方式仅区别于是否为初次BlockReport。初次BlockReport显然只发生在NameNode重启期间。<br/>
+processFirstBlockReport：对Standby节点（NameNode重启期间均为Standby），如果汇报的数据块相关元数据还没有加载，会将报告的块信息暂存队列，当Standby节点完成加载相关元数据后，再处理该消息队列； 对第一次块汇报的处理比较特别，为提高处理效率，仅验证块是否损坏，然后判断块状态是否为FINALIZED状态，如果是建立块与DN节点的映射，其他信息一概暂不处理。<br/>
+processReport：对于非初次块汇报，处理逻辑要复杂很多；对报告的每个块信息，不仅会建立块与DN的映射，还会检查是否损坏，是否无效，是否需要删除，是否为UC状态等等。</p>
+
+<p>初次块汇报的处理逻辑单独拿出来，主要原因有两方面：<br/>
+1、加快NameNode的启动时间；统计数据也能说明，初次块汇报的处理时间比正常块汇报的处理时间能节省约一个数量级的时间。<br/>
+2、由于启动过程中，不提供正常读写服务，所以只要确保正常数据（整个Namespace和所有FINALIZED状态Blocks）无误，无效和冗余数据处理完全可以延后到IBR或next BR。<br/>
+说明：<br/>
+1、是否选择processFirstBlockReport处理逻辑不会因为NameNode当前为safemode或者standby发生变化，仅NameNode重启生效；<br/>
+2、BlockReport的处理时间与DataNode数据规模正相关，当前DataNode中Block数处于：200,000 ~ 1,000,000。<br/>
+如果不操作NameNode重启，BlockReport处理时间会因为处理逻辑复杂带来额外的处理时间，统计数据显示，约一个数量级的差别。</p>
+
+<p>NameNode对非第一次BlockReport的复杂处理逻辑只是NameNode负载持续处于高位的诱因，在其诱发下发生了一系列“滚雪球”式的异常放大。<br/>
+1、所有DataNode进程被关闭后，NameNode的CallQueue（默认大小：3200）会被快速消费完；</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/restart/1.png" align="center"><br />
+</div>
+
+
+<p>2、所有DataNode进程被重启后，NameNode的CallQueue会被迅速填充，主要来自DataNode重启后正常流程里的VersionRequest和registerDataNode两类RPC请求，由于均较轻量，所以也会被迅速消费完；</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/restart/2.png" align="center"><br />
+</div>
+
+
+<p>3、之后DataNode进入BlockReport流程，NameNode的CallQueue填充内容开始从VersionRequest和registerDataNode向BlockReport过渡；</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/restart/3.png" align="center"><br />
+</div>
+
+
+<p>直到CallQueue里几乎被所有BlockReport填充满。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/restart/4.png" align="center"><br />
+</div>
+
+
+<p>前面的统计数据显示，NameNode不重启对BlockReport的处理时间~500ms，另一个关键数据是Client看到的RPC超时时间，默认为60s；在默认的RPC超时时间范围内，CallQueue里最多可能被处理的BlockReport数~120个，其它均会发生超时。
+当发生超时后，Client端（DataNode）会尝试重试，所以NameNode的CallQueue会被持续打满；另一方面，如果NameNode发现RPC Request出现超时会被忽略（可以从日志证实），直到存在未超时的请求，此时从CallQueue拿出来的BlockReport请求虽未超时，但也处于即将超时的边缘，即使处理完成其中的少数几个，CallQueue中的剩余大部分也会出现超时。</p>
+
+<p><figure class='code'><figcaption><span>namenode.lgo </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>2015-04-28 13:14:48,709 INFO org.apache.hadoop.ipc.Server: IPC Server handler 9 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.16.45.38:37649 Call#650 Retry#0
+</span><span class='line'>2015-04-28 13:14:48,709 INFO org.apache.hadoop.ipc.Server: IPC Server handler 9 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.16.53.5:14839 Call#659 Retry#0
+</span><span class='line'>2015-04-28 13:14:48,709 INFO org.apache.hadoop.ipc.Server: IPC Server handler 9 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.16.62.5:55833 Call#702 Retry#0
+</span><span class='line'>2015-04-28 13:14:48,709 INFO org.apache.hadoop.ipc.Server: IPC Server handler 9 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.16.51.31:41016 Call#655 Retry#0
+</span><span class='line'>2015-04-28 13:14:48,709 INFO org.apache.hadoop.ipc.Server: IPC Server handler 29 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.16.62.36:53163 Call#702 Retry#0
+</span><span class='line'>2015-04-28 13:14:48,709 INFO org.apache.hadoop.ipc.Server: IPC Server handler 9 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.16.46.32:53530 Call#662 Retry#0
+</span><span class='line'>2015-04-28 13:14:48,710 INFO org.apache.hadoop.ipc.Server: IPC Server handler 29 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.16.55.11:52372 Call#662 Retry#0
+</span><span class='line'>2015-04-28 13:14:48,710 INFO org.apache.hadoop.ipc.Server: IPC Server handler 9 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.16.55.44:30295 Call#666 Retry#0
+</span><span class='line'>2015-04-28 13:14:48,710 INFO org.apache.hadoop.ipc.Server: IPC Server handler 29 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.16.50.4:37880 Call#674 Retry#0
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>通过前面的分析，从整个Timeline上看，NameNode长期处于满负荷运行状态，但是有效处理能力非常低（仅针对BlockReport）。这也是为什么1000+ DataNode（每一个DataNode管理的Block数均未超过1,000,000），也即1000+有效BlockReport请求，在~50min内依然没有被处理完成。</p>
+
+<p>如果DataNode进程处于正常运行状态下，重启NameNode后会发生完全不同的情况。<br/>
+1、NameNode重启后，首先加载FsImage，此时，除Namespace外NameNode的元数据几乎为空，此后开始接收DataNode过来的RPC请求（绝大多数为Heartbeat）；</p>
+
+<div class=“pic” align="center" padding=“0”> 
+<img src="http://hexiaoqiao.github.io/images/restart/5.png" align="center"><br />
+</div>
+
+
+<p>2、NameNode接收到Heartbeat后由于在初始状态会要求DataNode重新注册；由于Heartbeat间隔是3s，所以从NameNode的角度看，所有DataNode的后续一系列RPC请求会被散列到3s时间线上；</p>
+
+<div class=“pic” align="center" padding=“0”>  
+<img src="http://hexiaoqiao.github.io/images/restart/6.png" align="center"><br />
+</div>
+
+
+<p>3、DataNode向NameNode注册完成后立即开始BlockReport；由于步骤2里提到的3s时间线散列关系，队列里后半部分BlockReport请求和VersionRequest/registerDataNode请求会出现相互交叉的情况；</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/restart/7.png" align="center"><br />
+</div>
+
+
+<p>4、如前述，处理BlockReport时部分RPC请求一样会发生超时；</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/restart/8.png" align="center"><br />
+</div>
+
+
+<p>5、由于超时重试，所以部分BlockReport和registerDataNode需要重试；可以发现不同于重启所有DataNode时重试的RPC几乎都是BlockReport，这里重试的RPC包括了VersionRequest/registerDataNode（可以从日志证实），这就大幅降低了NameNode的负载，避免了“滚雪球”式高负载RPC堆积，使异常有效收敛。</p>
+
+<p><figure class='code'><figcaption><span>namenode.log </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.versionRequest from 10.32.73.39:16329 Call#2893 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.32.20.15:54831 Call#2889 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.versionRequest from 10.16.62.38:10818 Call#2835 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.versionRequest from 10.16.52.18:59462 Call#2818 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.registerDatanode from 10.16.39.24:13728 Call#2864 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.versionRequest from 10.32.27.8:58789 Call#2883 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.registerDatanode from 10.32.73.40:56606 Call#2889 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.versionRequest from 10.16.40.21:19961 Call#2843 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.versionRequest from 10.16.43.13:22644 Call#2870 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.registerDatanode from 10.16.43.26:16289 Call#2876 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.versionRequest from 10.16.61.30:31968 Call#2825 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.versionRequest from 10.32.21.5:47752 Call#2879 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.blockReport from 10.32.49.11:46892 Call#2904 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.versionRequest from 10.16.36.24:12326 Call#2859 Retry#0
+</span><span class='line'>2015-04-28 14:01:19,302 INFO org.apache.hadoop.ipc.Server: IPC Server handler 31 on 8020: skipped org.apache.hadoop.hdfs.server.protocol.DatanodeProtocol.versionRequest from 10.16.56.4:55321 Call#2833 Retry#0
+</span></code></pre></td></tr></table></div></figure></p>
+
+<h3>3、避免重启大量DataNode时雪崩</h3>
+
+<p>从前面的分析过程，可以得出两个结论：<br/>
+（1）NameNode对正常BlockReport处理效率是造成可能雪崩的根本原因；<br/>
+（2）BlockReport的堆积让问题完全失控；</p>
+
+<p>从这两个结论出发可以推导出相应的解决办法：</p>
+
+<p>1、解决效率问题：<br/>
+（1）优化代码逻辑；这块代码相对成熟，可优化的空间不大，另外所需的时间成本较高，暂可不考虑；<br/>
+（2）降低BlockReport时数据规模；NameNode处理BR的效率低主要原因还是每次BR所带的Block规模过大造成，所以可以通过调整Block数量阈值，将一次BlockReport分成多盘分别汇报，提高NameNode处理效率。可参考的参数为：dfs.blockreport.split.threshold，默认为1,000,000，当前集群DataNode上Block规模数处于240,000 ~ 940,000，建议调整为500,000；另一方面，可以通过在同一个物理节点上部署多个DataNode实例，分散数据，达到缩小规模的目的，但是这种方案仅能解决当前问题，长期来看依然不能避免，且影响范围比较大，需要多方面权衡。</p>
+
+<p>2、解决堆积问题：<br/>
+（1）控制重启DataNode的数量；按照当前节点数据规模，如果大规模重启DataNode，可采取滚动方式，以~15/单位间隔~1min滚动重启，如果数据规模增长，需要适当调整实例个数；<br/>
+（2）定期清空CallQueue；如前述，当大规模DataNode实例被同时重启后，如果不采取措施一定会发生“雪崩”，若确实存在类似需求或场景，可以通过定期清空CallQueue（dfsadmin -refreshCallQueue）的方式，避免堆积效应；这种方案的弊端在于不能有选择的清空RPC Request，所以当线上服务期时，存在数据读写请求超时、作业失败的风险。</p>
+
+<p>3、选择合适的重启方式：<br/>
+（1）当需要对全集群的DataNode重启操作，且规模较大（包括集群规模和数据规模）时，建议在重启DataNode进程之后将NameNode重启，避免前面的“雪崩”问题；<br/>
+（2）当灰度操作部分DataNode或者集群规模和数据规模均较小时，可采取滚动重启DataNode进程的方式；</p>
+
+<h2>三、总结</h2>
+
+<p>1、重启所有DataNode时，由于处理BlockReport逻辑不同，及由此诱发的“雪崩式”效应，导致重启进度极度缓慢；<br/>
+2、在数据规模达到10K~100K，重启一台DataNode都会给NameNode的正常服务造成瞬时抖动；<br/>
+3、在数据规模到100K量级时，同时重启~15以内DataNode不会对集群造成雪崩式灾难，但是可能出现短时间内服务不可用状态；<br/>
+4、全集群升级时，建议NameNode和DataNode均重启，在预期时间内可恢复服务。</p>
+]]></content>
+  </entry>
+  
+</feed>

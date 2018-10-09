@@ -1,0 +1,984 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Apache CarbonData初探 - Hexiaoqiao</title>
+  <meta name="author" content="Hexiaoqiao">
+
+  
+  <meta name="description" content="CarbonData是由华为开源并支持Hadoop的列式存储文件格式，支持索引、压缩以及解编码等。其目的是为了实现同一份数据达到多种需求，而且能够实现更快的交互查询，目前该项目正处于Apache孵化阶段。本文在简单介绍CarbonData基础上， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://hexiaoqiao.github.io/blog/2016/10/01/carbondata-column-based-storage-format/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Hexiaoqiao" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-72478952-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Hexiaoqiao</a></h1>
+  
+    <h2>Focus on BigData,Distributed System,Hadoop 2.*</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="hexiaoqiao.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Apache CarbonData初探</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-10-01T10:45:00+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2016</span></span> <span class='time'>10:45 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><a href="https://github.com/apache/incubator-carbondata">CarbonData</a>是由华为开源并支持<a href="http://hadoop.apache.org/">Hadoop</a>的列式存储文件格式，支持索引、压缩以及解编码等。其目的是为了实现同一份数据达到多种需求，而且能够实现更快的交互查询，目前该项目正处于Apache孵化阶段。本文在简单介绍CarbonData基础上，利用SSB基准测试工具对CarbonData与其他多种列式文件存储格式进行简单测试。部分内容来自<a href="http://weibo.com/207774111">@大月</a>同学。</p>
+
+<h2>一、简介</h2>
+
+<h3>1.1 背景</h3>
+
+<p>针对数据的需求分析主要有以下5点要求： <br/>
+（1）支持海量数据扫描提取其中某些列；<br/>
+（2）支持根据主键进行查找的低于秒级响应；<br/>
+（3）支持海量数据进行交互式查询的秒级响应； <br/>
+（4）支持快速地抽取单独记录，并且从该记录中获取到所有列信息； <br/>
+（5）支持HDFS，可以与Hadoop集群进行很好的无缝兼容。<br/>
+现有的Hadoop生态系统中没有同时满足这五点要求文件格式。比如Parquet/ORC的文件能够满足第一和第五条要求，其他的要求无法满足，基于这些事实华为开发了CarbonData。</p>
+
+<h3>1.2 优势</h3>
+
+<p>CarbonData文件格式是基于列式存储的，并存储在HDFS之上；其包含了现有列式存储文件格式的许多优点，比如：可分割、可压缩、支持复杂数据类型等。</p>
+
+<p>CarbonData为了解决前面提到的几点要求，加入了许多独特的特性，主要概括为以下四点：<br/>
+（1）数据及索引：在有过滤的查询中，它可以显著地加速查询性能，减少I/O和CPU资源；CarbonData的索引由多级索引组成，计算引擎可以利用这些索引信息来减少调度和一些处理的开销；扫描数据的时候可以仅仅扫描更细粒度的单元（称为blocklet），而不再是扫描整个文件；<br/>
+（2）可操作的编码数据：通过支持高效的压缩和全局编码模式，它可以直接在压缩或者编码的数据上查询，仅仅在需要返回结果的时候才进行转换，更好的查询下推；<br/>
+（3）列组：支持列组，并且使用行格式进行存储，减少查询时行重建的开销；<br/>
+（4）多种使用场景：顺序存取、随机访问、类OLAP交互式查询等。</p>
+
+<h3>1.3 文件格式</h3>
+
+<p>一个CarbonData文件是由一系列被称为blocklet组成的，除了blocklet，还有许多其他的元信息，比如模式、偏移量以及索引信息等，这些元信息是存储在CarbonData文件中的footer里。<br/>
+当在内存中建立索引的时候都需要读取footer里面的信息，因为可以利用这些信息优化后续所有的查询。</p>
+
+<p>每个blocklet又是由许多Data Chunks组成。Data Chunks里面的数据可以按列或者行的形式存储；数据既可以是单独的一列也可以是多列。文件中所有blocklets都包含相同数量和类型的Data Chunks。CarbonData文件格式如图1所示。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="/images/carbondata/carbonformat.png" alt="CarbonData文件格式" align="center"><br />
+<label class=“pic_title” align="center">图1 CarbonData文件格式</label>
+</div>
+
+
+<p></p>
+
+<p>每个Data Chunk又是由许多被称为Pages的单元组成。总共有三种类型的pages：<br/>
+（1）Data Page：包含一列或者列组的编码数据；<br/>
+（2）Row ID Page：包含行id的映射，在Data Page以反向索引的形式存储时会被使用；<br/>
+（3）RLE Page：包含一些额外的元信息，只有在Data Page使用RLE编码的时候会被使用。</p>
+
+<h2>二、SSB介绍</h2>
+
+<p>SSB全称Star Schema Benchmark，顾名思义，是一套用于测试数据库产品在星型模式下性能表现的基准测试规范，目前在学术界和工业界都得到了广泛的使用。提到数据仓库系统（更广义地说，决策支持系统）的基准测试规范，最权威的莫过于TPC-H和TPC-DS这两套规范，他们都由非营利组织TPC（事务处理性能理事会）发布。SSB实际上就是基于TPC-H修改而来的，将TPC-H的雪花模式简化为了星型模式，将基准查询由TPC-H的复杂Ad-Hoc查询改为了结构更固定的OLAP查询。</p>
+
+<p>SSB的设定为零售业订单的产品、供应商分析场景，Schema包含一张事实表「订单lineorder」和四张维表：「消费者customer」, 「供应商supplier」, 「零件part」, 「日期date」，构成了一个典型的星型模式。图1中，表名下方的"SF * 30,000"代表各表的数据行数。例如，当SF=1时，事实表lineorder包含6,000,000行数据，维表customer包含30,000行数据，Date表的行数固定，不随SF变化。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="/images/carbondata/ssb.png" alt="SSB Schema" align="center"><br />
+<label class=“pic_title” align="center">图2 SSB Schema</label>
+</div>
+
+
+<p>SSB的基准查询专注于星型模式下的一类典型查询：读取事实表一次，连接各个维表，对某些维度属性做过滤，最后对某些维度属性分组聚集。在此基础上，SSB重点关注以下方面：<br/>
+（1）提升「功能覆盖率」：基准查询集合应当尽可能地覆盖对星型模式的各种查询类型。SSB的基准查询分为四组，分别测试带2、3、4个维度属性过滤的情况，基本覆盖了多数场景；<br/>
+（2）提升「选择度覆盖率」：某个查询最终需要读取的事实表行数（即事实表的选择度）由各个维度过滤条件的FF（过滤因子）决定。基准查询应当覆盖不同的选择度。SSB的基准查询的选择度大到1.9%，小到百万分之1，覆盖了很宽的范围；<br/>
+（3）减小缓存的影响：如果相邻的两个基准查询扫描的事实数据有很大的重合，后者很有可能直接从缓存中读取数据，这会影响最终的测试结果。因此应当尽量避免基准查询读取重合的事实数据。</p>
+
+<p>SSB的完整规范见<a href="http://www.cs.umb.edu/~poneil/StarSchemaB.PDF%E3%80%82">http://www.cs.umb.edu/~poneil/StarSchemaB.PDF%E3%80%82</a></p>
+
+<p>简单说明：<br/>
+SF（Scale Factor） ：生成测试数据集时传入的数据量规模因子，决定了各表最终生成的行数。<br/>
+FF（Filter Factor）：每个where过滤条件筛选出一部分行，被筛选出的行数占过滤前行数的比例叫做FF。在过滤列彼此独立的条件下，表的FF为该表上各个过滤条件FF的乘积。</p>
+
+<h2>三、安装使用</h2>
+
+<p>SSB的安装是指测试数据集生成工具dbgen的安装，步骤如下：<br/>
+（1）下载代码。官方提供的代码不支持在Mac上编译，这里我们使用Presto开发人员修改过的版本；</p>
+
+<figure class='code'><figcaption><span>ssb-dbgen </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>$ git clone https://github.com/electrum/ssb-dbgen
+</span><span class='line'>$ cd ssb-dbgen
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>（2）如果在Mac上编译，直接运行make即可。如果在Linux上编译，需要修改makefile，将“MACHINE =MAC”改为“MACHINE =LINUX”；<br/>
+（3）编译后的可执行程序为dbgen，它依赖一个数据分布文件dists.dss。dbgen默认将测试数据生成在当前目录，如果需要生成到其他目录，可以将dbgen和dists.dss拷贝到对应目录使用；<br/>
+（4）使用dbgen生成测试数据。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="/images/carbondata/ssbgen.png" align="center"><br />
+<label class=“pic_title” align="center">图3 dbgen生成测试数据</label>
+</div>
+
+
+<p></p>
+
+<h2>四、基准测试用例</h2>
+
+<p>SSB提供了一套标准对各个数据仓库/OLAP系统进行性能测试和比较，其最大的特点：使用星型模式、基准查询代表性强、可以生成任意量级的测试数据。SSB的基准查询集分为4组，共13个查询。每组的查询结构类似，但「选择度」不同。这里列出每个查询的SQL和FF以及需要的事实表行数。</p>
+
+<figure class='code'><figcaption><span>ssbquery-set </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+<span class='line-number'>103</span>
+<span class='line-number'>104</span>
+<span class='line-number'>105</span>
+<span class='line-number'>106</span>
+<span class='line-number'>107</span>
+<span class='line-number'>108</span>
+<span class='line-number'>109</span>
+<span class='line-number'>110</span>
+<span class='line-number'>111</span>
+<span class='line-number'>112</span>
+<span class='line-number'>113</span>
+<span class='line-number'>114</span>
+<span class='line-number'>115</span>
+<span class='line-number'>116</span>
+<span class='line-number'>117</span>
+<span class='line-number'>118</span>
+<span class='line-number'>119</span>
+<span class='line-number'>120</span>
+<span class='line-number'>121</span>
+<span class='line-number'>122</span>
+<span class='line-number'>123</span>
+<span class='line-number'>124</span>
+<span class='line-number'>125</span>
+<span class='line-number'>126</span>
+<span class='line-number'>127</span>
+<span class='line-number'>128</span>
+<span class='line-number'>129</span>
+<span class='line-number'>130</span>
+<span class='line-number'>131</span>
+<span class='line-number'>132</span>
+<span class='line-number'>133</span>
+<span class='line-number'>134</span>
+<span class='line-number'>135</span>
+<span class='line-number'>136</span>
+<span class='line-number'>137</span>
+<span class='line-number'>138</span>
+<span class='line-number'>139</span>
+<span class='line-number'>140</span>
+<span class='line-number'>141</span>
+<span class='line-number'>142</span>
+<span class='line-number'>143</span>
+<span class='line-number'>144</span>
+<span class='line-number'>145</span>
+<span class='line-number'>146</span>
+<span class='line-number'>147</span>
+<span class='line-number'>148</span>
+<span class='line-number'>149</span>
+<span class='line-number'>150</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>Q1.1
+</span><span class='line'>select sum(lo_extendedprice*lo_discount) as revenue
+</span><span class='line'>from lineorder, date
+</span><span class='line'>where lo_orderdate = d_datekey
+</span><span class='line'>and d_year = 1993
+</span><span class='line'>and lo_discount between 1 and 3
+</span><span class='line'>and lo_quantity <span class="nt">&lt; 25</span><span class="err">;</span>
+</span><span class='line'><span class="na">FF =</span> <span class="s">(1/7)*0.5*(3/11)</span> <span class="err">=</span> <span class="err">0.0194805</span>
+</span><span class='line'><span class="err">#</span> <span class="err">of</span> <span class="na">lineorder =</span> <span class="s">0.0194805*6,000,000</span> <span class="err">≈</span> <span class="err">116,883</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">Q1.2</span>
+</span><span class='line'><span class="err">select</span> <span class="err">sum(lo_extendedprice*lo_discount)</span> <span class="err">as</span> <span class="err">revenue</span>
+</span><span class='line'><span class="err">from</span> <span class="err">lineorder,</span> <span class="err">date</span>
+</span><span class='line'><span class="err">where</span> <span class="na">lo_orderdate =</span> <span class="s">d_datekey</span>
+</span><span class='line'><span class="err">and</span> <span class="na">d_yearmonthnum =</span> <span class="s">199401</span>
+</span><span class='line'><span class="err">and</span> <span class="err">lo_discount</span> <span class="err">between</span> <span class="err">4</span> <span class="err">and</span> <span class="err">6</span>
+</span><span class='line'><span class="err">and</span> <span class="err">lo_quantity</span> <span class="err">between</span> <span class="err">26</span> <span class="err">and</span> <span class="err">35;</span>
+</span><span class='line'><span class="na">FF =</span> <span class="s">(1/84)*(3/11)*0.2</span> <span class="err">=</span> <span class="err">0.00064935</span>
+</span><span class='line'><span class="err">#</span> <span class="err">of</span> <span class="na">lineorder =</span> <span class="s">0.00064935*6,000,000</span> <span class="err">≈</span> <span class="err">3896</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">Q1.3</span>
+</span><span class='line'><span class="err">select</span> <span class="err">sum(lo_extendedprice*lo_discount)</span> <span class="err">as</span> <span class="err">revenue</span>
+</span><span class='line'><span class="err">from</span> <span class="err">lineorder,</span> <span class="err">date</span>
+</span><span class='line'><span class="err">where</span> <span class="na">lo_orderdate =</span> <span class="s">d_datekey</span>
+</span><span class='line'><span class="err">and</span> <span class="na">d_weeknuminyear =</span> <span class="s">6</span>
+</span><span class='line'><span class="err">and</span> <span class="na">d_year =</span> <span class="s">1994</span>
+</span><span class='line'><span class="err">and</span> <span class="err">lo_discount</span> <span class="err">between</span> <span class="err">5</span> <span class="err">and</span> <span class="err">7</span>
+</span><span class='line'><span class="err">and</span> <span class="err">lo_quantity</span> <span class="err">between</span> <span class="err">26</span> <span class="err">and</span> <span class="err">35;</span>
+</span><span class='line'><span class="na">FF =</span> <span class="s">(1/364)*(3/11)*0.1</span> <span class="err">=</span> <span class="err">0.000075</span>
+</span><span class='line'><span class="err">#</span> <span class="err">of</span> <span class="na">lineorder =</span> <span class="s">0.000075*6,000,000</span> <span class="err">≈</span> <span class="err">450</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">Q2.1</span>
+</span><span class='line'><span class="err">select</span> <span class="err">sum(lo_revenue),</span> <span class="err">d_year,</span> <span class="err">p_brand1</span>
+</span><span class='line'><span class="err">from</span> <span class="err">lineorder,</span> <span class="err">date,</span> <span class="err">part,</span> <span class="err">supplier</span>
+</span><span class='line'><span class="err">where</span> <span class="na">lo_orderdate =</span> <span class="s">d_datekey</span> <span class="err">and</span> <span class="na">lo_partkey =</span> <span class="s">p_partkey</span> <span class="err">and</span> <span class="na">lo_suppkey =</span> <span class="s">s_suppkey</span>
+</span><span class='line'><span class="err">and</span> <span class="na">p_category =</span> <span class="s">&#39;MFGR#12&#39;</span>
+</span><span class='line'><span class="err">and</span> <span class="na">s_region =</span> <span class="s">&#39;AMERICA&#39;</span>
+</span><span class='line'><span class="err">group</span> <span class="err">by</span> <span class="err">d_year,</span> <span class="err">p_brand1</span>
+</span><span class='line'><span class="err">order</span> <span class="err">by</span> <span class="err">d_year,</span> <span class="err">p_brand1;</span>
+</span><span class='line'><span class="na">pcategory =</span> <span class="s">&#39;MFGR#12&#39;</span><span class="err">,</span> <span class="na">FF =</span> <span class="s">1/25;</span> <span class="err">sregion,</span> <span class="na">FF=</span><span class="s">1/5.</span>
+</span><span class='line'><span class="na">FF =</span> <span class="s">(1/25)*(1/5)</span> <span class="err">=</span> <span class="err">1/125</span>
+</span><span class='line'><span class="err">#</span> <span class="err">of</span> <span class="na">lineorder =</span> <span class="s">(1/125)*6,000,000</span> <span class="err">≈</span> <span class="err">48,000</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">Q2.2</span>
+</span><span class='line'><span class="err">select</span> <span class="err">sum(lo_revenue),</span> <span class="err">d_year,</span> <span class="err">p_brand1</span>
+</span><span class='line'><span class="err">from</span> <span class="err">lineorder,</span> <span class="err">date,</span> <span class="err">part,</span> <span class="err">supplier</span>
+</span><span class='line'><span class="err">where</span> <span class="na">lo_orderdate =</span> <span class="s">d_datekey</span> <span class="err">and</span> <span class="na">lo_partkey =</span> <span class="s">p_partkey</span> <span class="err">and</span> <span class="na">lo_suppkey =</span> <span class="s">s_suppkey</span>
+</span><span class='line'><span class="err">and</span> <span class="err">p_brand1</span> <span class="err">between</span> <span class="err">&#39;MFGR#2221&#39;</span> <span class="err">and</span> <span class="err">&#39;MFGR#2228&#39;</span>
+</span><span class='line'><span class="err">and</span> <span class="na">s_region =</span> <span class="s">&#39;ASIA&#39;</span>
+</span><span class='line'><span class="err">group</span> <span class="err">by</span> <span class="err">d_year,</span> <span class="err">p_brand1</span>
+</span><span class='line'><span class="err">order</span> <span class="err">by</span> <span class="err">d_year,</span> <span class="err">p_brand1;</span>
+</span><span class='line'><span class="na">FF =</span> <span class="s">(1/125)*(1/5)</span> <span class="err">=</span> <span class="err">1/625</span>
+</span><span class='line'><span class="err">#</span> <span class="err">of</span> <span class="na">lineorder =</span> <span class="s">(1/625)*6,000,000</span> <span class="err">≈</span> <span class="err">9600</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">Q2.3</span>
+</span><span class='line'><span class="err">select</span> <span class="err">sum(lo_revenue),</span> <span class="err">d_year,</span> <span class="err">p_brand1</span>
+</span><span class='line'><span class="err">from</span> <span class="err">lineorder,</span> <span class="err">date,</span> <span class="err">part,</span> <span class="err">supplier</span>
+</span><span class='line'><span class="err">where</span> <span class="na">lo_orderdate =</span> <span class="s">d_datekey</span> <span class="err">and</span> <span class="na">lo_partkey =</span> <span class="s">p_partkey</span> <span class="err">and</span> <span class="na">lo_suppkey =</span> <span class="s">s_suppkey</span>
+</span><span class='line'><span class="err">and</span> <span class="na">p_brand1 =</span> <span class="s">&#39;MFGR#2221&#39;</span>
+</span><span class='line'><span class="err">and</span> <span class="na">s_region =</span> <span class="s">&#39;EUROPE&#39;</span>
+</span><span class='line'><span class="err">group</span> <span class="err">by</span> <span class="err">d_year,</span> <span class="err">p_brand1</span>
+</span><span class='line'><span class="err">order</span> <span class="err">by</span> <span class="err">d_year,</span> <span class="err">p_brand1;</span>
+</span><span class='line'><span class="na">FF =</span> <span class="s">(1/1000)*(1/5)</span> <span class="err">=</span> <span class="err">1/5000</span>
+</span><span class='line'><span class="err">#</span> <span class="err">of</span> <span class="na">lineorder =</span> <span class="s">(1/5000)*6,000,000</span> <span class="err">≈</span> <span class="err">1200</span>
+</span><span class='line'>
+</span><span class='line'><span class="err">Q3.1</span>
+</span><span class='line'><span class="err">select</span> <span class="err">c_nation,</span> <span class="err">s_nation,</span> <span class="err">d_year,</span> <span class="err">sum(lo_revenue)</span> <span class="err">as</span> <span class="err">revenue</span>
+</span><span class='line'><span class="err">from</span> <span class="err">lineorder,</span> <span class="err">customer,</span> <span class="err">supplier,</span> <span class="err">date</span>
+</span><span class='line'><span class="err">where</span> <span class="na">lo_custkey =</span> <span class="s">c_custkey</span> <span class="err">and</span> <span class="na">lo_suppkey =</span> <span class="s">s_suppkey</span> <span class="err">and</span> <span class="na">lo_orderdate =</span> <span class="s">d_datekey</span>
+</span><span class='line'><span class="err">and</span> <span class="na">c_region =</span> <span class="s">&#39;ASIA&#39;</span>
+</span><span class='line'><span class="err">and</span> <span class="na">s_region =</span> <span class="s">&#39;ASIA&#39;</span>
+</span><span class='line'><span class="err">and</span> <span class="err">d_year</span> <span class="nt">&gt;</span>= 1992 and d_year <span class="err">&lt;</span>= 1997
+</span><span class='line'>group by c_nation, s_nation, d_year
+</span><span class='line'>order by d_year asc, revenue desc;
+</span><span class='line'>FF = (1/5)*(1/5)*(6/7) = 6/175
+</span><span class='line'># of lineorder = (6/175)*6,000,000 ≈ 205,714
+</span><span class='line'>
+</span><span class='line'>Q3.2
+</span><span class='line'>select c_city, s_city, d_year, sum(lo_revenue) as revenue
+</span><span class='line'>from lineorder, customer, supplier, date
+</span><span class='line'>where lo_custkey = c_custkey and lo_suppkey = s_suppkey and lo_orderdate = d_datekey
+</span><span class='line'>and c_nation = &#39;UNITED STATES&#39;
+</span><span class='line'>and s_nation = &#39;UNITED STATES&#39;
+</span><span class='line'>and d_year &gt;= 1992 and d_year <span class="err">&lt;</span>= 1997
+</span><span class='line'>group by c_city, s_city, d_year
+</span><span class='line'>order by d_year asc, revenue desc;
+</span><span class='line'>FF = (1/25)*(1/25)*(6/7) = 6/4375
+</span><span class='line'># of lineorder = (6/4375)*6,000,000 ≈ 8,228
+</span><span class='line'>
+</span><span class='line'>Q3.3
+</span><span class='line'>select c_city, s_city, d_year, sum(lo_revenue) as revenue
+</span><span class='line'>from lineorder, customer, supplier, date
+</span><span class='line'>where lo_custkey = c_custkey and lo_suppkey = s_suppkey and lo_orderdate = d_datekey
+</span><span class='line'>and (c_city=&#39;UNITED KI1&#39; or c_city=&#39;UNITED KI5&#39;)
+</span><span class='line'>and (s_city=&#39;UNITED KI1&#39; or s_city=&#39;UNITED KI5&#39;)
+</span><span class='line'>and d_year &gt;= 1992 and d_year <span class="err">&lt;</span>= 1997
+</span><span class='line'>group by c_city, s_city, d_year
+</span><span class='line'>order by d_year asc, revenue desc;
+</span><span class='line'>FF = (1/125)*(1/125)*(6/7) = 6/109375
+</span><span class='line'># of lineorder = (6/109375)*6,000,000 ≈ 329
+</span><span class='line'>
+</span><span class='line'>Q3.4 &quot;needle-in-haystack&quot;
+</span><span class='line'>select c_city, s_city, d_year, sum(lo_revenue) as revenue
+</span><span class='line'>from lineorder, customer, supplier, date
+</span><span class='line'>where lo_custkey = c_custkey and lo_suppkey = s_suppkey and lo_orderdate = d_datekey
+</span><span class='line'>and (c_city=&#39;UNITED KI1&#39; or c_city=&#39;UNITED KI5&#39;)
+</span><span class='line'>and (s_city=&#39;UNITED KI1&#39; or s_city=&#39;UNITED KI5&#39;)
+</span><span class='line'>and d_yearmonth = &#39;Dec1997&#39;
+</span><span class='line'>group by c_city, s_city, d_year
+</span><span class='line'>order by d_year asc, revenue desc;
+</span><span class='line'>FF = (1/125)*(1/125)*(1/84) = 1/1,312,500
+</span><span class='line'># of lineorder = (1/1,312,500)*6,000,000 ≈ 5
+</span><span class='line'>
+</span><span class='line'>Q4.1
+</span><span class='line'>select d_year, c_nation, sum(lo_revenue - lo_supplycost) as profit
+</span><span class='line'>from lineorder, date, customer, supplier, part
+</span><span class='line'>where lo_custkey = c_custkey and lo_suppkey = s_suppkey and lo_partkey = p_partkey and lo_orderdate = d_datekey
+</span><span class='line'>and c_region = &#39;AMERICA&#39;
+</span><span class='line'>and s_region = &#39;AMERICA&#39;
+</span><span class='line'>and (p_mfgr = &#39;MFGR#1&#39; or p_mfgr = &#39;MFGR#2&#39;)
+</span><span class='line'>group by d_year, c_nation
+</span><span class='line'>order by d_year, c_nation;
+</span><span class='line'>FF = (1/5)(1/5)*(2/5) = 2/125
+</span><span class='line'># of lineorder = (2/125)*6,000,000 ≈ 96000
+</span><span class='line'>
+</span><span class='line'>Q4.2 &quot;Drill Down to Category in 2 Specific Years&quot;
+</span><span class='line'>select d_year, s_nation, p_category, sum(lo_revenue - lo_supplycost) as profit
+</span><span class='line'>from lineorder, date, customer, supplier, part
+</span><span class='line'>where lo_custkey = c_custkey and lo_suppkey = s_suppkey and lo_partkey = p_partkey and lo_orderdate = d_datekey
+</span><span class='line'>and c_region = &#39;AMERICA&#39;
+</span><span class='line'>and s_region = &#39;AMERICA&#39;
+</span><span class='line'>and (d_year = 1997 or d_year = 1998)
+</span><span class='line'>and (p_mfgr = &#39;MFGR#1&#39; or p_mfgr = &#39;MFGR#2&#39;)
+</span><span class='line'>group by d_year, s_nation, p_category
+</span><span class='line'>order by d_year, s_nation, p_category;
+</span><span class='line'>FF = (2/7)*(2/125) = 4/875
+</span><span class='line'># of lineorder = (4/875)*6,000,000 ≈ 27,428
+</span><span class='line'>
+</span><span class='line'>Q4.3 &quot;Further Drill Down to cities in US&quot;
+</span><span class='line'>select d_year, s_city, p_brand1, sum(lo_revenue - lo_supplycost) as profit
+</span><span class='line'>from lineorder, date, customer, supplier, part
+</span><span class='line'>where lo_custkey = c_custkey and lo_suppkey = s_suppkey and lo_partkey = p_partkey and lo_orderdate = d_datekey
+</span><span class='line'>and c_region = &#39;AMERICA&#39;
+</span><span class='line'>and s_nation = &#39;UNITED STATES&#39;
+</span><span class='line'>and (d_year = 1997 or d_year = 1998)
+</span><span class='line'>and p_category = &#39;MFGR#14&#39;
+</span><span class='line'>group by d_year, s_city, p_brand1
+</span><span class='line'>order by d_year, s_city, p_brand1;
+</span><span class='line'>FF = (1/5)*(1/25)*(2/7)*(1/25) = 2/21875
+</span><span class='line'># of lineorder = (2/21875)*6,000,000 ≈ 549
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>五、测试过程</h2>
+
+<h3>5.1 测试范围</h3>
+
+<p>为了尽可能覆盖多种列式存储系统的性能表现，本次测试选择了ORC，Parquet和CarbonData。</p>
+
+<h3>5.2 测试数据规模</h3>
+
+<p>我们希望测到千万级、亿级和十亿级事实表的规模，因此分别选择了2、20、200的SF（Scale Factor），对应的各表行数如下：</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="/images/carbondata/datascale.png" align="center"><br />
+<label class=“pic_title” align="center">图4 测试数据规模</label>
+</div>
+
+
+<p></p>
+
+<h3>5.3 测试数据准备</h3>
+
+<p>由于CarbonData的数据导入必须依赖csv文件，但是dbgen生成的是"|&ldquo;分割的文本数据，所以利用dbgen生成数据后需要先对测试数据进行一次预处理，将其转换成各系统均可识别的格式。最后，为避免测试过程中，数据缓存对测试结果的影响，为不同的存储系统和SF建立不同的测试表{table}_{format}_{scale}，如lineorder_orc_2。<br/>
+综上考虑，以SF=2为例，数据准备分为三步：<br/>
+（1）使用dbgen生成文本的测试数据；<br/>
+（2）预处理生成的测试数据将其转换成csv格式；<br/>
+（3）将csv格式的测试数据按照{table}_{format}_{scale}导入不同存储格式的表中；
+最终在测试库下会生成包括文本存储格式数据在内共60张测试表{table}_{format}_{scale}；
+测试数据在HDFS上副本因子统一为3；</p>
+
+<h4>附：建表语句</h4>
+
+<figure class='code'><figcaption><span>create ssb tables </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>USE ssb;
+</span><span class='line'>
+</span><span class='line'>DROP TABLE IF EXISTS `LINEORDER`;
+</span><span class='line'>CREATE TABLE `LINEORDER` (
+</span><span class='line'>  LO_ORDERKEY       bigint,
+</span><span class='line'>  LO_LINENUMBER     int,
+</span><span class='line'>  LO_CUSTKEY        bigint,
+</span><span class='line'>  LO_PARTKEY        bigint,
+</span><span class='line'>  LO_SUPPKEY        bigint,
+</span><span class='line'>  LO_ORDERDATE      int,
+</span><span class='line'>  LO_ORDERPRIOTITY  string,
+</span><span class='line'>  LO_SHIPPRIOTITY   int,
+</span><span class='line'>  LO_QUANTITY       int,
+</span><span class='line'>  LO_EXTENDEDPRICE  int,
+</span><span class='line'>  LO_ORDTOTALPRICE  int,
+</span><span class='line'>  LO_DISCOUNT       int,
+</span><span class='line'>  LO_REVENUE        int,
+</span><span class='line'>  LO_SUPPLYCOST     int,
+</span><span class='line'>  LO_TAX            int,
+</span><span class='line'>  LO_COMMITDATE     int,
+</span><span class='line'>  LO_SHIPMODE       string
+</span><span class='line'>)
+</span><span class='line'>STORED BY &#39;carbondata&#39;;
+</span><span class='line'>
+</span><span class='line'>DROP TABLE IF EXISTS `CUSTOMER`;
+</span><span class='line'>CREATE TABLE `CUSTOMER` (
+</span><span class='line'>  C_CUSTKEY     bigint,
+</span><span class='line'>  C_NAME        string,
+</span><span class='line'>  C_ADDRESS     string,
+</span><span class='line'>  C_CITY        string,
+</span><span class='line'>  C_NATION      string,
+</span><span class='line'>  C_REGION      string,
+</span><span class='line'>  C_PHONE       string,
+</span><span class='line'>  C_MKTSEGMENT  string
+</span><span class='line'>)
+</span><span class='line'>STORED BY &#39;carbondata&#39;;
+</span><span class='line'>
+</span><span class='line'>DROP TABLE IF EXISTS `DATE`;
+</span><span class='line'>CREATE TABLE `DATE` (
+</span><span class='line'>  D_DATEKEY          int,
+</span><span class='line'>  D_DATE             string,
+</span><span class='line'>  D_DAYOFWEEK        string,
+</span><span class='line'>  D_MONTH            string,
+</span><span class='line'>  D_YEAR             int,
+</span><span class='line'>  D_YEARMONTHNUM     int,
+</span><span class='line'>  D_YEARMONTH        string,
+</span><span class='line'>  D_DAYNUMINWEEK     int,
+</span><span class='line'>  D_DAYNUMINMONTH    int,
+</span><span class='line'>  D_DAYNUMINYEAR     int,
+</span><span class='line'>  D_MONTHNUMINYEAR   int,
+</span><span class='line'>  D_WEEKNUMINYEAR    int,
+</span><span class='line'>  D_SELLINGSEASON    string,
+</span><span class='line'>  D_LASTDAYINWEEKFL  int,
+</span><span class='line'>  D_LASTDAYINMONTHFL int,
+</span><span class='line'>  D_HOLIDAYFL        int,
+</span><span class='line'>  D_WEEKDAYFL        int
+</span><span class='line'>)
+</span><span class='line'>STORED BY &#39;carbondata&#39;;
+</span><span class='line'>
+</span><span class='line'>DROP TABLE IF EXISTS `PART`;
+</span><span class='line'>CREATE TABLE `PART`  (
+</span><span class='line'>  P_PARTKEY     bigint,
+</span><span class='line'>  P_NAME        string,
+</span><span class='line'>  P_MFGR        string,
+</span><span class='line'>  P_CATEGORY    string,
+</span><span class='line'>  P_BRAND1      string,
+</span><span class='line'>  P_COLOR       string,
+</span><span class='line'>  P_TYPE        string,
+</span><span class='line'>  P_SIZE        int,
+</span><span class='line'>  P_CONTAINER   string
+</span><span class='line'>)
+</span><span class='line'>STORED BY &#39;carbondata&#39;;
+</span><span class='line'>
+</span><span class='line'>DROP TABLE IF EXISTS `SUPPLIER`;
+</span><span class='line'>CREATE TABLE `SUPPLIER` (
+</span><span class='line'>  S_SUPPKEY     bigint,
+</span><span class='line'>  S_NAME        string,
+</span><span class='line'>  S_ADDRESS     string,
+</span><span class='line'>  S_CITY        string,
+</span><span class='line'>  S_NATION      string,
+</span><span class='line'>  S_REGION      string,
+</span><span class='line'>  S_PHONE       string
+</span><span class='line'>)
+</span><span class='line'>STORED BY &#39;carbondata&#39;;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>5.4 测试方法</h3>
+
+<p>使用13个基准查询对各系统进行测试，测试期间尽量避免队列资源存在竞争情况。每个基准查询跑三遍，结果取均值。<br/>
+为减少不同计算引擎之间的差异，本次测试基于Spark 1.5.2进行，详细配置如下：</p>
+
+<figure class='code'><figcaption><span>spark-1.5.2 </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>$SPARK_HOME/bin/spark-submit --master yarn-client --queue root.hadoop-hdp.test --executor-cores 4 --executor-memory 8G --num-executors 8 --name &quot;SSB Colume Test&quot;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>对于CarbonData选择相同的资源选项。</p>
+
+<figure class='code'><figcaption><span>carbondata-0.1.0 </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>$CARBON_HOME/bin/carbon-spark-sql --master yarn-client --queue root.hadoop-hdp.test --executor-cores 4 --executor-memory 8G --num-executors 8 --conf spark.carbon.storepath=hdfs:///user/hive/warehouse/ssb_compress.db --name &quot;SSB Column Test&quot;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>附Hadoop集群环境：<br/>
+（1）JDK：1.7.0_76 HotSpot&trade; 64-Bit Server<br/>
+（2）Hadoop：2.7.1<br/>
+（3）Spark：1.5.2<br/>
+（4）HDFS Replica Ratio：3</p>
+
+<h3>5.5 测试结果</h3>
+
+<h4>1、数据导入时间对比</h4>
+
+<p>数据导入时间可参考：<a href="https://cwiki.apache.org/confluence/pages/viewpage.action?pageId=65869949">Apache CarbonData Performance Benchmark</a>，数据导入效率表现基本一致，orc与parquet无明显差别，这里不再详述。</p>
+
+<h4>2、存储资源占用对比</h4>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="/images/carbondata/compressdata.png" align="center"><br />
+<label class=“pic_title” align="center">图5 数据存储空间占用对比结果</label>
+</div>
+
+
+
+
+<div class=“pic” align="center" padding=“0”>
+<img src="/images/carbondata/compressratio.png" align="center"><br />
+<label class=“pic_title” align="center">图6 数据压缩率对比图示</label>
+</div>
+
+
+<p></p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="/images/carbondata/compress.png" align="center"><br />
+<label class=“pic_title” align="center">图7 数据压缩率对比图示</label>
+</div>
+
+
+<p></p>
+
+<p>从数据压缩率的测试结果可以看出：<br/>
+（1）orc和parquet的数据压缩率与数据本身的关系并不大，基本可以控制在0.3以内，但是CarbonData对数据的压缩能力并不好，对于SSB的测试数据集，压缩率主要集中在0.4上下；<br/>
+（2）需要关注的的是CarbonData中部分数据甚至超过的原始文本数据大小；</p>
+
+<h4>3、查询效率对比</h4>
+
+<p><em>注：下面关于查询效率的测试数据中包含了作业提交时间、JVM启动时间等，数据本身存在少许误差。</em></p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="/images/carbondata/ssb2.png" align="center"><br />
+<label class=“pic_title” align="center">图8 数据规模SF2下的查询结果对比</label>
+</div>
+
+
+<p></p>
+
+<p>从SF=2数据规模下查询效率对比数据来看：<br/>
+（1）多种存储系统的查询性能差别并不大；<br/>
+（2） 整体来看，CarbonData稍微优于其他存储系统；<br/>
+如果考虑到作业提交时间及JVM启动时间的误差，在SF2数据规模下的结果基本没有明显差异；</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="/images/carbondata/ssb20.png" align="center"><br />
+<label class=“pic_title” align="center">图9 数据规模SF20下的查询结果对比</label>
+</div>
+
+
+<p></p>
+
+<p><em>注：在SF=20数据规模下的测试结果看，结论与SF=2保持一致；</em></p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="/images/carbondata/ssb200.png" align="center"><br />
+<label class=“pic_title” align="center">图10 数据规模SF200下的查询结果对比</label>
+</div>
+
+
+<p></p>
+
+<p>在SF=200的数据规模查询效率对比数据来看：<br/>
+（1）所有查询模式中，carbon明显优于其他存储系统；<br/>
+（2）从整体上看，ORC/Parquet没有明显区别，基本可认为性能表现相似；<br/>
+如果考虑到作业提交时间及JVM启动时间的误差，作业执行时间的差异表现差异非常明显，CarbonData具有非常好的优势；</p>
+
+<h2>六、结论</h2>
+
+<p>1、从查询性能上看，CarbonData具备非常好的优势，主要原因：<br/>
+（1）MDK，Min-Max and Inverted Index等辅助信息可对结果数据进行更快速的查询，也能高效重建结果数据；<br/>
+（2）列组（Column group）技术消除了行数据重建时隐式Join操作；<br/>
+（3）使用全局字典编码加快计算速度，处理/查询引擎直接在编码数据上进行处理而不需要转换；<br/>
+（4）延迟解码使得聚合操作更快，只有需要返回结果给用户时才进行解码转换。</p>
+
+<p>2、由于CarbonData在加载数据时需要建立索引和全局字典编码，所以在数据加载和压缩率上比ORC和Parquet都要差，尤其在对一些特殊结构的数据表现较差，更适合一次写多次读且对存储资源使用不敏感的场景。<br/>
+3、截止2016.10.01最新发布版本carbondata-0.1.0，在功能完备性、系统稳定性等方面还有提升空间，社区也在持续改进完善。<br/>
+4、从整体上看，CarbonData优异的查询性能表现及社区的持续改进优化，未来非常值得期待。</p>
+
+<h2>七、参考</h2>
+
+<p>[1] <a href="https://github.com/apache/incubator-carbondata">https://github.com/apache/incubator-carbondata</a><br/>
+[2] <a href="https://cwiki.apache.org/confluence/display/CARBONDATA/CarbonData+Home">https://cwiki.apache.org/confluence/display/CARBONDATA/CarbonData+Home</a><br/>
+[3] <a href="https://www.iteblog.com/archives/1806">https://www.iteblog.com/archives/1806</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">hexiaoqiao</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-10-01T10:45:00+08:00'><span class='date'><span class='date-month'>Oct</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2016</span></span> <span class='time'>10:45 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/carbondata/'>carbondata</a>, <a class='category' href='/blog/categories/hadoop/'>hadoop</a>, <a class='category' href='/blog/categories/storage/'>storage</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://hexiaoqiao.github.io/blog/2016/10/01/carbondata-column-based-storage-format/" data-via="" data-counturl="http://hexiaoqiao.github.io/blog/2016/10/01/carbondata-column-based-storage-format/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/09/13/namenode-repicationmonitor-exception-trace/" title="Previous Post: NameNode RepicationMonitor异常追查">&laquo; NameNode RepicationMonitor异常追查</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2016/11/27/exact-count-and-global-dictionary-of-apache-kylin/" title="Next Post: Apache Kylin精确计数与全局字典揭秘">Apache Kylin精确计数与全局字典揭秘 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/10/05/recruit/">大数据职位招聘</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/07/13/a-brief-introduction-of-hdfs-blocktoken-mechanism/">HDFS BlockToken机制解析</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/03/30/the-analysis-of-basic-principle-of-hdfs-ha-using-qjm/">HDFS HA Using QJM原理解析</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/02/12/namenode-restart-optimization/">HDFS NameNode重启优化</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/18/exact-count-optimization-of-apache-kylin/">Apache Kylin精确去重指标优化</a>
+      </li>
+    
+  </ul>
+</section>
+  
+<section>  
+  <h1>Weibo</h1>  
+  <ul id="weibo">  
+    <li>
+    <iframe 
+	width="100%" 
+	height="550" 
+	class="share_self"  
+	frameborder="0" 
+	scrolling="no" 
+	src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=0&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=1283533382&verifier=9bc28858&dpc=1">
+    </iframe>
+    </li>  
+  </ul>  
+</section>  
+
+<section>
+  <h1>WeChat</h1>
+  <ul id="wechat">
+  <div class=“pic” padding=“0”>
+  <img src="/images/qrcode.jpg"><br />
+  </div>
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2018 - Hexiaoqiao -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'Hexiaoqiao';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://hexiaoqiao.github.io/blog/2016/10/01/carbondata-column-based-storage-format/';
+        var disqus_url = 'http://hexiaoqiao.github.io/blog/2016/10/01/carbondata-column-based-storage-format/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

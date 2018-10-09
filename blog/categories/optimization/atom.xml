@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Optimization | Hexiaoqiao]]></title>
+  <link href="http://hexiaoqiao.github.io/blog/categories/optimization/atom.xml" rel="self"/>
+  <link href="http://hexiaoqiao.github.io/"/>
+  <updated>2018-10-09T11:58:28+08:00</updated>
+  <id>http://hexiaoqiao.github.io/</id>
+  <author>
+    <name><![CDATA[Hexiaoqiao]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Apache Kylin精确去重指标优化]]></title>
+    <link href="http://hexiaoqiao.github.io/blog/2017/01/18/exact-count-optimization-of-apache-kylin/"/>
+    <updated>2017-01-18T10:45:00+08:00</updated>
+    <id>http://hexiaoqiao.github.io/blog/2017/01/18/exact-count-optimization-of-apache-kylin</id>
+    <content type="html"><![CDATA[<p>前篇《<a href="http://hexiaoqiao.github.io/blog/2016/11/27/exact-count-and-global-dictionary-of-apache-kylin/">Apache Kylin精确计数与全局字典揭秘</a>》从精确计数使用场景到当前方案存在的问题及Apache Kylin在解决精确计数问题的思路进行了详细介绍。在此基础上，来自团队同学也是Apache Kylin社区Committer的<a href="https://github.com/kangkaisen">@Kangkaisen</a>更进一步，将Apache Kylin超高基数的精确去重指标查询提速数十倍。</p>
+
+<h2>一、问题背景</h2>
+
+<p>某业务方的Cube有12个维度，35个指标，其中13个是精确去重指标，并且有一半以上的精确去重指标单天基数在千万级别，Cube单天数据量1.5亿行左右。</p>
+
+<p>但是一个结果仅有21行的精确去重查询竟然需要12秒多：<br/>
+<code>
+SELECT A, B, count(distinct uuid),
+FROM table
+WHERE dt = 17150
+GROUP BY A, B
+</code><br/>
+跟踪整个查询执行过程发现，HBase端耗时~6s，Kylin的Query Server端耗时~5s。</p>
+
+<p>精确去重指标已经在美团点评生产环境大规模使用，精确去重的查询的确比普通Sum指标慢，但是差异并不明显。但是这个查询的性能表现已超出预期，决定分析一下，到底慢在哪。</p>
+
+<h2>二、优化过程</h2>
+
+<h3>2.1 将精确去重指标拆分HBase列族</h3>
+
+<p>首先确认了这个Cube的维度设计是合理的，这个查询也精准匹配了cuboid，并且在HBase端也只扫描了21行数据。</p>
+
+<p>那么问题是，为什么在HBase端只扫描21行数据需要~6s？一个显而易见的原因是Kylin的精确去重指标是用bitmap存储的明细数据，而这个Cube有13个精确去重指标，并且基数都很大。</p>
+
+<p>从两方面验证了这个猜想：<br/>
+（1）同样SQL的查询Sum指标只需要120毫秒，并且HBase端Scan仅需2毫秒；<br/>
+（2）用HBase HFile命令行工具查看并计算出HFile单个KeyValue的大小，发现普通的指标列族的每个KeyValue大小是29B，精确去重指标列族的每个KeyValue大小是37M；</p>
+
+<p>所以第一个优化就是将精确去重指标拆分到多个HBase列族，优化后效果十分明显。查询时间从12s减少到5.7s，HBase端耗时从6s减少到1.3s，不过Query Server耗时依旧有~4.5s。</p>
+
+<h3>2.2 移除不必要的toString避免bitmap deserialize</h3>
+
+<p>Kylin的Query Server耗时依旧有4.5s，猜测还是和bitmap比较大有关，但是为什么bitmap大会导致如此耗时呢？</p>
+
+<p>为了分析Query Server端查询处理的时间到底花在了哪，利用[Java Mission Control][1]进行了性能分析。</p>
+
+<p>JMC分析很简单，在Kylin的启动进程中增加以下参数：
+<code>
+-XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:+UnlockDiagnosticVMOptions -XX:+DebugNonSafepoints -XX:StartFlightRecording=delay=20s,duration=300s,name=kylin,filename=myrecording.jfr,settings=profile
+</code>
+获得myrecording.jfr文件后，在本机执行jmc，然后打开myrecording.jfr文件就可以进行性能分析。</p>
+
+<p>热点代码的分析如图：</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="http://hexiaoqiao.github.io/images/kylin/expensiveOftoString.png" alt="" align="center"><br />
+<label class=“pic_title” align="center">图1 JMC分析结果图示</label>
+</div>
+
+
+<p></p>
+
+<p>从图中我们可以发现，耗时最多的代码是一个毫无意义的toString。
+<code>
+Preconditions.checkState(comparator.compare(last, fetched) &lt;= 0, "Not sorted! last: " + last + " fetched: " + fetched);
+</code>
+其中last和fetched就是一个bitamp。
+去掉这个toString之后，Query Server的耗时减少超过1s。</p>
+
+<h3>2.3 获取bitmap的字节长度时避免deserialize</h3>
+
+<p>在去掉无意义的toString之后，热点代码已经变成了对bitmap的deserialize。</p>
+
+<p>不过bitmap的deserialize共有两处，一处是bitmap本身的deserialize，一处是在获取bitmap的字节长度。</p>
+
+<p>于是很自然的想法就是在获取bitmap的字节长度时避免deserialize bitmap，当时有两种思路：
+（1）在serialize bitmap时就写入bitmap的字节长度；<br/>
+（2）在MutableRoaringBitmap序列化的头信息中获取bitmap的字节长度。(Kylin的精确去重使用的bitmap是[RoaringBitmap][2])；</p>
+
+<p>思路1中一个显然问题是如何保证向前兼容，这里向前兼容的方法就是根据MutableRoaringBitmap deserialize时的cookie头信息来确认版本，并在新的serialize方式中写入了版本号，便于之后序列化方式的更新和向前兼容。</p>
+
+<p>经过这个优化后，Kylin Query Server端耗时再次减少超过1s。</p>
+
+<h3>2.4 无需上卷聚合的精确去重查询优化</h3>
+
+<p>从精确去重指标在美团点评大规模使用以来，我们发现部分用户的应用场景并没有跨Segment上卷聚合的需求，即只需要查询单天的去重值，或是每次全量构建的Cube，也无需跨Segment上卷聚合。</p>
+
+<p>所以我们希望对无需上卷聚合的精确去重查询进行优化，当时考虑了两种可行方案：</p>
+
+<p><strong>方案1：精确去重指标新增一种返回类型</strong></p>
+
+<p>一个极端的做法是对无需跨segment上卷聚合的精确去重查询，我们只存储最终的去重值。</p>
+
+<p>优点：<br/>
+（1）存储成本会极大降低；<br/>
+（2）查询速度会明显提高；</p>
+
+<p>缺点：<br/>
+（1）无法支持上卷聚合，与Kylin指标的设计原则不符合；<br/>
+（2）无法支持segment的merge，因为要进行merge必须要存储明细的bitmap；<br/>
+（3）新增一种返回类型，对不清楚的用户可能会有误导；<br/>
+（4）查询需要上卷聚合时直接报错，用户体验不好，尽管使用这种返回类型的前提是无需上聚合卷；</p>
+
+<p>实现难点：
+如果能够接受以上缺点，实现成本并不高，目前没有想到明显的难点。</p>
+
+<p><strong>方案2：serialize bitmap的同时写入distinct count值</strong></p>
+
+<p>优点：<br/>
+（1）对用户无影响；<br/>
+（2）符合现在Kylin指标和查询的设计；</p>
+
+<p>缺点：<br/>
+（1）存储依然需要存储明细的bitmap；<br/>
+（2）查询速度提升有限，因为即使不进行任何bitmap serialize，bitmap本身太大也会导致HBase scan，网络传输等过程变慢；</p>
+
+<p>实现难点：
+如何根据是否需要上卷聚合来确定是否需要serialize bitmap？开始的思路是从查询过程入手，确认在整个查询过程中，哪些地方需要进行上卷聚合。</p>
+
+<p>为此，仔细阅读了Kylin Query Server端的查询代码，HBase Coprocessor端的查询代码，看了Calcite的example例子。发现在HBase端和Kylin Query Server端，Cube build时都有可能需要指标的聚合。</p>
+
+<p>此时又意识到另外一个问题：即使清晰的知道了何时需要聚合，我又该如何把是否聚合的标记传递到精确去重的反序列方法中呢？</p>
+
+<p>现在精确去重的deserialize方法参数只有一个ByteBuffer，如果加参数，就要改变整个kylin指标deserialize的接口，这将会影响所有指标类型，并会造成大范围的改动。所以把这个思路放弃了。</p>
+
+<p>后来想到既然目标是优化无需上卷的精确去重指标，那为什么还要费劲去deserialize出整个bitmap呢，只要个distinct count值就可以。</p>
+
+<p>所以目标就集中在BitmapCounter本身的deserialize上，并联想到早前在Kylin前端加载速度提升十倍的核心思想：延迟加载，就改变了BitmapCounter的deserialize方法，默认只读出distinct count值，不进行bitmap的deserialize，并将那个buffer保留，等到的确需要上卷聚合的时候再根据buffer deserialize 出bitmap。</p>
+
+<p>当然，这个思路可行有一个前提，就是buffer内存拷贝的开销是远小于bitmap deserialize的开销，庆幸的是事实的确如此。</p>
+
+<p>最终经过这个优化，对于无需上卷聚合的精确去重查询，查询速度也有了较大提升。</p>
+
+<p>显然，这个优化加速查询的同时加大了需要上卷聚合的精确去重查询的内存开销。解决的办法：<br/>
+（1）对于超大数据集并且需要上卷的精确去重查询，用户在分析查询时返回的结果行数应该不会太多；<br/>
+（2）我们需要做好Query Server端的内存控制；</p>
+
+<h2>三、总结</h2>
+
+<p>通过总共4个优化，在向前兼容的前提下，后端仅通过100多行的代码改动，对Kylin超高基数的精确去重指标查询有了明显提升，测试中最明显的查询超过50倍的性能提升。</p>
+
+<h2>四、反思</h2>
+
+<p>（1）善于利用各类命令和工具，快速分析和定位问题；<br/>
+（2）重写toString，hashCode，equals等基础方法一定要轻量化，避免复杂操作；<br/>
+（3）设计序列化，通信协议，存储格式时，一定要有版本信息，便于之后的更新和兼容；</p>
+
+<h2>五、参考</h2>
+
+<p>[1] <a href="http://blog.takipi.com/oracle-java-mission-control-the-ultimate-guide/">http://blog.takipi.com/oracle-java-mission-control-the-ultimate-guide/</a> <br/>
+[2] <a href="https://github.com/RoaringBitmap/RoaringBitmap">https://github.com/RoaringBitmap/RoaringBitmap</a><br/>
+[3] <a href="https://issues.apache.org/jira/browse/KYLIN-2308">https://issues.apache.org/jira/browse/KYLIN-2308</a><br/>
+[4] <a href="https://issues.apache.org/jira/browse/KYLIN-2337">https://issues.apache.org/jira/browse/KYLIN-2337</a><br/>
+[5] <a href="https://issues.apache.org/jira/browse/KYLIN-2349">https://issues.apache.org/jira/browse/KYLIN-2349</a><br/>
+[6] <a href="https://issues.apache.org/jira/browse/KYLIN-2353">https://issues.apache.org/jira/browse/KYLIN-2353</a></p>
+]]></content>
+  </entry>
+  
+</feed>

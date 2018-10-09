@@ -1,0 +1,780 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>NameNode RepicationMonitor异常追查 - Hexiaoqiao</title>
+  <meta name="author" content="Hexiaoqiao">
+
+  
+  <meta name="description" content="集群版本从2.4.1升级到2.7.1之后，出现了一个诡异的问题，虽然没有影响到线上正常读写服务，但是潜在的问题还是比较严重，经过追查彻底解决，这里简单整理追查过程。 一、问题描述 异常初次出现时收集到的集群异常表现信息有两条： 1、两个关键数据结构持续堆积， &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://hexiaoqiao.github.io/blog/2016/09/13/namenode-repicationmonitor-exception-trace/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Hexiaoqiao" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-72478952-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Hexiaoqiao</a></h1>
+  
+    <h2>Focus on BigData,Distributed System,Hadoop 2.*</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="hexiaoqiao.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">NameNode RepicationMonitor异常追查</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-09-13T10:45:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:45 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>集群版本从2.4.1升级到2.7.1之后，出现了一个诡异的问题，虽然没有影响到线上正常读写服务，但是潜在的问题还是比较严重，经过追查彻底解决，这里简单整理追查过程。</p>
+
+<h2>一、问题描述</h2>
+
+<p>异常初次出现时收集到的集群异常表现信息有两条：</p>
+
+<p>1、两个关键数据结构持续堆积，监控显示UnderReplicatedBlocks和PendingDeletionBlocks表现明显。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="/images/monitor/underreplicatedblocks.png" alt="NameNode UnderReplicatedBlocks数据结构变化趋势" align="center"><br />
+<label class=“pic_title” align="center">图1 NameNode UnderReplicatedBlocks数据结构变化趋势</label>
+</div>
+
+
+<p></p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="/images/monitor/pendingblocks.png" alt="NameNode PendingBlocks数据结构变化趋势" align="center"><br />
+<label class=“pic_title” align="center">图2 NameNode PendingBlocks数据结构变化趋势</label>
+</div>
+
+
+<p></p>
+
+<p><em>说明：没有找到异常同一时间段的监控图，可将上图时间点简单匹配，基本不影响后续的分析。</em></p>
+
+<p>2、从NameNode的jstack获得信息ReplicationMonitor线程在长期执行chooseRandom函数；</p>
+
+<figure class='code'><figcaption><span>namenode.jstack </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>&quot;org.apache.hadoop.hdfs.server.blockmanagement.BlockManager$ReplicationMonitor@254e0df1&quot; daemon prio=10 tid=0x00007f59b4364800 nid=0xa7d9 runnable [0x00007f2baf40b000]
+</span><span class='line'>   java.lang.Thread.State: RUNNABLE
+</span><span class='line'>        at java.util.AbstractCollection.toArray(AbstractCollection.java:195)
+</span><span class='line'>        at java.lang.String.split(String.java:2311)
+</span><span class='line'>        at org.apache.hadoop.net.NetworkTopology$InnerNode.getLoc(NetworkTopology.java:282)
+</span><span class='line'>        at org.apache.hadoop.net.NetworkTopology$InnerNode.getLoc(NetworkTopology.java:292)
+</span><span class='line'>        at org.apache.hadoop.net.NetworkTopology$InnerNode.access$000(NetworkTopology.java:82)
+</span><span class='line'>        at org.apache.hadoop.net.NetworkTopology.getNode(NetworkTopology.java:539)
+</span><span class='line'>        at org.apache.hadoop.net.NetworkTopology.countNumOfAvailableNodes(NetworkTopology.java:775)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicyDefault.chooseRandom(BlockPlacementPolicyDefault.java:707)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicyDefault.chooseTarget(BlockPlacementPolicyDefault.java:383)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicyDefault.chooseTarget(BlockPlacementPolicyDefault.java:432)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicyDefault.chooseTarget(BlockPlacementPolicyDefault.java:225)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicyDefault.chooseTarget(BlockPlacementPolicyDefault.java:120)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockManager$ReplicationWork.chooseTargets(BlockManager.java:3783)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockManager$ReplicationWork.access$200(BlockManager.java:3748)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockManager.computeReplicationWorkForBlocks(BlockManager.java:1408)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockManager.computeReplicationWork(BlockManager.java:1314)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockManager.computeDatanodeWork(BlockManager.java:3719)
+</span><span class='line'>        at org.apache.hadoop.hdfs.server.blockmanagement.BlockManager$ReplicationMonitor.run(BlockManager.java:3671)
+</span><span class='line'>        at java.lang.Thread.run(Thread.java:745)
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>由于线上环境的日志级别为INFO，而ReplicationMonitor中INFO级别之上的日志非常少，从中几乎不能获取到任何有用信息；</p>
+
+<p>异常出现场景：<br/>
+1、坏盘、DataNode Decommision或进程异常退出，但不能稳定复现；<br/>
+2、外部环境无任何变化和异常，正常读写服务期偶发。</p>
+
+<h2>二、追查过程</h2>
+
+<h3>2.1 处理线上问题</h3>
+
+<p>ReplicationMonitor线程运行异常，造成数据块的副本不能及时补充，如果异常长期存在，极有可能出现丢数据的情况，在没有其他信息辅助解决的情况下，唯一的办法就是重启NameNode（传说中的“三大招”之一），好在HA架构的支持，不至于影响到正常数据生产。</p>
+
+<h3>2.2 日志</h3>
+
+<p>缺少日志，不能定位问题出现的场景，所以首先需要在关键路径上留下必要的信息，方便追查。由于ReplicationMonitor属于独立线程，合理的日志量输出不至于影响服务性能，经过多次调整基本确定需要收集的日志信息：</p>
+
+<p>1、根据NameNode多次jstack信息，怀疑chooseRandom时不停计算countNumOfAvailableNodes，可能存在死循环，尝试输出两类信息：<br/>
+（1）ReplicationMonitor当前处理的整体参数及正在处理的Block；</p>
+
+<figure class='code'><figcaption><span>BlockManager.java</span><a href='https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L3662'>github </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;numlive = &quot;</span> <span class="o">+</span> <span class="n">numlive</span><span class="o">);</span>
+</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;blockToProcess = &quot;</span> <span class="o">+</span> <span class="n">blocksToProcess</span><span class="o">);</span>
+</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;nodeToProcess = &quot;</span> <span class="o">+</span> <span class="n">nodesToProcess</span><span class="o">);</span>
+</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;blocksInvalidateWorkPct = &quot;</span> <span class="o">+</span> <span class="k">this</span><span class="o">.</span><span class="na">blocksInvalidateWorkPct</span><span class="o">);</span>
+</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;workFound = &quot;</span> <span class="o">+</span> <span class="n">workFound</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>（2）chooseRandom逻辑中循环体内（调用了countNumOfAvailableNodes）运行超过1min输出该函数入口的所有参数；问题复现后，日志并没有输出，说明异常并不在chooseRandom逻辑本身；</p>
+
+<p>2、结合NameNode的jstack信息并跟进实现逻辑时发现NetworkTopology.InnerNode#getLoc(String loc)的实现存在性能问题：</p>
+
+<figure class='code'><figcaption><span>NetworkTopology.java</span><a href='https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-common-project/hadoop-common/src/main/java/org/apache/hadoop/net/NetworkTopology.java#L274'>github </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="cm">/** Given a node&#39;s string representation, return a reference to the node</span>
+</span><span class='line'><span class="cm"> * @param loc string location of the form /rack/node</span>
+</span><span class='line'><span class="cm"> * @return null if the node is not found or the childnode is there but</span>
+</span><span class='line'><span class="cm"> * not an instance of {@link InnerNode}</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="kd">private</span> <span class="n">Node</span> <span class="nf">getLoc</span><span class="o">(</span><span class="n">String</span> <span class="n">loc</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">loc</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">loc</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="k">return</span> <span class="k">this</span><span class="o">;</span>
+</span><span class='line'>  <span class="n">String</span><span class="o">[]</span> <span class="n">path</span> <span class="o">=</span> <span class="n">loc</span><span class="o">.</span><span class="na">split</span><span class="o">(</span><span class="n">PATH_SEPARATOR_STR</span><span class="o">,</span> <span class="mi">2</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">Node</span> <span class="n">childnode</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>  <span class="k">for</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="o">;</span> <span class="n">i</span><span class="o">&lt;</span><span class="n">children</span><span class="o">.</span><span class="na">size</span><span class="o">();</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">children</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">).</span><span class="na">getName</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="n">path</span><span class="o">[</span><span class="mi">0</span><span class="o">]))</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">childnode</span> <span class="o">=</span> <span class="n">children</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">i</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">childnode</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="k">return</span> <span class="kc">null</span><span class="o">;</span> <span class="c1">// non-existing node</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">path</span><span class="o">.</span><span class="na">length</span> <span class="o">==</span> <span class="mi">1</span><span class="o">)</span> <span class="k">return</span> <span class="n">childnode</span><span class="o">;</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">childnode</span> <span class="k">instanceof</span> <span class="n">InnerNode</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="o">((</span><span class="n">InnerNode</span><span class="o">)</span><span class="n">childnode</span><span class="o">).</span><span class="na">getLoc</span><span class="o">(</span><span class="n">path</span><span class="o">[</span><span class="mi">1</span><span class="o">]);</span>
+</span><span class='line'>  <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>这段逻辑的用意是通过集群网络拓扑结构中节点的字符串标识（如：/IDC/Rack/hostname）获取该节点的对象。实现方法是从拓扑结构中根节点开始逐层向下搜索，直到找到对应的目标节点，逻辑本身没有问题，但是在line286处应该正常break，实现时出现遗漏，其结果是多出一些不必要的时间开销，对于小集群可能影响不大，但是对于IO比较密集的大集群其实影响还是比较大，线下模拟~5K节点的集群拓扑结构，对于NetworkTopology.InnerNode#getLoc(String loc)本身，break可以提升一半的时间开销。</p>
+
+<p>3、通过前面两个阶段仍然不能完全解决问题，只能继续追加日志，这里再次怀疑可能BlockManager.computeReplicationWorkForBlocks(List&lt;List<Block>> blocksToReplicate)在调用chooseRandom方法时耗时严重，所以在chooseRandom结束后增加了关键的几条日志：</p>
+
+<figure class='code'><figcaption><span>BlockManager.java</span><a href='https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L1322'>github </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;ReplicationMonitor: block = &quot;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">block</span><span class="o">);</span>
+</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;ReplicationMonitor: priority = &quot;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">priority</span><span class="o">);</span>
+</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;ReplicationMonitor: srcNode = &quot;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">srcNode</span><span class="o">);</span>
+</span><span class='line'><span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;ReplicationMonitor: storagepolicyid = &quot;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">bc</span><span class="o">.</span><span class="na">getStoragePolicyID</span><span class="o">());</span>
+</span><span class='line'><span class="k">if</span> <span class="o">(</span><span class="n">rw</span><span class="o">.</span><span class="na">targets</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">rw</span><span class="o">.</span><span class="na">targets</span><span class="o">.</span><span class="na">length</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;ReplicationMonitor: targets is empty&quot;</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;ReplicationMonitor: targets.length = &quot;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">targets</span><span class="o">.</span><span class="na">length</span><span class="o">);</span>
+</span><span class='line'>  <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">rw</span><span class="o">.</span><span class="na">targets</span><span class="o">.</span><span class="na">length</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;ReplicationMonitor: target = &quot;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">targets</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">+</span> <span class="s">&quot;, StorageType = &quot;</span> <span class="o">+</span> <span class="n">rw</span><span class="o">.</span><span class="na">targets</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">getStorageType</span><span class="o">());</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="k">for</span> <span class="o">(</span><span class="n">Iterator</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;</span> <span class="n">iterator</span> <span class="o">=</span> <span class="n">excludedNodes</span><span class="o">.</span><span class="na">iterator</span><span class="o">();</span> <span class="n">iterator</span><span class="o">.</span><span class="na">hasNext</span><span class="o">();)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">DatanodeDescriptor</span> <span class="n">node</span> <span class="o">=</span> <span class="o">(</span><span class="n">DatanodeDescriptor</span><span class="o">)</span> <span class="n">iterator</span><span class="o">.</span><span class="na">next</span><span class="o">();</span>
+</span><span class='line'>  <span class="n">LOG</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;ReplicationMonitor: exclude = &quot;</span> <span class="o">+</span> <span class="n">node</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>包括当前正在处理的Block，优先级（标识缺块的严重程度），源和目标节点集合；（遗漏了关键的信息：Block的Numbytes，后面后详细解释。）</p>
+
+<p>通过这一步基本上能够收集到异常现场信息，同时也可确定异常时ReplicationMonitor的运行情况，从后续的日志也能说明这一点：</p>
+
+<figure class='code'><figcaption><span>namenode.log </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>2016-04-19 20:08:52,328 WARN org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicy: Failed to place enough replicas, still in need of 7 to reach 10 (unavailableStorages=[], storagePolicy=BlockStoragePolicy{HOT:7, storageTypes=[DISK], creationFallbacks=[], replicationFallbacks=[ARCHIVE]}, newBlock=false) For more information, please enable DEBUG log level on org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicy
+</span><span class='line'>2016-04-19 20:08:52,328 WARN org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicy: Failed to place enough replicas, still in need of 7 to reach 10 (unavailableStorages=[DISK], storagePolicy=BlockStoragePolicy{HOT:7, storageTypes=[DISK], creationFallbacks=[], replicationFallbacks=[ARCHIVE]}, newBlock=false) For more information, please enable DEBUG log level on org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicy
+</span><span class='line'>2016-04-19 20:08:52,328 WARN org.apache.hadoop.hdfs.server.blockmanagement.BlockPlacementPolicy: Failed to place enough replicas, still in need of 7 to reach 10 (unavailableStorages=[DISK, ARCHIVE], storagePolicy=BlockStoragePolicy{HOT:7, storageTypes=[DISK], creationFallbacks=[], replicationFallbacks=[ARCHIVE]}, newBlock=false) All required storage types are unavailable: unavailableStorages=[DISK, ARCHIVE], storagePolicy=BlockStoragePolicy{HOT:7, storageTypes=[DISK], creationFallbacks=[], replicationFallbacks=[ARCHIVE]}
+</span><span class='line'>2016-04-19 20:08:52,328 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: block = blk_8206926206_7139007477
+</span><span class='line'>2016-04-19 20:08:52,328 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: priority = 2
+</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: srcNode = 10.16.*.*:*
+</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: storagepolicyid = 0
+</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: targets is empty
+</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: exclude = 10.16.*.*:*
+</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: exclude = 10.16.*.*:*
+</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: exclude = 10.16.*.*:*
+</span><span class='line'>2016-04-19 20:08:52,329 INFO org.apache.hadoop.hdfs.server.blockmanagement.BlockManager: ReplicationMonitor: exclude = 10.16.*.*:**
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>日志中容易看到当前发生异常时的场景：</p>
+
+<p>（1）Block的副本数尝试从3调整的10；（异常时还有其他副本增加的请求）<br/>
+（2）ReplicationMonitor尝试进行副本调整时失败，原因是遍历全集群后并没有找到一个合适的节点给该Block提供副本存储，日志显示全集群的节点均被加入到了exclude；</p>
+
+<p>基本能够确定由于chooseRandom函数遍历了全集群导致处理某（些）Block耗时严重，类似情况累积会恶化这种问题；</p>
+
+<p>到这里基本可以解释为什么几个关键数据结构（UnderReplicatedBlocks和PendingDeletionBlocks）的量持续增加，根本原因在于ReplicationMonitor在尝试对某个Block进行副本调整时，遍历全集群不能选出合适的节点，导致处理一个Block都会耗时严重，如果多个类似Block累积会滚雪球式使情况恶化，而且更加糟糕的是UnderReplicatedBlocks本质是一个优先级队列，如果正好这些Block的优先级较高，处理失败发生超时后还会回到原来的优先队列里，导致后续正常Block也会被阻塞，即使在超时时间范围内ReplicationMonitor可以正常工作，限于其本身的限流及周期（3s）运行机制，实际上可处理的规模非常小，而UnderReplicatedBlocks及PendingDeletionBlocks的生产者丝毫没有变慢，所以造成了数据源源不断的进入队列，但是消费非常缓慢。线上监控数据看到某次极端情况一度累积到1000K规模的UnderReplicatedBlocks，其实风险已经非常高了。</p>
+
+<p>虽然从日志能够解释通UnderReplicatedBlocks和PendingDeletionBlocks持续升高了，但是仍然遗留了一个关键问题：为什么在副本调整时全集群遍历都没有选出合适的节点？</p>
+
+<h3>2.3 暴力破解</h3>
+
+<p>此前已经在社区找到类似问题反馈：
+<a href="https://issues.apache.org/jira/browse/HDFS-8718">https://issues.apache.org/jira/browse/HDFS-8718</a>
+但是很遗憾没看到解决方案；</p>
+
+<p>尝试从各种可能和怀疑中解释前面留下的问题并在线下进行各种场景复现：<br/>
+（1）线下模拟了~5000节点集群规模遍历的时间开销，基本能够反映线上的情况；<br/>
+（2）构造负载严重不均衡时节点选择的场景，不能复现；<br/>
+（3）异构存储实现逻辑可能造成的chooseRandom遍历全集群，尝试构造各种异构存储组合并，不能复现；<br/>
+（4）并发进行删除和副本调整，没有复现；（后面详细介绍）</p>
+
+<p>其实（2）和（3）的验证必要性不是很大，负载问题通过源码简单分析即可，异构存储线上并没有开启。复现结果是：没有结果。</p>
+
+<p>不得已选择临时解决方案：在BlockManager.computeReplicationWorkForBlocks(List&lt;List<Block>> blocksToReplicate)的第二个阶段，针对需要调整副本的Block集合批量进行chooseTargets时加入时间判断，并设定了阈值，当超时发生时退出本轮目标选择逻辑，可以解决PendingDeletionBlocks长时间不能被处理到的问题，代价是牺牲少量处理UnderReplicatedBlocks的时间；上线后符合预期，PendingDeletionBlocks规模得到了有效控制，但是UnderReplicatedBlocks的问题依然存在。</p>
+
+<h3>2.4 调整参数</h3>
+
+<p>期间，我们从前面新增的日志里同时发现了一个有意思的现象，正常情况下workFound的值相对较高，但是一旦出现异常，开始严重下降。workFound标识的是ReplicationMonitor本轮可以调度出去的Block数，影响该值的三个关键参数如下：</p>
+
+<figure class='code'><figcaption><span>hdfs-site.xml</span><a href='http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml'>apache </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;property&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;name&gt;</span>dfs.namenode.replication.work.multiplier.per.iteration<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;value&gt;</span>5<span class="nt">&lt;/value&gt;</span>
+</span><span class='line'><span class="nt">&lt;/property&gt;</span>
+</span><span class='line'><span class="nt">&lt;property&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;name&gt;</span>dfs.namenode.replication.max-streams<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;value&gt;</span>50<span class="nt">&lt;/value&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;description&gt;</span>
+</span><span class='line'>        The maximum number of outgoing replication streams a given node should have
+</span><span class='line'>        at one time considering all but the highest priority replications needed.
+</span><span class='line'>  <span class="nt">&lt;/description&gt;</span>
+</span><span class='line'><span class="nt">&lt;/property&gt;</span>
+</span><span class='line'><span class="nt">&lt;property&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;name&gt;</span>dfs.namenode.replication.max-streams-hard-limit<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;value&gt;</span>100<span class="nt">&lt;/value&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;description&gt;</span>
+</span><span class='line'>        The maximum number of outgoing replication streams a given node should have
+</span><span class='line'>        at one time.
+</span><span class='line'>  <span class="nt">&lt;/description&gt;</span>
+</span><span class='line'><span class="nt">&lt;/property&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>为控制单DN并发数默认值为&lt;2,2,4>，此外可调度的Block数与集群规模正相关，正常情况其实完全满足运行需求，但是由于存在Block不符预期，所以造成workFound量会下降。<br/>
+结合集群实际基础环境，尝试大幅提高并发度，设置为&lt;5,50,100>，提高ReplicationMonitor每一轮的处理效率。参数调整后，情况得到了明显改善。</p>
+
+<p><em>说明：结合实际情况谨慎调整该参数，可能会给集群内的网络带来压力。</em></p>
+
+<p>虽然通过一系列调整能够暂缓和改善线上情况，但是依然没有回答前面留下的疑问，也没有彻底解决问题。只有从头再来梳理流程。</p>
+
+<h2>三、ReplicationMonitor工作流程</h2>
+
+<p>ReplicationMonitor是NameNode内部线程，负责维护数据块的副本数稳定，包括清理无效块和对不符预期副本数的Block进行增删工作。ReplicationMonitor是周期运行线程，默认每3s执行一次，主要由两个关键函数组成：computeDatanodeWork和processPendingReplications（rescanPostponedMisreplicatedBlocks在NameNode启动/主从切换被调用，不包括在本次异常分析范围内）。</p>
+
+<figure class='code'><figcaption><span>BlockManager.java</span><a href='https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L3621'>github </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">privateclass</span> <span class="n">ReplicationMonitor</span> <span class="kd">implements</span> <span class="n">Runnable</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Override</span>
+</span><span class='line'>  <span class="n">publicvoid</span> <span class="nf">run</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">while</span> <span class="o">(</span><span class="n">namesystem</span><span class="o">.</span><span class="na">isRunning</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>        <span class="c1">// Process replication work only when active NN is out of safe mode.</span>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">namesystem</span><span class="o">.</span><span class="na">isPopulatingReplQueues</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">computeDatanodeWork</span><span class="o">();</span>
+</span><span class='line'>          <span class="n">processPendingReplications</span><span class="o">();</span>
+</span><span class='line'>          <span class="n">rescanPostponedMisreplicatedBlocks</span><span class="o">();</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="n">replicationRecheckInterval</span><span class="o">);</span>
+</span><span class='line'>      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Throwable</span> <span class="n">t</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="o">......</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p><strong>computeDatanodeWork</strong><br/>
+（1）从UnderReplicatedBlocks中取出给定阈值（默认为集群节点总数的2倍）数量范围内需要进行复制的Block集合；由于UnderReplicatedBlocks是一个优先级队列，所以每次一定是按照优先级从高到低获取；<br/>
+（2）遍历选出的Block集合，对于每一个Block，根据当前副本分布及chooseTarget策略，选择合适的DataNode集合作为目标节点，准备副本复制；<br/>
+（3）将Block进行副本复制的指令分发到NameNode里对应DatanodeDescriptor数据结构中，待该DataNode下次heartbeat过来后及时下发，同时将该Block从UnderReplicatedBlocks拿出来暂存到pendingReplications；<br/>
+（4）DataNode接收到指令后把对应Block复制到目标节点，复制结束后，目标节点向NameNode汇报RECEIVED_BLOCK，此后便可以从pendingReplications中删除对应的Block；这里引入pendingReplications的目的是防止Block在复制过程中出现异常后超时，当在给定时间内（默认为5min）仍没有完成复制，需要将其从pendingReplications转移到timedOutItems集合中；超时检查的工作由PendingReplicationBlocks#PendingReplicationMonitor负责。<br/>
+（5）将InvalidateBlocks中待删除的Blocks按照DataNode分组后取出分发到NameNode里对应DatanodeDescriptor数据结构中，同样待该DataNode的heartbeat过来后及时下发删除指令；</p>
+
+<p><strong>processPendingReplications</strong><br/>
+computeDatanodeWork步骤4出现超时后，将对应的Block从pendingReplications转移到timedOutItems后并没有其他处理逻辑，但是Block复制的事情还得继续，所以还需要将Block再拿回到UnderReplicatedBlocks后重复前面的工作；从timedOutItems拿回到UnderReplicatedBlocks的工作即由processPendingReplications来负责；</p>
+
+<p>可以看出computeDatanodeWork，processPendingReplications和PendingReplicationMonitor组成了一个生产者消费者的环，下图可以说明这个过程。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="/images/monitor/replicationmonitor.png" alt="ReplicationMonitor相关数据流动图示" align="center"><br />
+<label class=“pic_title” align="center">图3 ReplicationMonitor相关数据流动图示</label>
+</div>
+
+
+<p></p>
+
+<p>ReplicationMonitor涉及到两个关键的数据结构：UnderReplicatedBlocks和InvalidateBlocks；这两个数据结构到底是什么，数据哪里来。</p>
+
+<p>（1）UnderReplicatedBlocks：副本数不足的Block集合；<br/>
+* 写数据完成时进行副本检查，副本不足Block；<br/>
+* 用户调用setReplication增加副本；<br/>
+* DataNode节点异常，其上的所有Block；</p>
+
+<p>（2）InvalidateBlocks：无效Block集合；<br/>
+* 文件删除操作；<br/>
+* 用户调用setReplication降低副本；</p>
+
+<p>可以简单理解副本调整和数据删除本质上是一个异步操作，当NameNode接收到客户端的setReplication或delete请求后，简单处理后即可返回，实际的工作是由ReplicationMonitor周期异步进行处理。</p>
+
+<h2>四、根本原因</h2>
+
+<p>继续追踪日志时，针对触发问题的Block检索了所有日志，发现另外一个现象，每次chooseTarget目标节点选择失败后，总会紧跟一条删除操作的日志：</p>
+
+<figure class='code'><figcaption><span>namenode.log </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>2016-04-19 09:23:08,453 INFO BlockStateChange: BLOCK* addToInvalidates: blk_8197702254_7129783384 10.16.*.*:* 10.16.*.*:* 10.16.*.*:**
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>审计日志中也能对照到同一时间点，对应的文件确实有删除操作。这个现象在多次异常复现时稳定发生。可以猜测与删除操作有关联。</p>
+
+<p>删除操作的流程是先把目录树的节点删除，根据删除结果收集到的Block集合，删除每一个Block。</p>
+
+<p>其中在逐个Block进行删除过程中，发现其逻辑有疑点，主要在block.setNumBytes(BlockCommand.NO_ACK)，其中NO_ACK=Long.MAX_VALUE，也即先将该Block的numbytes设置为最大值，再后续的操作。</p>
+
+<figure class='code'><figcaption><span>BlockManager.java</span><a href='https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L3378'>github </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">removeBlock</span><span class="o">(</span><span class="n">Block</span> <span class="n">block</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">assert</span> <span class="n">namesystem</span><span class="o">.</span><span class="na">hasWriteLock</span><span class="o">();</span>
+</span><span class='line'>  <span class="c1">// No need to ACK blocks that are being removed entirely</span>
+</span><span class='line'>  <span class="c1">// from the namespace, since the removal of the associated</span>
+</span><span class='line'>  <span class="c1">// file already removes them from the block map below.</span>
+</span><span class='line'>  <span class="n">block</span><span class="o">.</span><span class="na">setNumBytes</span><span class="o">(</span><span class="n">BlockCommand</span><span class="o">.</span><span class="na">NO_ACK</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">addToInvalidates</span><span class="o">(</span><span class="n">block</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">removeBlockFromMap</span><span class="o">(</span><span class="n">block</span><span class="o">);</span>
+</span><span class='line'>  <span class="c1">// Remove the block from pendingReplications and neededReplications</span>
+</span><span class='line'>  <span class="n">pendingReplications</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">block</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">neededReplications</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">block</span><span class="o">,</span> <span class="n">UnderReplicatedBlocks</span><span class="o">.</span><span class="na">LEVEL</span><span class="o">);</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">postponedMisreplicatedBlocks</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">block</span><span class="o">))</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">postponedMisreplicatedBlocksCount</span><span class="o">.</span><span class="na">decrementAndGet</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>虽然对目录树的操作及removeBlock的操作均会持有全局写锁，但是很自然将Block的NumBytes设置成Long.MAX_VALUE的逻辑与chooseTarget遍历全集群仍不能选出合适节点的事实结合起来。</p>
+
+<p>接下来自然是验证chooseTarget的处理逻辑：</p>
+
+<figure class='code'><figcaption><span>BlockManager.java</span><a href='https://github.com/apache/hadoop/blob/branch-2.7.1/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/blockmanagement/BlockManager.java#L1390'>github </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">......</span>
+</span><span class='line'><span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">namesystem</span><span class="o">.</span><span class="na">writeUnlock</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="kd">final</span> <span class="n">Set</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;</span> <span class="n">excludedNodes</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashSet</span><span class="o">&lt;</span><span class="n">Node</span><span class="o">&gt;();</span>
+</span><span class='line'><span class="k">for</span><span class="o">(</span><span class="n">ReplicationWork</span> <span class="n">rw</span> <span class="o">:</span> <span class="n">work</span><span class="o">){</span>
+</span><span class='line'>  <span class="c1">// Exclude all of the containing nodes from being targets.</span>
+</span><span class='line'>  <span class="c1">// This list includes decommissioning or corrupt nodes.</span>
+</span><span class='line'>  <span class="n">excludedNodes</span><span class="o">.</span><span class="na">clear</span><span class="o">();</span>
+</span><span class='line'>  <span class="k">for</span> <span class="o">(</span><span class="n">DatanodeDescriptor</span> <span class="n">dn</span> <span class="o">:</span> <span class="n">rw</span><span class="o">.</span><span class="na">containingNodes</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">excludedNodes</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">dn</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="c1">// choose replication targets: NOT HOLDING THE GLOBAL LOCK</span>
+</span><span class='line'>  <span class="c1">// It is costly to extract the filename for which chooseTargets is called,</span>
+</span><span class='line'>  <span class="c1">// so for now we pass in the block collection itself.</span>
+</span><span class='line'>  <span class="n">rw</span><span class="o">.</span><span class="na">chooseTargets</span><span class="o">(</span><span class="n">blockplacement</span><span class="o">,</span> <span class="n">storagePolicySuite</span><span class="o">,</span> <span class="n">excludedNodes</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="n">namesystem</span><span class="o">.</span><span class="na">writeLock</span><span class="o">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>上面的实现可以看出，chooseTargets之前释放了全局锁，chooseTargets后重新申请到全局锁，唯独中间的chooseTargets在锁之外。至此，问题触发条件、场景等基本清楚：</p>
+
+<p>（1）setReplication将文件的副本调大，此时会有一批属于该文件的Block进入UnderReplicatedBlocks等待ReplicationMonitor处理；<br/>
+（2）ReplicationMonitor从UnderReplicatedBlocks中取出部分Block，并在前期根据处理逻辑初始化相关参数，将每个Block打包成ReplicationWork，取出的所有Block完成打包后组成ReplicationWork集合，这个过程持有全局锁；<br/>
+（3）当步骤2释放完全局锁后，被删除请求的RPC抢到全局锁，恰好这次删除操作对应文件即是步骤（1）中的文件，此时Block的NumBytes被设置成Long.MAX_VALUE，并被从BlocksMap,pendingReplications及UnderReplicatedBlocks中删除，但是该Block对象的引用还被步骤（2）中的ReplicationWork集合持有，不会被JVM回收，不同的是ReplicationWork集合中对应Block的NumBytes已经被修改成Long.MAX_VALUE；<br/>
+（4）ReplicationMonitor中computeReplicationWorkForBlocks继续进行chooseTarget时显然已经不可能在集群中选出合适的节点，即使遍历完整个集群，本质上还是由于块大小已经是Long.MAX_VALUE，不可能有节点能满足需求。</p>
+
+<p>通过单元测试对该场景能够稳定复现。</p>
+
+<h2>五、解决方式</h2>
+
+<p>问题分析完后，解决办法其实比较简单：</p>
+
+<p>（1）如果ReplicationMonitor遇到了Block的NumBytes=BlockCommand.NO_ACK，直接将该Block从UnderReplicatedBlocks中删除；<br/>
+（2）如果chooseTarget时遇到了Block的NumBytes=BlockCommand.NO_ACK，直接返回空，无需再遍历整个集群节点；</p>
+
+<p>至此彻底解决了线上隐藏将近了一个月的Bug。线上再没有出现该异常。详细Patch见：<a href="https://issues.apache.org/jira/browse/HDFS-10453">https://issues.apache.org/jira/browse/HDFS-10453</a> 。</p>
+
+<h2>六、经验</h2>
+
+<p>回头看追查的整个过程，有几点值得总结的经验：</p>
+
+<p>1、日志经过多次才调整到位，中间遗漏了关键的信息（block.getNumBytes），如果开始及时收集到这个信息，可以省去很多时间，所以如果能够准确快速收集关键数据，问题已经解决一半；</p>
+
+<p>2、场景复现时提高并发其实是可以复现的，当时仅利用小工具模拟简单的场景，没有在真实环境进行高并发复现，错过一次可以定位的机会，合理的假设怀疑和严谨的场景复现很重要；</p>
+
+<p>3、虽然问题在线上存在了超过两周时间，但是并没有实际影响到集群正常服务，得益于中间合理可控的缓解手段。如果不能彻底解决可以尝试通过各种方法缓解或绕过问题值得借鉴，这种方法论随处可见，但是只有亲自趟过坑后才能印象深刻。</p>
+
+<p>4、回过头再看整个问题，解决问题的思路没有问题，但追查过程其实存在一个严重Bug，不再展开详述。</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">hexiaoqiao</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-09-13T10:45:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:45 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/hdfs/'>hdfs</a>, <a class='category' href='/blog/categories/namenode/'>namenode</a>, <a class='category' href='/blog/categories/replicationmonitor/'>replicationmonitor</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://hexiaoqiao.github.io/blog/2016/09/13/namenode-repicationmonitor-exception-trace/" data-via="" data-counturl="http://hexiaoqiao.github.io/blog/2016/09/13/namenode-repicationmonitor-exception-trace/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/09/04/hdfs-centralized-cache-management/" title="Previous Post: HDFS集中式缓存管理">&laquo; HDFS集中式缓存管理</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2016/10/01/carbondata-column-based-storage-format/" title="Next Post: Apache CarbonData初探">Apache CarbonData初探 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2018/10/05/recruit/">大数据职位招聘</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/07/13/a-brief-introduction-of-hdfs-blocktoken-mechanism/">HDFS BlockToken机制解析</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2018/03/30/the-analysis-of-basic-principle-of-hdfs-ha-using-qjm/">HDFS HA Using QJM原理解析</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/02/12/namenode-restart-optimization/">HDFS NameNode重启优化</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/01/18/exact-count-optimization-of-apache-kylin/">Apache Kylin精确去重指标优化</a>
+      </li>
+    
+  </ul>
+</section>
+  
+<section>  
+  <h1>Weibo</h1>  
+  <ul id="weibo">  
+    <li>
+    <iframe 
+	width="100%" 
+	height="550" 
+	class="share_self"  
+	frameborder="0" 
+	scrolling="no" 
+	src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=0&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=1283533382&verifier=9bc28858&dpc=1">
+    </iframe>
+    </li>  
+  </ul>  
+</section>  
+
+<section>
+  <h1>WeChat</h1>
+  <ul id="wechat">
+  <div class=“pic” padding=“0”>
+  <img src="/images/qrcode.jpg"><br />
+  </div>
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2018 - Hexiaoqiao -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'Hexiaoqiao';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://hexiaoqiao.github.io/blog/2016/09/13/namenode-repicationmonitor-exception-trace/';
+        var disqus_url = 'http://hexiaoqiao.github.io/blog/2016/09/13/namenode-repicationmonitor-exception-trace/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
