@@ -341,8 +341,9 @@ task :setup_github_pages, :repo do |t, args|
       end
     end
   end
+  url = blog_url(user, project)
   jekyll_config = IO.read('_config.yml')
-  jekyll_config.sub!(/^url:.*$/, "url: #{blog_url(user, project)}")
+  jekyll_config.sub!(/^url:.*$/, "url: #{url}")
   File.open('_config.yml', 'w') do |f|
     f.write jekyll_config
   end
