@@ -4,7 +4,7 @@
   <title><![CDATA[Hexiaoqiao]]></title>
   <link href="http://hexiaoqiao.github.io/atom.xml" rel="self"/>
   <link href="http://hexiaoqiao.github.io/"/>
-  <updated>2019-04-26T18:58:49+08:00</updated>
+  <updated>2019-04-27T19:04:53+08:00</updated>
   <id>http://hexiaoqiao.github.io/</id>
   <author>
     <name><![CDATA[Hexiaoqiao]]></name>
@@ -252,7 +252,7 @@ NameNode全局锁水平拆分的思路可以借鉴GFS1.0和Alluxio解决思路�
 （3）特殊场景需要锁内跨层调用时，仅允许Namespace到BlocksMap单向调用；</p>
 
 <div class="pic" align="center" padding="0">
-<img src="http://hexiaoqiao.github.io/images/hdfslock/globallock.png" align="center"><br />
+<img src="http://hexiaoqiao.github.io/images/hdfslock/exlayerlock.png" align="center"><br />
 <label class="pic_title" align="center">图7 NameNode全局锁水平切分</label>
 </div>
 
