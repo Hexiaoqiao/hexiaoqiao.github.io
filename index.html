@@ -9,7 +9,7 @@
   <meta name="author" content="Hexiaoqiao">
 
   
-  <meta name="description" content="一、背景 众所周知，NameNode全局锁（FSNamesystemLock）问题一直是制约HDFS性能尤其是NameNode处理能力的主要原因。为此，社区和业界经过多次尝试，试图解决NameNode全局锁问题，但是从结果来看，都不理想。 &hellip;">
+  <meta name="description" content="一、背景 HDFS NameNode重启效率是另一个被长期诟病的问题，尤其对超大规模集群，动辄数小时的重启时间对整个集群的稳定性和可用性都存在极大的潜在风险，HDFS NameNode重启优化一文对NameNode启动效率提升的优化办法做过简单梳理和探讨，但是从实践情况来看，虽然有提升， &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,287 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2021/02/27/namenode-fsimage-loading-optimization/">NameNode FSImage加载优化</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2021-02-27T10:45:00+08:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>27</span><span class='date-suffix'>th</span>, <span class='date-year'>2021</span></span> <span class='time'>10:45 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>一、背景</h2>
+
+<p>HDFS NameNode重启效率是另一个被长期诟病的问题，尤其对超大规模集群，动辄数小时的重启时间对整个集群的稳定性和可用性都存在极大的潜在风险，<a href="https://hexiaoqiao.github.io/blog/2017/02/12/namenode-restart-optimization/">HDFS NameNode重启优化</a>一文对NameNode启动效率提升的优化办法做过简单梳理和探讨，但是从实践情况来看，虽然有提升，但是依然存在优化空间。</p>
+
+<p>从线上一组NameNode重启的抽样数据为例来看，整个重启时间依然非常可观，具体到重启每阶段的时间分布如图1所示（时间占比分布情况受元数据量、NameNode本地存储介质和集群规模等诸多因素影响，不具备一般性，仅供参考）。从时间分布来看，占比较大的是加载FSImage和BlockReport两个阶段，其中FSImage加载的实际时间开销超过小时。所以优化和提升FSImage加载效率对整个进程重启有很大帮助。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="/images/fsimage/restarttime.png" align="center"><br />
+<label class=“pic_title” align="center">图1 NameNode重启过程时间分布</label>
+</div>
+
+
+<p>本文将在介绍FSImage原有加载方式基础上，分析效率低的原因，并结合加载方式的演进和实践效果对FSImage的并行加载优化进行简单说明，期望能有借鉴和参考价值。</p>
+
+<h2>二、重启流程</h2>
+
+<p>在HDFS的整个运行期里，整个文件系统的目录树均在NameNode内存中集中管理，但由于内存易失特性，一旦出现进程退出、宕机等异常情况，所有元数据都会丢失，将给整个系统的数据安全会造成不可恢复的灾难。为了更好的容错能力，NameNode（SBN/Secondary）会周期进行Checkpoint，将文件系统的目录树持久化到外部设备，即二进制文件FSImage，这样即使NameNode出现异常也能从持久化设备上恢复元数据，保证了数据的安全可靠。详细分析参考<a href="https://hexiaoqiao.github.io/blog/2017/02/12/namenode-restart-optimization/">HDFS NameNode重启优化</a>一文。</p>
+
+<p>在HA with QJM架构下，NameNode重启始终以SBN（StandbyNameNode）角色开始。启动过程大致分成以下几个阶段：<br/>
+0、加载FSImage：从最新持久化的FSImage中恢复文件系统的目录树结构；<br/>
+1、回放EditLog：通过回放EditLog对齐最新的目录树结构；<br/>
+2、执行Checkpoint：可选操作；<br/>
+3、收集所有DataNode的注册和数据块汇报：重建文件的数据块内容具体分布；</p>
+
+<p>FSImage完整记录了文件系统目录树相关的数据。从Hadoop-2.4.0起，FSImage开始使用<a href="https://developers.google.com/protocol-buffers/">Google Protocol Buffers</a>编码格式描述（HDFS-5698），详细描述文件见<a href="https://github.com/apache/hadoop/blob/branch-2.4.0/hadoop-hdfs-project/hadoop-hdfs/src/main/proto/fsimage.proto">fsimage.proto</a>，当然在后续的版本中也有调整，但整体上没有本质差异。根据描述文件和实现逻辑，FSImage文件组织格式如图2所示。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="/images/fsimage/fsimageformat.svg" align="center"><br />
+<label class=“pic_title” align="center">图2 FSImage文件格式</label>
+</div>
+
+
+<p>从fsimage.proto和FSImage文件存储格式容易看到，除了文件头部校验（MAGIC）和尾部文件索引（FILESUMMARY）等管理信息外，核心数据都是与文件系统目录树强相关。其中INODE和INODE_DIR是整个FSImage文件中最核心且也是规模最大的两个部分。</p>
+
+<p>NameNode重启的第一个步骤就是加载FSImage，传统的加载完全按照串行方式执行：<br/>
+（1）FSImage文件MD5值校验；<br/>
+（2）读取FSImage文件的Summary数据；<br/>
+（3）根据Summary的信息对每个Section依次读取、反序列化并构建内存数据结构；<br/>
+其中两个规模最大的两个Section即INODE和INODE_DIR。假设针对包含1亿个INode目录树的加载过程：需要先将1亿个INode从FSImage文件中按序读入并反序列化；完成后再将包含1亿条父子关系的INODE_DIR按序读入并反序列化，根据反序列化结果将所有子节点的引用按照二分查找的方式插入到父节点维护的数组中，到这里基本上目录树就构建起来（当然如果开启了如SNAPSHOT和Cache等特性的话，还需要将这部分数据加载完成），目录树构建完成后的内存组织情况详情参考<a href="https://hexiaoqiao.github.io/blog/2016/07/06/namenode-memory-overview/">NameNode内存全景</a>。</p>
+
+<p>使用传统的FSImage加载模式，测试验证~3亿节点规模的目录树，FSImage文件大小~30GB，加载过程时间开销统计：<br/>
+- MD5校验耗时~125sec;<br/>
+- FSImage加载时间~811sec;</p>
+
+<h2>三、并行加载优化</h2>
+
+<p>如果分析FSImage的整个加载过程，尤其是占比最大的INODE和INODE_DIR两个Section容易发现两个特点：<br/>
+（1）INODE_DIR加载依赖INODE完成，即INODE和INODE_DIR两个Section之间存在严格的先后顺序；<br/>
+（2）INODE和INODE_DIR两个Section内部Entry（目录树节点数据和节点之间父子关系信息）相互之间其实完全独立；<br/>
+根据这两个特点，我们可以把INODE和INODE_DIR内部结构进一步做逻辑拆分，切割成多个INODE_SUB和多个INODE_DIR_SUB便于后续并行处理，其中：</p>
+
+<p><img src="/images/fsimage/inode.png"></p>
+
+<p>将INODE和INODE_DIR两个Section进行逻辑拆分后其实不影响FSImage物理上的组织结构。为了能把INODE_SUB和INODE_DIR_SUB真正的分配给独立的线程且不重不漏，只需要在FSImage文件的FILESUMMARY索引里对逻辑SUB_SECTION（INODE_SUB+INODE_DIR_SUB）做好记录：偏移量+长度。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="/images/fsimage/fsimageformat2.svg" align="center"><br />
+<label class=“pic_title” align="center">图3 FSImage文件格式差异对比</label>
+</div>
+
+
+<p>FSImage文件索引数据就绪后，当再次重启触发加载时，根据SUB_SECTION的个数及配置的加载线程数进行均衡拆分：<br/>
+（1）确保多个线程之间分配到的SUB_SECTION尽可能相同；<br/>
+（2）每一个SUB_SECTION只被一个线程独立消费；<br/>
+通过这种方式拆分，FSImage的加载过程可以演变成如下图4所示流程。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="/images/fsimage/load.svg" align="center"><br />
+<label class=“pic_title” align="center">图4 FSImage并行加载流程</label>
+</div>
+
+
+<p>从整个优化思路可以看到，FSImage文件物理结构没有大调整，仅对FILESUMMARY做了简单扩展，核心数据组织上没有做任何改变，所以兼容能力上相对更好。<br/>
+（1）使用原有逻辑加载新格式的FSImage文件时仅需要在读取FILESUMMARY时将INODE_SUB和INODE_DIR_SUB两类SECTION的索引过滤掉就可以，事实上在实现时也是这么处理的，即使是较早版本的实现也非常容易修复；<br/>
+（2）并行逻辑加载原有格式FSImage文件时因为在FILESUMMARY中没有SUB_SECTION描述，所以及时升级到并行加载逻辑在真正执行时也是单线程完成；</p>
+
+<p>整体上看，这种并行加载方案在效率和兼容性上能做到兼顾。</p>
+
+<h2>四、其他优化</h2>
+
+<p>除了对INODE和INODE_DIR并行加载优化外，其实社区参与者还提出了其他实现逻辑的优化，其中效果较好的主要有：</p>
+
+<p>（1）异步MD5检查；<br/>
+在图4的FSImage加载流程里，为了检查FSImage文件合法性，第一步需要对其进行MD5校验。这个步骤需要执行一次完整的FSImage文件读操作，如果文件较大，IO开销比较可观。为了提升加载效率，<a href="https://issues.apache.org/jira/browse/HDFS-13694">HDFS-13694</a>提出将MD5检查逻辑从主流程中摘出来，用独立的线程异步执行检查，减少文件合法性检查引入的时间开销。</p>
+
+<p>（2）加载INODE_DIR/INODE_DIR_SUB去掉二分查找逻辑；<br/>
+如前述，INODE_DIR Section实际上是为了构建目录树节点之间的父子关系。为了提升检索效率，父节点使用数组按照字符序维护子节点引用的集合，这样处理后读取时容易通过二分查找的方式在O(logn)时间复杂度内就完成检索；为了满足子节点有序的条件，传统方式当加载INODE_DIR/INODE_DIR_SUB时也是先按照二分查找的方法定位到每一个子节点引用应该插入到数组的具体位置，再执行插入操作。但事实上，对目录树序列化操作时（即执行Checkpoint）子节点本身都已经是有序持久化到FSImage的INODE_DIR Section内，所以加载的时候每一次二分查找的目标位置一定是数组尾部。这种情况下其实二分查找定位目标位置的逻辑完全没有必要。<a href="https://issues.apache.org/jira/browse/HDFS-13693">HDFS-13693</a>提出按照INODE_DIR内Entry的加载顺序逐个插入子节点数组的尾部，去掉二分查找逻辑。</p>
+
+<h2>五、效果验证</h2>
+
+<h3>测试环境</h3>
+
+<p>1、基础环境: <br/>
+CPU: Intel&reg; Xeon&reg; CPU 2.60GHz<br/>
+OS: CentOS 6.6<br/>
+FS: EXT4 on HDD<br/>
+JDK: Java HotSpot&trade; 64-Bit Server VM 1.8.0</p>
+
+<p>2、数据规模：<br/>
+INode总数：~3亿<br/>
+Block数：~3亿<br/>
+FSImage大小：~30GB</p>
+
+<p>3、测试场景：<br/>
+原生加载<br/>
+并行加载（默认线程数12）<br/>
+并行加载+异步MD5校验<br/>
+并行加载+异步MD5校验+跳过二分查找</p>
+
+<h3>结果对比</h3>
+
+<p>下图5是针对同一份元数据使用不同策略执行加载过程耗时情况。</p>
+
+<div class=“pic” align="center" padding=“0”>
+<img src="/images/fsimage/result.png" align="center"><br />
+<label class=“pic_title” align="center">图5 不同加载策略时间开销对比</label>
+</div>
+
+
+<p>结果说明：<br/>
+（1）将INODE和INODE_DIR两个最大规模的元数据并行化加载收益最明显，使用12个线程数加载效率有~40%的提升；实际场景中具体应该使用多少线程执行并行加载需要综合考虑服务器核数和元数据规模等。<br/>
+（2）MD5检查是容易被忽略的部分，尤其针对较大规模元数据场景，因为需要一次完整IO过程，所以开销也比较可观~10%；这里的主要开销在IO，所以与FSImage文件大小强相关。<br/>
+（3）虽然在加载INODE_DIR构建节点之间父子关系时可以跳过二分查找，直接进入数组尾部，但是效果并不明显。原因在于：一般场景子节点的规模都不大，另外二分查找本身的开销非常低；在常规服务器上即使对1亿规模的数据执行1亿次二分查找的耗时不超过10秒；</p>
+
+<h3>使用参数</h3>
+
+<p>FSImage并行加载特性使用的主要参数如下：<br/>
+1、<code>dfs.image.parallel.load</code>: 描述是否开启并行加载特性；<br/>
+2、<code>dfs.image.parallel.target.sections</code>: 描述开启并行加载特性后新生成的FSImage里包含的SUB_SECTION个数，一般建议设置为<code>dfs.image.parallel.threads</code>的整数倍；<br/>
+3、<code>dfs.image.parallel.inode.threshold</code>: 描述开启并行加载特性所需节点数的最小阈值，对小规模元数据并行加载并不会有很好的效果，所以默认在1000000节点规模下，并行加载特性不会开启； <br/>
+4、<code>dfs.image.parallel.threads</code>: 描述并行加载使用的线程数，需要综合考虑元数据规模和NameNode进程所在服务器的承载能力适当调整。</p>
+
+<figure class='code'><figcaption><span>hdfs-site.xml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>  <span class="nt">&lt;property&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;name&gt;</span>dfs.image.parallel.load<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;value&gt;</span>true<span class="nt">&lt;/value&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;description&gt;</span>
+</span><span class='line'>      If true, write sub-section entries to the fsimage index so it can
+</span><span class='line'>      be loaded in parallel. Also controls whether parallel loading
+</span><span class='line'>      will be used for an image previously created with sub-sections.
+</span><span class='line'>      If the image contains sub-sections and this is set to false,
+</span><span class='line'>      parallel loading will not be used.
+</span><span class='line'>      Parallel loading is not compatible with image compression,
+</span><span class='line'>      so if dfs.image.compress is set to true this setting will be
+</span><span class='line'>      ignored and no parallel loading will occur.
+</span><span class='line'>      Enabling this feature may impact rolling upgrades and downgrades if
+</span><span class='line'>      the previous version does not support this feature. If the feature was
+</span><span class='line'>      enabled and a downgrade is required, first set this parameter to
+</span><span class='line'>      false and then save the namespace to create a fsimage with no
+</span><span class='line'>      sub-sections and then perform the downgrade.
+</span><span class='line'>    <span class="nt">&lt;/description&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/property&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nt">&lt;property&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;name&gt;</span>dfs.image.parallel.target.sections<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;value&gt;</span>12<span class="nt">&lt;/value&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;description&gt;</span>
+</span><span class='line'>      Controls the number of sub-sections that will be written to
+</span><span class='line'>      fsimage for each section. This should be larger than
+</span><span class='line'>      dfs.image.parallel.threads, otherwise all threads will not be
+</span><span class='line'>      used when loading. Ideally, have at least twice the number
+</span><span class='line'>      of target sections as threads, so each thread must load more
+</span><span class='line'>      than one section to avoid one long running section affecting
+</span><span class='line'>      the load time.
+</span><span class='line'>    <span class="nt">&lt;/description&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/property&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nt">&lt;property&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;name&gt;</span>dfs.image.parallel.inode.threshold<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;value&gt;</span>1000000<span class="nt">&lt;/value&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;description&gt;</span>
+</span><span class='line'>      If the image contains less inodes than this setting, then
+</span><span class='line'>      do not write sub-sections and hence disable parallel loading.
+</span><span class='line'>      This is because small images load very quickly in serial and
+</span><span class='line'>      parallel loading is not needed.
+</span><span class='line'>    <span class="nt">&lt;/description&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/property&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nt">&lt;property&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;name&gt;</span>dfs.image.parallel.threads<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;value&gt;</span>12<span class="nt">&lt;/value&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;description&gt;</span>
+</span><span class='line'>      The number of threads to use when dfs.image.parallel.load is
+</span><span class='line'>      enabled. This setting should be less than
+</span><span class='line'>      dfs.image.parallel.target.sections. The optimal number of
+</span><span class='line'>      threads will depend on the hardware and environment.
+</span><span class='line'>    <span class="nt">&lt;/description&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/property&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>社区在优化和解决FSImage加载问题的讨论持续了较长时间，其中比较典型的解决方案还有如<a href="https://issues.apache.org/jira/browse/HDFS-7784">HDFS-7784</a>和<a href="https://issues.apache.org/jira/browse/HDFS-13700">HDFS-13700</a>等，这些解决方案虽然没有最终合入主干代码，但是都提供了非常不错的想法。综合考虑性能、稳定性和兼容能力，HDFS-14167优势明显，另外从实践效果上看HDFS-14167也有较好的表现。如果集群规模和元数据规模较大，且重启加载FSImage阶段耗时严重，并行加载特性值得一试。</p>
+
+<h2>六、参考</h2>
+
+<p>[1] <a href="https://issues.apache.org/jira/browse/HDFS-14617">https://issues.apache.org/jira/browse/HDFS-14617</a><br>
+[2] <a href="https://issues.apache.org/jira/browse/HDFS-13694">https://issues.apache.org/jira/browse/HDFS-13694</a><br>
+[3] <a href="https://issues.apache.org/jira/browse/HDFS-13693">https://issues.apache.org/jira/browse/HDFS-13693</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2950,380 +3231,6 @@ computeDatanodeWork步骤4出现超时后，将对应的Block从pendingReplicati
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/09/04/hdfs-centralized-cache-management/">HDFS集中式缓存管理</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-09-04T10:45:00+08:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:45 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><h2>一、背景</h2>
-
-<p>Hadoop设计之初借鉴GFS/MapReduce的思想：移动计算的成本远小于移动数据的成本。所以调度通常会尽可能将计算移动到拥有数据的节点上，在作业执行过程中，从HDFS角度看，计算和数据通常是同一个DataNode节点，即存在大量的本地读写。</p>
-
-<p>但是HDFS最初实现时，并没有区分本地读和远程读，二者的实现方式完全一样，都是先由DataNode读取数据，然后通过DFSClient与DataNode之间的Socket管道进行数据交互。这样的实现方式很显然由于经过DataNode中转对数据读性能有一定的影响。</p>
-
-<p>社区很早也关注到了这一问题，先后提出过两种方案来提升性能，分别是<a href="https://issues.apache.org/jira/browse/HDFS-347">HDFS-347</a>和<a href="https://issues.apache.org/jira/browse/HDFS-2246">HDFS-2246</a>。</p>
-
-<p>HDFS-2246是比较直接和自然的想法，既然DFSClient和DataNode在同一个节点上，当DFSClient对数据发出读请求后，DataNode提供给DFSClient包括文件路径，偏移量和长度的三元组（path,offset,length）,DFSClient拿到这些信息后直接从文件系统读取数据，从而绕过DataNode避免一次数据中转的过程。但是这个方案存在两个问题，首先，HDFS需要为所有用户配置白名单，赋予其可读权限，当增加新用户需要更新白名单，维护不方便；其次，当为用户赋权后，意味着用户拥有了访问所有数据的权限，相当于超级用户，从而导致数据存在安全漏洞。</p>
-
-<p>HDFS-347使用UNIX提供的Unix Domain Socket进程通讯机制实现了安全的本地短路读取。DFSClient向DataNode请求数据时，DataNode打开块文件和元数据文件，通过Unix Domain Socket将对应的文件描述符传给DFSClient，而不再是路径、偏移量和长度等三元组。文件描述符是只读的，DFSClient不能随意修改接收到的文件。同时由于DFSClient自身无法访问块所在的目录，也就不能访问未授权数据。</p>
-
-<p>虽然本地短路读在性能上有了明显的提升，但是从全集群看，依然存在几个性能问题：<br/>
-（1）DFSClient向DataNode发起数据读请求后，DataNode在OS Buffer对数据会进行Cache，但是数据Cache的分布情况并没有显式暴漏给上层，对任务调度透明，造成Cache浪费。比如同一Block多个副本可能被Cache在多个存储这些副本的DataNode OS Buffer，造成内存资源浪费。<br/>
-（2）由于Cache的分布对任务调度透明，一些低优先级任务的读请求有可能将高优先级任务正在使用的数据从Cache中淘汰出去，造成数据必须从磁盘读，增加读数据的开销从而影响任务的完成时间，甚至影响到关键生产任务SLA。</p>
-
-<p>针对这些问题，社区在2013年提出集中式缓存方案（Centralized cache management）<a href="https://issues.apache.org/jira/browse/HDFS-4949">HDFS-4949</a>，由NameNode对DataNode的Cache进行统一集中管理，并将缓存接口显式暴漏给上层应用，该功能在2.3.0发布。这个功能对于提升HDFS读性能和上层应用的执行效率与实时性有很大帮助。</p>
-
-<p>集中式缓存方案的主要优势：<br/>
-（1）用户可以指定常用数据或者高优先级任务对应的数据常驻内存，避免被淘汰到磁盘。例如在数据仓库应用中事实表会频繁与其他表JOIN，如果将这些事实表常驻内存，当DataNode内存使用紧张的时候也不会把这些数据淘汰出去，可以很好的实现了对于关键生产任务的SLA保障；<br/>
-（2）由NameNode统一进行缓存的集中管理，DFSClient根据Block被Cache分布情况调度任务，尽可能实现本地内存读，减少资源浪费；<br/>
-（3）明显提升读性能。当DFSClient要读取的数据被Cache在同一DataNode时，可以通过<a href="https://en.wikipedia.org/wiki/Zero-copy">ZeroCopy</a>直接从内存读，略过磁盘IO和checksum校验等环节，从而提升读性能；<br/>
-（4）由于NameNode统一管理并作为元数据的一部分进行持久化处理，即使DataNode节点出现宕机，Block移动，集群重启，Cache不会受到影响。</p>
-
-<h2>二、部署与使用</h2>
-
-<h3>2.1 部署</h3>
-
-<p>集群开启HDFS集中式缓存特性非常简单，虽然HDFS本身为集中式缓存在NameNode/DataNode端均提供了多个配置参数，但是大多不是必须配置项，最核心的配置项是DataNode侧一个参数。</p>
-
-<figure class='code'><figcaption><span>hdfs-site.xml</span><a href='http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml'>hdfs-default.xml </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;property&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;name&gt;</span>dfs.datanode.max.locked.memory<span class="nt">&lt;/name&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;value&gt;</span>0<span class="nt">&lt;/value&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;description&gt;</span>
-</span><span class='line'>    The amount of memory in bytes to use for caching of block replicas in
-</span><span class='line'>    memory on the datanode. The datanode&#39;s maximum locked memory soft ulimit
-</span><span class='line'>    (RLIMIT_MEMLOCK) must be set to at least this value, else the datanode
-</span><span class='line'>    will abort on startup.
-</span><span class='line'>    By default, this parameter is set to 0, which disables in-memory caching.
-</span><span class='line'>    If the native libraries are not available to the DataNode, this
-</span><span class='line'>    configuration has no effect.
-</span><span class='line'>  <span class="nt">&lt;/description&gt;</span>
-</span><span class='line'><span class="nt">&lt;/property&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>如配置项描述所述，该配置的默认值为0，表示集中式缓存特性处于关闭状态，选择适当的值打开该特性。</p>
-
-<p>开启集中式缓存特性需要注意两个前提：<br/>
-（1）DataNode的native库必须可用；因为集中式缓存特性通过系统调用<a href="https://en.wikipedia.org/wiki/Mmap">mmap/mlock</a>实现，DataNode需要通过native库支持完成系统调用，否则会导致该特性不生效。<br/>
-（2）系统memlock至少与配置值相同；因为集中式缓存特性通过系统调用mmap/mlock实现，所以系统最大锁定内存空间需要至少与DataNode配置的锁定空间大小相同，否则会导致DataNode进行启动失败。</p>
-
-<p>此外，HDFS还包括了其他可选的配置项：</p>
-
-<figure class='code'><figcaption><span>hdfs-site.xml</span><a href='http://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml'>hdfs-default.xml </a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;property&gt;</span>
-</span><span class='line'><span class="nt">&lt;name&gt;</span>dfs.namenode.path.based.cache.refresh.interval.ms<span class="nt">&lt;/name&gt;</span>
-</span><span class='line'><span class="nt">&lt;value&gt;</span>30000<span class="nt">&lt;/value&gt;</span>
-</span><span class='line'><span class="nt">&lt;description&gt;</span>The amount of milliseconds between subsequent path cache rescans. Path cache rescans are when we calculate which blocks should be cached, and on what datanodes. By default, this parameter is set to 30 seconds.<span class="nt">&lt;/description&gt;</span>
-</span><span class='line'><span class="nt">&lt;/property&gt;</span>
-</span><span class='line'><span class="nt">&lt;property&gt;</span>
-</span><span class='line'><span class="nt">&lt;name&gt;</span>
-</span><span class='line'>dfs.namenode.path.based.cache.block.map.allocation.percent
-</span><span class='line'><span class="nt">&lt;/name&gt;</span>
-</span><span class='line'><span class="nt">&lt;value&gt;</span>0.25<span class="nt">&lt;/value&gt;</span>
-</span><span class='line'><span class="nt">&lt;description&gt;</span>The percentage of the Java heap which we will allocate to the cached blocks map. The cached blocks map is a hash map which uses chained hashing. Smaller maps may be accessed more slowly if the number of cached blocks is large; larger maps will consume more memory.<span class="nt">&lt;/description&gt;</span>
-</span><span class='line'><span class="nt">&lt;/property&gt;</span>
-</span><span class='line'><span class="nt">&lt;property&gt;</span>
-</span><span class='line'><span class="nt">&lt;name&gt;</span>dfs.cachereport.intervalMsec<span class="nt">&lt;/name&gt;</span>
-</span><span class='line'><span class="nt">&lt;value&gt;</span>10000<span class="nt">&lt;/value&gt;</span>
-</span><span class='line'><span class="nt">&lt;description&gt;</span>Determines cache reporting interval in milliseconds. After this amount of time, the DataNode sends a full report of its cache state to the NameNode. The NameNode uses the cache report to update its map of cached blocks to DataNode locations. This configuration has no effect if in-memory caching has been disabled by setting dfs.datanode.max.locked.memory to 0 (which is the default). If the native libraries are not available to the DataNode, this configuration has no effect.<span class="nt">&lt;/description&gt;</span>
-</span><span class='line'><span class="nt">&lt;/property&gt;</span>
-</span><span class='line'>property&gt;
-</span><span class='line'><span class="nt">&lt;name&gt;</span>dfs.datanode.fsdatasetcache.max.threads.per.volume<span class="nt">&lt;/name&gt;</span>
-</span><span class='line'><span class="nt">&lt;value&gt;</span>4<span class="nt">&lt;/value&gt;</span>
-</span><span class='line'><span class="nt">&lt;description&gt;</span>The maximum number of threads per volume to use for caching new data on the datanode. These threads consume both I/O and CPU. This can affect normal datanode operations.<span class="nt">&lt;/description&gt;</span>
-</span><span class='line'><span class="nt">&lt;/property&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>2.2 使用</h3>
-
-<p>HDFS集中式缓存对数据读写接口并没有影响，正常调用已缓存数据的读写即可使用缓存特性。
-为了便于数据管理，HDFS通过CacheAdmin对外暴露了一系列缓存管理的接口，其中CLI接口如下。</p>
-
-<figure class='code'><figcaption><span>CacheAdmin </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'>Usage: bin/hdfs cacheadmin [COMMAND]
-</span><span class='line'>          [-addDirective -path <span class="nt">&lt;path&gt;</span> -pool <span class="nt">&lt;pool-name&gt;</span> [-force] [-replication <span class="nt">&lt;replication&gt;</span>] [-ttl <span class="nt">&lt;time-to-live&gt;</span>]]
-</span><span class='line'>          [-modifyDirective -id <span class="nt">&lt;id&gt;</span> [-path <span class="nt">&lt;path&gt;</span>] [-force] [-replication <span class="nt">&lt;replication&gt;</span>] [-pool <span class="nt">&lt;pool-name&gt;</span>] [-ttl <span class="nt">&lt;time-to-live&gt;</span>]]
-</span><span class='line'>          [-listDirectives [-stats] [-path <span class="nt">&lt;path&gt;</span>] [-pool <span class="nt">&lt;pool&gt;</span>] [-id <span class="nt">&lt;id&gt;</span>]
-</span><span class='line'>          [-removeDirective <span class="nt">&lt;id&gt;</span>]
-</span><span class='line'>          [-removeDirectives -path <span class="nt">&lt;path&gt;</span>]
-</span><span class='line'>          [-addPool <span class="nt">&lt;name&gt;</span> [-owner <span class="nt">&lt;owner&gt;</span>] [-group <span class="nt">&lt;group&gt;</span>] [-mode <span class="nt">&lt;mode&gt;</span>] [-limit <span class="nt">&lt;limit&gt;</span>] [-maxTtl <span class="nt">&lt;maxTtl&gt;</span>]
-</span><span class='line'>          [-modifyPool <span class="nt">&lt;name&gt;</span> [-owner <span class="nt">&lt;owner&gt;</span>] [-group <span class="nt">&lt;group&gt;</span>] [-mode <span class="nt">&lt;mode&gt;</span>] [-limit <span class="nt">&lt;limit&gt;</span>] [-maxTtl <span class="nt">&lt;maxTtl&gt;</span>]]
-</span><span class='line'>          [-removePool <span class="nt">&lt;name&gt;</span>]
-</span><span class='line'>          [-listPools [-stats] [<span class="nt">&lt;name&gt;</span>]]
-</span><span class='line'>          [-help <span class="nt">&lt;command-name&gt;</span>]
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>CacheAdmin主要对用户暴露的是对缓存数据/缓存池（在系统架构及原理进行详细解释）的增删改查功能，另外还提供了相关的缓存策略，供用户灵活使用。<br/>
-如这里期望能够缓存数据仓库中被频繁访问的user表数据：</p>
-
-<figure class='code'><figcaption><span>CacheAdmin CLI </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'>$HADOOP_HOME/bin/hdfs cacheadmin -addPool factPool -owner hadoop-user -group hadoop-user -mod 777 -limit 1024000000 -ttl 2d
-</span><span class='line'>$HADOOP_HOME/bin/hdfs cacheadmin -addDirective -path /user/hive/warehouse/dw.db/user -pool factPool -force -replication 3 -ttl 1d
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>首先新建名称为factPool的缓存池，并赋予相关的用户组及权限等信息，另外限制该缓存池可以缓存的最大空间及缓存数据的最大TTL等；<br/>
-然后将user表数据加入到缓存池factPool进行缓存，并指定缓存时间为1天，缓存3个副本；<br/>
-之后当有读user表数据的请求过来后即可调度到缓存节点上从内存直接读取，从而提升读性能。其它CLI的用法可类比这里不再一一罗列。</p>
-
-<h3>2.3 适用场景</h3>
-
-<p>当前内存相比HDD成本还比较高，另外对于Hadoop集群，节点的内存大部分是分配给YARN供计算使用，所以剩余的内存资源其实非常有限，能够提供给HDFS集中式缓存使用的部分更少，为了使有限的资源发挥出最好的效率，这里提供几点建议：<br/>
-（1）数据仓库中存在一部分事实表被频繁访问，与其他事实表/维度表JOIN，将访问频率较高的部分事实表进行缓存，可以提高数据生产的效率；<br/>
-（2）根据局部性原理，最近写入的数据最容易被访问到，从数据仓库应用来看，每天有大量报表统计任务，需要读取前一天数据做分析，事实上大量表都是按天进行分区，可以把符合要求的热点分区数据做缓存处理，过期后清理缓存，也能大幅提升生产和统计效率；<br/>
-（3）资源数据，当前存在非常多的计算框架依赖JAR/SO等一些公共资源，传统的做法是将这些资源数据写入到HDFS，通过Distributed Cache进行全局共享，也便于管理，如Spark/Tez/Hive/Kafaka等使用到的公共JAR包。如果将这部分资源数据进行长期缓存，可以优化JVM初始化时间，进而提升效率；<br/>
-（4）其他；</p>
-
-<h2>三、系统架构及原理</h2>
-
-<h3>3.1 架构</h3>
-
-<p>设计文档中定义集中式缓存机制（Centralized cache management）：</p>
-
-<blockquote><p>An explicit caching mechanism that allows users to specify paths to be cached by HDFS.</p></blockquote>
-
-<p>其中包含了若干具体的目标：</p>
-
-<blockquote><p>Strong semantics for cached paths<br/>
-Exposing cache state to framework schedulers<br/>
-Defer cache policy decisions to higher­ level frameworks<br/>
-Backwards compatibility<br/>
-Management, debugging, metrics<br/>
-Security<br/>
-Quotas</p></blockquote>
-
-<p>为了实现上述目标，首先引入两个重要的概念：CacheDirective，CachePool。其中CacheDirective定义了缓存基本单元，本质上是文件系统的目录或文件与具体缓存策略等属性的集合；为了便于灵活管理，将属性类似的一组CacheDirective组成缓存池（CachePool），在缓存池CachePool上可以进行权限、Quota、缓存策略和统计信息等灵活控制。<br/>
-在具体展开集中式缓存的系统架构和原理前，首先梳理对CacheDirective缓存的详细流程，具体如图1：<br/>
-（1）用户通过调用客户端接口向NameNode发起对CacheDirective（Directory/File）缓存请求；<br/>
-（2）NameNode接收到缓存请求后，将CacheDirective转换成需要缓存的Block集合，并根据一定的策略并将其加入到缓存队列中；<br/>
-（3）NameNode接收到DataNode心跳后，将缓存Block的指令下发到DataNode；<br/>
-（4）DataNode接收到NameNode发下的缓存指令后根据实际情况触发Native JNI进行系统调用，对Block数据进行实际缓存；<br/>
-（5）此后DataNode定期（默认10s）向NameNode进行缓存汇报，更新当前节点的缓存状态；<br/>
-（6）上层调度尽可能将任务调度到数据所在的DataNode，当客户端进行读数据请求时，通过DFSClient直接从内存进行ZeroCopy，从而显著提升性能；</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/cache/cache.png" alt="HDFS集中式缓存管理流程图" align="center"><br />
-<label class=“pic_title” align="center">图1 HDFS集中式缓存管理流程图</label>
-</div>
-
-
-<p>HDFS集中式缓存的架构如图2所示，这里主要涉及到NameNode和DataNode两侧的管理和实现，NameNode对数据缓存的统一集中管理，并根据策略调度合适的DataNode对具体的数据进行数据的缓存和置换，DataNode根据NameNode的指令执行对数据的实际缓存和置换。</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/cache/cachearc.png" alt="HDFS集中式缓存架构图" align="center"><br />
-<label class=“pic_title” align="center">图2 HDFS集中式缓存架构图</label>
-</div>
-
-
-<h3>3.2 DataNode</h3>
-
-<p>DataNode是执行缓存和置换的具体执行者，具体来说即cacheBlock和uncacheBlock调用。FsDatasetImpl#FsDatasetCache类是该操作的执行入口。</p>
-
-<blockquote><p>Manages caching for an FsDatasetImpl by using the mmap(2) and mlock(2) system calls to lock blocks into memory. Block checksums are verified upon entry into the cache.</p></blockquote>
-
-<p>FsDatasetCache的核心是称为mappableBlockMap的HashMap，用于维护当前缓存的Block集合，其中Key为标记该Block的ExtendedBlockId，为了能够实现与Federation的兼容，在blockid的基础上增加了blockpoolid，这样多个blockpool的block不会因为blockid相同产生冲突；Value是具体的缓存数据及当前的缓存状态。</p>
-
-<figure class='code'><figcaption><span>FsDatasetCache#mappableBlockMap </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">private</span> <span class="kd">final</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">ExtendedBlockId</span><span class="o">,</span> <span class="n">Value</span><span class="o">&gt;</span> <span class="n">mappableBlockMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">ExtendedBlockId</span><span class="o">,</span> <span class="n">Value</span><span class="o">&gt;();</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
-
-<p>mappableBlockMap更新只有FsdatasetCache提供的两个具体的函数入口：</p>
-
-<figure class='code'><figcaption><span>FsDatasetCache.java </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">synchronized</span> <span class="kt">void</span> <span class="nf">cacheBlock</span><span class="o">(</span><span class="kt">long</span> <span class="n">blockId</span><span class="o">,</span> <span class="n">String</span> <span class="n">bpid</span><span class="o">,</span> <span class="n">String</span> <span class="n">blockFileName</span><span class="o">,</span> <span class="kt">long</span> <span class="n">length</span><span class="o">,</span> <span class="kt">long</span> <span class="n">genstamp</span><span class="o">,</span> <span class="n">Executor</span> <span class="n">volumeExecutor</span><span class="o">)</span>
-</span><span class='line'><span class="kd">synchronized</span> <span class="kt">void</span> <span class="nf">uncacheBlock</span><span class="o">(</span><span class="n">String</span> <span class="n">bpid</span><span class="o">,</span> <span class="kt">long</span> <span class="n">blockId</span><span class="o">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
-
-<p>可以看出，对mappableBlockMap的并发控制实际上放在了cacheBlock和uncacheBlock两个方法上，虽然锁粒度比较大，但是并不会对并发读写带来影响。原因是：cacheBlock在系统调用前构造空Value结构加入mappableBlockMap中，此时该Value维护的Block状态是CACHING，之后将真正缓存数据的任务加入异步任务CachingTask去完成，所以锁很快会被释放，当处于CACHING状态的Block被访问的时候会退化到从HDD访问，异步任务CachingTask完成数据缓存后将其状态置为CACHED；uncacheBlock是同样原理。所以，虽然锁的粒度比较大，但是并不会阻塞后续的数据缓存任务，也不会对数据读写带来额外的开销。</p>
-
-<p>顺着自底向上的思路，再来看触发cacheBlock和uncacheBlock的场景，通过函数调用关系容易看到缓存和置换的触发场景都比较简单。<br/>
-（1）cacheBlock：唯一的入口是从ANN（HA Active NameNode）下发的指令；</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/cache/cacheblockinvoke.png" align="center"><br />
-<label class=“pic_title” align="center"></label>
-</div>
-
-
-<p>（2）uncacheBlock：与cacheBlock不同，uncacheBlock存在三个入口：append，invalidate和uncache。其中uncache也是来自ANN下发的指令；append和invalidate触发uncacheBlock的原因是：append会导致数据发生变化，缓存失效需要清理后重新缓存，invalidate来自删除操作，缓存同样失效需要清理。</p>
-
-<div class=“pic” align="center" padding=“0”>
-<img src="/images/cache/uncacheblockinvoke.png" align="center"><br />
-<label class=“pic_title” align="center"></label>
-</div>
-
-
-<p>DataNode的处理逻辑比较简单，到这里整个实现的主路径基本梳理完成。</p>
-
-<h3>3.3 NameNode</h3>
-
-<p>相比DataNode的实现逻辑，NameNode侧要复杂的多，缓存管理继承了NameNode一贯的模块化思路，通过CacheManager实现了整个集中式缓存在管理端的复杂处理逻辑。<br/>
-CacheManager通过几个关键数据结构组织对数据缓存的实现。</p>
-
-<figure class='code'><figcaption><span>CacheManager.java</span><a href='https://github.com/apache/hadoop/blob/trunk/hadoop-hdfs-project/hadoop-hdfs/src/main/java/org/apache/hadoop/hdfs/server/namenode/CacheManager.java#L119'>github</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * Cache directives, sorted by ID.</span>
-</span><span class='line'><span class="cm"> */</span>
-</span><span class='line'><span class="kd">private</span> <span class="kd">final</span> <span class="n">TreeMap</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">,</span> <span class="n">CacheDirective</span><span class="o">&gt;</span> <span class="n">directivesById</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TreeMap</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">,</span> <span class="n">CacheDirective</span><span class="o">&gt;();</span>
-</span><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * Cache directives, sorted by path</span>
-</span><span class='line'><span class="cm"> */</span>
-</span><span class='line'><span class="kd">private</span> <span class="kd">final</span> <span class="n">TreeMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">CacheDirective</span><span class="o">&gt;&gt;</span> <span class="n">directivesByPath</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TreeMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">CacheDirective</span><span class="o">&gt;&gt;();</span>
-</span><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * Cache pools, sorted by name.</span>
-</span><span class='line'><span class="cm"> */</span>
-</span><span class='line'><span class="kd">private</span> <span class="kd">final</span> <span class="n">TreeMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">CachePool</span><span class="o">&gt;</span> <span class="n">cachePools</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TreeMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">CachePool</span><span class="o">&gt;();</span>
-</span><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * All cached blocks.</span>
-</span><span class='line'><span class="cm"> */</span>
-</span><span class='line'><span class="kd">private</span> <span class="kd">final</span> <span class="n">GSet</span><span class="o">&lt;</span><span class="n">CachedBlock</span><span class="o">,</span> <span class="n">CachedBlock</span><span class="o">&gt;</span> <span class="n">cachedBlocks</span><span class="o">;</span>
-</span><span class='line'><span class="kd">private</span> <span class="n">CacheReplicationMonitor</span> <span class="n">monitor</span><span class="o">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
-
-<p>通过上述的几个核心集合类数据结构，很容易实现用户层对缓存数据/缓存池的增删改查功能调用的支持。</p>
-
-<p>虽然上述的几个核心集合类数据结构能够容易支持用户对相关接口的调用，但是从整个集中式缓存全局来看，并没有将用户调用接口对目录/文件的缓存同DataNode实际数据缓存建立起有效连接。CacheReplicationMonitor发挥的即是这种作用，CacheReplicationMonitor使得缓存接口调用、核心数据结构以及数据缓存真正有序流动起来。</p>
-
-<p>如果对BlockManager#ReplicationMonitor比较熟悉的话，可以发现CacheReplicationMonitor的工作模式几乎从ReplicationMonitor复制而来，CacheReplicationMonitor本质上也是一个定时线程，与ReplicationMonitor稍微不同的是，CacheReplicationMonitor除了定时触发外用户的缓存调用也会触发。其核心是其rescan方法，具体来看主要做三个具体工作：<br/>
-（1）resetStatistics：对CacheManager从CacheDirective和CachePool两个维度对统计信息进行更新；<br/>
-（2）rescanCacheDirectives：顺序扫描CacheManager#directivesById数据结构（与CacheManager#directivesByPath实际上等价），检查哪些CacheDirective（目录或文件）需要进行cache处理，一旦发现有文件需要进行缓存，立即将该文件的所有Block加入到CacheReplicationMonitor#cachedBlocks（GSet&lt;CachedBlock, CachedBlock> cachedBlocks）中，后续工作由rescanCachedBlockMap接着进行；<br/>
-（3）rescanCachedBlockMap：顺序扫描CacheReplicationMonitor#cachedBlocks的所有CacheBlock，由于CacheBlock也有副本个数的概念，rescanCachedBlockMap在扫描的过程中会发现实际缓存的Block副本数与预设的缓存副本有差异，比如新增缓存请求/节点宕机/心跳异常/节点下线等等导致Cache Block副本数与期望值之间产生差异，所以需要CacheReplicationMonitor进行周期检查和修复，根据差异多少关系将对应的CacheBlock加入到DatanodeManager管理的对应DatanodeDescriptor#{pendingCached,pendingUncached}数据结构中，待对应的DataNode心跳过来后将其转化成对应的执行指令下发给DataNode实际执行。关于心跳与指令下发的细节已经在之前文章中多处提到，这里不再展开。</p>
-
-<p>这里还遗留一个问题，由于Block与CacheBlock均存在多副本的关系，如何选择具体的DataNode执行缓存或置换。<br/>
-（1）uncacheBlock：uncacheBlock选择对应的DataNode其实比较简单，顺序遍历所有已经缓存了该Block的DataNode，为其准备uncacheBlock指令，直到缓存副本达到预期即可；<br/>
-（2）cacheBlock：cacheBlock稍微复杂，先从Block副本所在的所有DataNode集合中排除DecommissionInProgress/Decommissioned/CorruptBlock所在DataNode/已经缓存了该Block的DataNode之后，在剩下的DataNode集合中随机进行选择即可。</p>
-
-<p>DataNode实际执行完成NameNode下发的cacheBlock/uncacheBlock指令后，在下次cacheReport（默认时间间隔10s）汇报给NameNode，CacheManager根据汇报情况对缓存执行情况对CacheManager#cachedBlocks进行更新。</p>
-
-<p>至此，NameNode端的集中式缓存逻辑形成了合理有效的闭环，基本实现了设计目标。</p>
-
-<h3>3.3 DFSClient</h3>
-
-<p>客户端本身的读数据逻辑基本没有变化，与传统的读模式区别在于，当客户端向DataNode发出REQUEST_SHORT_CIRCUIT_FDS请求到达DataNode后，DataNode会首先判断数据是否被缓存，如果数据已经缓存，将缓存信息返回到客户端后续直接进行内存数据的ZeroCopy；如果数据没有缓存采用传统方式进行ShortCircuit-Read。</p>
-
-<h2>四、总结</h2>
-
-<p>通过前述分析，可以看到HDFS集中式缓存优势非常明显：<br/>
-1、显著提升数据读性能；<br/>
-2、提升集群内存利用率；</p>
-
-<p>虽然优势明显，但是HDFS集中式缓存目前还有一些不足：<br/>
-1、内存置换策略（LRU/LFU/etc.）尚不支持，如果内存资源不足，缓存会失败；<br/>
-2、集中式缓存与Balancer之间还不能很好的兼容，大量的Block迁移会造成频繁内存数据交换；<br/>
-3、缓存能力仅对读有效，对写来说其实存在副作用，尤其是Append；<br/>
-4、与Federation的兼容非常不友好；</p>
-
-<p>总之，内存模式在存储和计算的多个方向上已经成为业界广泛关注的方向和趋势，Hadoop社区也在投入精力持续在内存上发力，从集中式缓存来看，收益非常明显，但是还存在一些小问题，在实际应用过程中还需要优化和改进。</p>
-
-<h2>五、引用</h2>
-
-<p>[1] <a href="https://issues.apache.org/jira/browse/HDFS-4949">https://issues.apache.org/jira/browse/HDFS-4949</a><br/>
-[2] <a href="http://hadoop.apache.org/docs/r2.7.1/hadoop-project-dist/hadoop-hdfs/CentralizedCacheManagement.html">http://hadoop.apache.org/docs/r2.7.1/hadoop-project-dist/hadoop-hdfs/CentralizedCacheManagement.html</a><br/>
-[3] <a href="https://issues.apache.org/jira/secure/attachment/12610186/caching-design-doc-2013-10-24.pdf">https://issues.apache.org/jira/secure/attachment/12610186/caching-design-doc-2013-10-24.pdf</a><br/>
-[4] <a href="https://en.wikipedia.org/wiki/Zero-copy">https://en.wikipedia.org/wiki/Zero-copy</a><br/>
-[5] <a href="https://en.wikipedia.org/wiki/Mmap">https://en.wikipedia.org/wiki/Mmap</a><br/>
-[6] <a href="https://issues.apache.org/jira/browse/HDFS-347">https://issues.apache.org/jira/browse/HDFS-347</a><br/>
-[7] <a href="https://issues.apache.org/jira/browse/HDFS-2246">https://issues.apache.org/jira/browse/HDFS-2246</a></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -3339,6 +3246,10 @@ CacheManager通过几个关键数据结构组织对数据缓存的实现。</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2021/02/27/namenode-fsimage-loading-optimization/">NameNode FSImage加载优化</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2019/04/26/discussion-on-the-optimization-of-hdfs-global-lock-mechanism/">HDFS锁机制优化方向讨论</a>
       </li>
     
@@ -3352,10 +3263,6 @@ CacheManager通过几个关键数据结构组织对数据缓存的实现。</p>
     
       <li class="post">
         <a href="/blog/2018/03/30/the-analysis-of-basic-principle-of-hdfs-ha-using-qjm/">HDFS HA Using QJM原理解析</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/02/12/namenode-restart-optimization/">HDFS NameNode重启优化</a>
       </li>
     
   </ul>
@@ -3396,7 +3303,7 @@ CacheManager通过几个关键数据结构组织对数据缓存的实现。</p>
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2019 - Hexiaoqiao -
+  Copyright &copy; 2021 - Hexiaoqiao -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
