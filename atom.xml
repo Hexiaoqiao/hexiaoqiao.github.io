@@ -4,7 +4,7 @@
   <title><![CDATA[Hexiaoqiao]]></title>
   <link href="http://hexiaoqiao.github.io/atom.xml" rel="self"/>
   <link href="http://hexiaoqiao.github.io/"/>
-  <updated>2021-02-28T15:42:35+08:00</updated>
+  <updated>2021-03-03T11:06:19+08:00</updated>
   <id>http://hexiaoqiao.github.io/</id>
   <author>
     <name><![CDATA[Hexiaoqiao]]></name>
@@ -264,7 +264,7 @@ FSImage大小：~30GB</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>社区在优化和解决FSImage加载问题的讨论持续了较长时间，其中比较典型的解决方案还有如<a href="https://issues.apache.org/jira/browse/HDFS-7784">HDFS-7784</a>和<a href="https://issues.apache.org/jira/browse/HDFS-13700">HDFS-13700</a>等，这些解决方案虽然没有最终合入主干代码，但是都提供了非常不错的想法。综合考虑性能、稳定性和兼容能力，HDFS-14167优势明显，另外从实践效果上看HDFS-14167也有较好的表现。如果集群规模和元数据规模较大，且重启加载FSImage阶段耗时严重，并行加载特性值得一试。</p>
+<p>社区在优化和解决FSImage加载问题的讨论持续了较长时间，其中比较典型的解决方案还有如<a href="https://issues.apache.org/jira/browse/HDFS-7784">HDFS-7784</a>和<a href="https://issues.apache.org/jira/browse/HDFS-13700">HDFS-13700</a>等，这些解决方案虽然没有最终合入主干代码，但是都提供了非常不错的想法。综合考虑性能、稳定性和兼容能力，HDFS-14617优势明显，另外从实践效果上看HDFS-14617也有较好的表现。如果集群规模和元数据规模较大，且重启加载FSImage阶段耗时严重，并行加载特性值得一试。</p>
 
 <h2>六、参考</h2>
 
